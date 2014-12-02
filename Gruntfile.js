@@ -3,11 +3,12 @@ module.exports = function (grunt) {
       '<%= grunt.template.today("yyyy-mm-dd") %> \n' +
       ' *  License: <%= pkg.license %> \n' +
       ' * Author: <%= pkg.author %> \n*/\n';
-  var name = '<%= pkg.name %>-v<%= pkg.version%>';
-  var devRelease = 'dist/'+name+'.js';
-  var minRelease = 'dist/'+name+'.min.js';
 
-  var srcFiles = ['src/config.js', 'src/h54s.js', 'src/methods.js'];
+  var name        = '<%= pkg.name %>-v<%= pkg.version%>';
+  var devRelease  = 'dist/'+name+'.js';
+  var minRelease  = 'dist/'+name+'.min.js';
+
+  var srcFiles    = ['src/helpers.js', 'src/h54s.js', 'src/methods.js'];
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -62,7 +63,9 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-karma');
+
   grunt.registerTask('default', ['jshint', 'concat', 'karma:run']);
   grunt.registerTask('compress', 'uglify');
-  grunt.registerTask('test', 'karma:run');
+  grunt.registerTask('test', ['jshint', 'karma:run']);
+  grunt.registerTask('watch', 'karma:dev');
 };
