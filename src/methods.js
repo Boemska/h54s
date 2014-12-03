@@ -20,11 +20,13 @@ h54s.prototype.call = function(sasProgram, callback) {
     myprogram = this.metaProgram;
   }
 
-  ajax.post(this.url, {
+  var params = {
     _program: sasProgram,
     _debug: this.debug ? 1 : 0,
     _service: this.sasService,
-  }).success(function(res) {
+  };
+
+  ajax.post(this.url, params).success(function(res) {
     if(/<form.+action="Logon.do".+/.test(res.responseText) && self.autoLogin) {
       self.logIn(function(status) {
         if(status === 200) {

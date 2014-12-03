@@ -58,7 +58,7 @@ describe('h54s', function() {
 
     it('Try to log in with credentials and callback', function(done) {
       this.timeout(4000);
-      sasAdapter = new h54s({
+      var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
       sasAdapter.logIn(serverData.user, serverData.pass, function(status) {
@@ -69,7 +69,7 @@ describe('h54s', function() {
 
     it('Try to log in with only callback', function(done) {
       this.timeout(4000);
-      sasAdapter = new h54s({
+      var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
       sasAdapter.setCredentials(serverData.user, serverData.pass);
@@ -80,7 +80,7 @@ describe('h54s', function() {
     });
 
     it('Call sas program without logging in', function(done) {
-      sasAdapter = new h54s({
+      var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
       //logout because we are already logged in in previeous tests
@@ -96,7 +96,7 @@ describe('h54s', function() {
 
     it('Test auto login', function(done) {
       this.timeout(6000);
-      sasAdapter = new h54s({
+      var sasAdapter = new h54s({
         hostUrl: serverData.url,
         autoLogin: true,
         user: serverData.user,
