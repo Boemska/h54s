@@ -36,7 +36,17 @@ h54s.prototype.call = function(sasProgram, callback) {
     } else if(/<form.+action="Logon.do".+/.test(res.responseText) && !self.autoLogin) {
       callback(callback(new Error('You are not logged in')));
     } else {
-      callback(undefined, res);
+      if(!self.debug) {
+        try {
+          var resObj = JSON.parse(res.responseText);
+          callback(undefined, resObj);
+        } catch(e) {
+          //TODO: ajax call retry
+          callback(new Error('Unable to parse response json'));
+        }
+      } else {
+        //TODO: find and parse json
+      }
     }
   }).error(function(res) {
     callback(res);

@@ -88,9 +88,7 @@ describe('h54s', function() {
         assert.equal(200, res.status, 'Log out is not successful');
         sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/startupService', function(err, res) {
           assert.equal(err.message, 'You are not logged in', 'Should throw error because user is not logged in');
-          expect(function() {
-            JSON.parse(res.responseText);
-          }).to.throw(Error);
+          assert.isUndefined(res, 'We got error, res should be undefined');
           done();
         });
       });
@@ -109,14 +107,14 @@ describe('h54s', function() {
         assert.equal(200, res.status, 'Log out is not successful');
         sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/startupService', function(err, res) {
           assert.isUndefined(err, 'We got error on sas program ajax call');
-          expect(function() {
-            JSON.parse(res.responseText);
-          }).not.to.throw(Error);
+          assert.isObject(res, 'We expected object to be returned by call method');
           done();
         });
       });
     });
 
+
+    //TODO: write tests for ajax retry
 
   });
 });
