@@ -43,7 +43,7 @@ h54s.prototype.call = function(sasProgram, callback) {
         }
       });
     } else if(/<form.+action="Logon.do".+/.test(res.responseText) && !self.autoLogin) {
-      callback(callback(new Error('You are not logged in')));
+      callback(new Error('You are not logged in'));
     } else {
       if(!self.debug) {
         try {
