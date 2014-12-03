@@ -113,8 +113,18 @@ describe('h54s', function() {
       });
     });
 
+    it('Test retry', function(done) {
+      this.timeout(10000);
+      var sasAdapter = new h54s({
+        hostUrl: 'http://example.com',
+        url: '/'
+      });
+      sasAdapter.call('filePath', function(err, res) {
+        assert.equal('Unable to parse response json', err.message, 'We should get json parsing error');
+        done();
+      });
+    });
 
-    //TODO: write tests for ajax retry
 
   });
 });

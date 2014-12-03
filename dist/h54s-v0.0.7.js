@@ -1,4 +1,4 @@
-/*! h54s v0.0.6 - 2014-12-02 
+/*! h54s v0.0.7 - 2014-12-03 
  *  License: GPL 
  * Author: Boemska 
 */
@@ -106,6 +106,7 @@ h54s = function(config) {
 h54s.prototype.call = function(sasProgram, callback) {
   var self = this;
   var callArgs = arguments;
+  var retryCount = 0;
   if (!callback && typeof callback !== 'function'){
     throw new Error('You must provide callback');
   }
@@ -124,11 +125,13 @@ h54s.prototype.call = function(sasProgram, callback) {
     myprogram = this.metaProgram;
   }
 
-  ajax.post(this.url, {
+  var params = {
     _program: sasProgram,
     _debug: this.debug ? 1 : 0,
     _service: this.sasService,
-  }).success(function(res) {
+  };
+
+  ajax.post(this.url, params).success(function(res) {
     if(/<form.+action="Logon.do".+/.test(res.responseText) && self.autoLogin) {
       self.logIn(function(status) {
         if(status === 200) {
@@ -140,10 +143,25 @@ h54s.prototype.call = function(sasProgram, callback) {
     } else if(/<form.+action="Logon.do".+/.test(res.responseText) && !self.autoLogin) {
       callback(callback(new Error('You are not logged in')));
     } else {
-      callback(undefined, res);
+      if(!self.debug) {
+        try {
+          var resObj = JSON.parse(res.responseText);
+          callback(undefined, resObj);
+        } catch(e) {
+          if(retryCount < self.counters.maxXhrRetries) {
+            ajax.post(self.url, params).success(this.success).error(this.error);
+            retryCount++;
+            console.log("Retrying #" + retryCount);
+          } else {
+            callback(new Error('Unable to parse response json'));
+          }
+        }
+      } else {
+        //TODO: find and parse json
+      }
     }
   }).error(function(res) {
-    callback(res);
+    callback(new Error(res.statusText));
   });
 };
 

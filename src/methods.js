@@ -2,6 +2,7 @@
 h54s.prototype.call = function(sasProgram, callback) {
   var self = this;
   var callArgs = arguments;
+  var retryCount = 0;
   if (!callback && typeof callback !== 'function'){
     throw new Error('You must provide callback');
   }
@@ -43,15 +44,20 @@ h54s.prototype.call = function(sasProgram, callback) {
           var resObj = JSON.parse(res.responseText);
           callback(undefined, resObj);
         } catch(e) {
-          //TODO: ajax call retry
-          callback(new Error('Unable to parse response json'));
+          if(retryCount < self.counters.maxXhrRetries) {
+            ajax.post(self.url, params).success(this.success).error(this.error);
+            retryCount++;
+            console.log("Retrying #" + retryCount);
+          } else {
+            callback(new Error('Unable to parse response json'));
+          }
         }
       } else {
         //TODO: find and parse json
       }
     }
   }).error(function(res) {
-    callback(res);
+    callback(new Error(res.statusText));
   });
 };
 
