@@ -1,3 +1,10 @@
+/*
+* Represents html5 for sas adapter
+* @constructor
+*
+*@param {object} config - adapter config object, with keys like url, debug, sasService, etc.
+*
+*/
 h54s = function(config) {
 
   this.systemtype = "SAS";

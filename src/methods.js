@@ -1,4 +1,10 @@
-/*global h54s*/
+/*
+* Call Sas program
+*
+* @param {string} sasProgram - Path of the sas program
+* @param {function} callback - Callback function called when ajax call is finished
+*
+*/
 h54s.prototype.call = function(sasProgram, callback) {
   var self = this;
   var callArgs = arguments;
@@ -61,6 +67,14 @@ h54s.prototype.call = function(sasProgram, callback) {
   });
 };
 
+
+/*
+* Set credentials
+*
+* @param {string} user - Login username
+* @param {string} pass - Login password
+*
+*/
 h54s.prototype.setCredentials = function(user, pass) {
   if(!user || !pass) {
     throw new Error('Missing credentials');
@@ -69,6 +83,18 @@ h54s.prototype.setCredentials = function(user, pass) {
   this.pass = pass;
 };
 
+/*
+* Login method
+*
+* @param {string} user - Login username
+* @param {string} pass - Login password
+* @param {function} callback - Callback function called when ajax call is finished
+*
+* OR
+*
+* @param {function} callback - Callback function called when ajax call is finished
+*
+*/
 h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
   var callback;
   if((!this.user && !arguments[0]) || (!this.pass && !arguments[1])) {
@@ -107,5 +133,3 @@ h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
     callCallback(res.status);
   });
 };
-
-
