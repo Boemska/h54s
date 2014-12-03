@@ -34,7 +34,7 @@ describe('h54s', function() {
     it('Try to log in on wrong url without credentials', function(done) {
       var sasAdapter = new h54s();
       expect(function() {
-        sasAdapter.logIn();
+        sasAdapter.login();
       }).to.throw(Error);
       done();
     });
@@ -42,7 +42,7 @@ describe('h54s', function() {
     it('Try to log in on wrong url with only callback', function(done) {
       var sasAdapter = new h54s();
       sasAdapter.setCredentials('username', 'pass');
-      sasAdapter.logIn(function(status) {
+      sasAdapter.login(function(status) {
         assert.equal(404, status, "We got wrong status code");
         done();
       });
@@ -50,7 +50,7 @@ describe('h54s', function() {
 
     it('Try to log in on wrong url with credentials and callback', function(done) {
       var sasAdapter = new h54s();
-      sasAdapter.logIn('username', 'pass', function(status) {
+      sasAdapter.login('username', 'pass', function(status) {
         assert.equal(404, status, "We got wrong status code");
         done();
       });
@@ -61,7 +61,7 @@ describe('h54s', function() {
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
-      sasAdapter.logIn(serverData.user, serverData.pass, function(status) {
+      sasAdapter.login(serverData.user, serverData.pass, function(status) {
         assert.equal(200, status, "We got wrong status code");
         done();
       });
@@ -73,7 +73,7 @@ describe('h54s', function() {
         hostUrl: serverData.url
       });
       sasAdapter.setCredentials(serverData.user, serverData.pass);
-      sasAdapter.logIn(function(status) {
+      sasAdapter.login(function(status) {
         assert.equal(200, status, "We got wrong status code");
         done();
       });
@@ -125,6 +125,16 @@ describe('h54s', function() {
       });
     });
 
+    it('Log in with wrong credentials', function(done) {
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url
+      });
+      sasAdapter.setCredentials('username', 'pass');
+      sasAdapter.login(function(status) {
+        assert.equal(-1, status, "We got wrong status code");
+        done();
+      });
+    });
 
   });
 });

@@ -29,7 +29,7 @@ h54s.prototype.call = function(sasProgram, callback) {
 
   ajax.post(this.url, params).success(function(res) {
     if(/<form.+action="Logon.do".+/.test(res.responseText) && self.autoLogin) {
-      self.logIn(function(status) {
+      self.login(function(status) {
         if(status === 200) {
           self.call.apply(self, callArgs);
         } else {
@@ -69,7 +69,7 @@ h54s.prototype.setCredentials = function(user, pass) {
   this.pass = pass;
 };
 
-h54s.prototype.logIn = function(/* (user, pass, callback) | callback */) {
+h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
   var callback;
   if((!this.user && !arguments[0]) || (!this.pass && !arguments[1])) {
     throw new Error('Credentials not set');
@@ -98,7 +98,11 @@ h54s.prototype.logIn = function(/* (user, pass, callback) | callback */) {
     ux: this.user,
     px: this.pass,
   }).success(function(res) {
-    callCallback(res.status);
+    if(/<form.+action="Logon.do".+/.test(res.responseText)) {
+      callCallback(-1);
+    } else {
+      callCallback(res.status);
+    }
   }).error(function(res) {
     callCallback(res.status);
   });
