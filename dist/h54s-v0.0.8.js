@@ -1,3 +1,121 @@
+/*! h54s v0.0.8 - 2014-12-04 
+ *  License: GPL 
+ * Author: Boemska 
+*/
+var ajax = (function () {
+  var xhr = function(type, url, data) {
+    var methods = {
+      success: function() {},
+      error: function() {}
+    };
+    var XHR     = XMLHttpRequest || ActiveXObject;
+    var request = new XHR('MSXML2.XMLHTTP.3.0');
+
+    request.open(type, url, true);
+    request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    request.onreadystatechange = function () {
+      if (request.readyState === 4) {
+        if (request.status >= 200 && request.status < 300) {
+          methods.success.call(methods, request);
+        } else {
+          methods.error.call(methods, request);
+        }
+      }
+    };
+
+    request.send(data);
+
+    return {
+      success: function (callback) {
+        methods.success = callback;
+        return this;
+      },
+      error: function (callback) {
+        methods.error = callback;
+        return this;
+      }
+    };
+  };
+
+  var serialize = function(obj) {
+    var str = [];
+    for(var p in obj)
+      if (obj.hasOwnProperty(p)) {
+        if(obj[p] instanceof Array) {
+          for(var i = 0, n = obj[p].length; i < n; i++) {
+            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p][i]));
+          }
+        } else {
+          str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+        }
+      }
+    return str.join("&");
+  };
+
+  return {
+    get: function(url, data) {
+      var dataStr;
+      if(typeof data === 'object') {
+        dataStr = serialize(data);
+      }
+      var urlWithParams = dataStr ? (url + '?' + dataStr) : '';
+      return xhr('GET', urlWithParams);
+    },
+    post: function(url, data) {
+      var dataStr;
+      if(typeof data === 'object') {
+        dataStr = serialize(data);
+      }
+      return xhr('POST', url, dataStr);
+    }
+  };
+})();
+
+/*
+* Represents html5 for sas adapter
+* @constructor
+*
+*@param {object} config - adapter config object, with keys like url, debug, sasService, etc.
+*
+*/
+h54s = function(config) {
+
+  this.systemtype = "SAS";
+  this.counters   =  {
+    maxXhrRetries: 5, // this is the number of times that xhrs retry before failing
+    finishedXhrCount: 0, // leave as 0
+    totalXhrCount: 0 // leave as 0
+  };
+  this.sasService = 'default';
+  this.url        = "/SASStoredProcess/do";
+  this.debug      = false;
+  this.loginUrl   = '/SASLogon/Logon.do';
+  this.sasParams  = [];
+
+
+  if(!config) {
+    return;
+  }
+
+  //merge config argument config
+  for(var key in config) {
+    if((key === 'url' || key === 'loginUrl') && config[key].charAt(0) !== '/') {
+      config[key] = '/' + config[key];
+    }
+    this[key] = config[key];
+  }
+
+  //if server is remote use the full server url
+  //NOTE: this is not permited by the same-origin policy
+  if(config.hostUrl) {
+    if(config.hostUrl.charAt(config.hostUrl.length - 1) === '/') {
+      config.hostUrl = config.hostUrl.slice(0, -1);
+    }
+    this.hostUrl  = config.hostUrl;
+    this.url      = config.hostUrl + this.url;
+  }
+};
+
 /*
 * Call Sas program
 *

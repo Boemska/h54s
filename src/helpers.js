@@ -37,7 +37,13 @@ var ajax = (function () {
     var str = [];
     for(var p in obj)
       if (obj.hasOwnProperty(p)) {
-        str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+        if(obj[p] instanceof Array) {
+          for(var i = 0, n = obj[p].length; i < n; i++) {
+            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p][i]));
+          }
+        } else {
+          str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+        }
       }
     return str.join("&");
   };
