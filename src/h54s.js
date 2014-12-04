@@ -40,5 +40,6 @@ h54s = function(config) {
     }
     this.hostUrl  = config.hostUrl;
     this.url      = config.hostUrl + this.url;
+    this.loginUrl = config.hostUrl + this.loginUrl;
   }
 };

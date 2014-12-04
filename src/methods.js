@@ -105,7 +105,7 @@ h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
     throw new Error('Credentials not set');
   }
   if(typeof arguments[0] === 'string' && typeof arguments[1] === 'string') {
-    this.setCredentials(this.user || arguments[0], this.pass || arguments[1]);
+    this.setCredentials(arguments[0], arguments[1]);
     callback = arguments[2];
   } else {
     callback = arguments[0];
@@ -116,10 +116,6 @@ h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
       callback(status);
     }
   };
-
-  if(this.hostUrl) {
-    this.loginUrl = this.hostUrl + this.loginUrl.slice();
-  }
 
   ajax.post(this.loginUrl, {
     _debug: this.debug ? 1 : 0,
