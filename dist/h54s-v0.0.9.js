@@ -1,4 +1,4 @@
-/*! h54s v0.0.8 - 2014-12-05 
+/*! h54s v0.0.9 - 2014-12-05 
  *  License: GPL 
  * Author: Boemska 
 */
@@ -48,6 +48,14 @@ h54s = function(config) {
   }
 };
 
+h54s.Error = function(type, message) {
+  Error.captureStackTrace(this);
+  this.message = message;
+  this.type = type;
+};
+
+h54s.Error.prototype = Object.create(Error.prototype);
+
 /*
 * Call Sas program
 *
@@ -60,13 +68,13 @@ h54s.prototype.call = function(sasProgram, callback) {
   var callArgs = arguments;
   var retryCount = 0;
   if (!callback && typeof callback !== 'function'){
-    throw new Error('You must provide callback');
+    throw new h54s.Error('argumentError', 'You must provide callback');
   }
   if(!sasProgram) {
-    throw new Error('You must provide Sas program file path');
+    throw new h54s.Error('argumentError', 'You must provide Sas program file path');
   }
   if(typeof sasProgram !== 'string') {
-    throw new Error('First parameter should be string');
+    throw new h54s.Error('argumentError', 'First parameter should be string');
   }
 
   // initialize dynamically generated xhr options first
@@ -93,11 +101,11 @@ h54s.prototype.call = function(sasProgram, callback) {
         if(status === 200) {
           self.call.apply(self, callArgs);
         } else {
-          callback(new Error('Unable to login'));
+          callback(new h54s.Error('loginError', 'Unable to login'));
         }
       });
     } else if(/<form.+action="Logon.do".+/.test(res.responseText) && !self.autoLogin) {
-      callback(new Error('You are not logged in'));
+      callback(new h54s.Error('notLoggedinError', 'You are not logged in'));
     } else {
       if(!self.debug) {
         try {
@@ -109,7 +117,7 @@ h54s.prototype.call = function(sasProgram, callback) {
             retryCount++;
             console.log("Retrying #" + retryCount);
           } else {
-            callback(new Error('Unable to parse response json'));
+            callback(new h54s.Error('parseError', 'Unable to parse response json'));
           }
         }
       } else {
@@ -117,7 +125,7 @@ h54s.prototype.call = function(sasProgram, callback) {
       }
     }
   }).error(function(res) {
-    callback(new Error(res.statusText));
+    callback(new h54s.Error(res.statusText));
   });
 };
 
@@ -131,7 +139,7 @@ h54s.prototype.call = function(sasProgram, callback) {
 */
 h54s.prototype.setCredentials = function(user, pass) {
   if(!user || !pass) {
-    throw new Error('Missing credentials');
+    throw new h54s.Error('credentialsError', 'Missing credentials');
   }
   this.user = user;
   this.pass = pass;
@@ -152,7 +160,7 @@ h54s.prototype.setCredentials = function(user, pass) {
 h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
   var callback;
   if((!this.user && !arguments[0]) || (!this.pass && !arguments[1])) {
-    throw new Error('Credentials not set');
+    throw new h54s.Error('credentialsError', 'Credentials not set');
   }
   if(typeof arguments[0] === 'string' && typeof arguments[1] === 'string') {
     this.setCredentials(arguments[0], arguments[1]);
@@ -204,7 +212,7 @@ h54s.prototype.addTable = function (inTable, macroName) {
     throw e;
   }
   if (typeof (macroName) !== 'string') {
-    throw new Error('Second parameter must be a valid string');
+    throw new h54s.Error('argumentError', 'Second parameter must be a valid string');
   }
   var tableArray = [];
   tableArray.push(JSON.stringify(result.spec));
@@ -295,12 +303,12 @@ h54s.prototype.utils.convertTableObject = function(inObject) {
   var chunkThreshold = 32000; // this goes to 32k for SAS
   // first check that the object is an array
   if (typeof (inObject) !== 'object') {
-    throw new Error('The parameter passed to checkAndGetTypeObject is not an object');
+    throw new h54s.Error('argumentError', 'The parameter passed to checkAndGetTypeObject is not an object');
   }
 
   var arrayLength = inObject.length;
   if (typeof (arrayLength) !== 'number') {
-    throw new Error('The parameter passed to checkAndGetTypeObject does not have a valid length and is most likely not an array');
+    throw new h54s.Error('argumentError', 'The parameter passed to checkAndGetTypeObject does not have a valid length and is most likely not an array');
   }
 
   var existingCols = {}; // this is just to make lookup easier rather than traversing array each time. Will transform after
@@ -383,7 +391,7 @@ h54s.prototype.utils.convertTableObject = function(inObject) {
         thisSpec.encodedLength;
 
       if (checkAndIncrement(thisSpec) == -1) {
-        throw new Error('There is a type mismatch in the array between elements (columns) of the same name.');
+        throw new h54s.Error('typeError', 'There is a type mismatch in the array between elements (columns) of the same name.');
       }
     }
     j++;

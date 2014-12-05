@@ -43,3 +43,11 @@ h54s = function(config) {
     this.loginUrl = config.hostUrl + this.loginUrl;
   }
 };
+
+h54s.Error = function(type, message) {
+  Error.captureStackTrace(this);
+  this.message = message;
+  this.type = type;
+};
+
+h54s.Error.prototype = Object.create(Error.prototype);

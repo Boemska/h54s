@@ -78,12 +78,12 @@ h54s.prototype.utils.convertTableObject = function(inObject) {
   var chunkThreshold = 32000; // this goes to 32k for SAS
   // first check that the object is an array
   if (typeof (inObject) !== 'object') {
-    throw new Error('The parameter passed to checkAndGetTypeObject is not an object');
+    throw new h54s.Error('argumentError', 'The parameter passed to checkAndGetTypeObject is not an object');
   }
 
   var arrayLength = inObject.length;
   if (typeof (arrayLength) !== 'number') {
-    throw new Error('The parameter passed to checkAndGetTypeObject does not have a valid length and is most likely not an array');
+    throw new h54s.Error('argumentError', 'The parameter passed to checkAndGetTypeObject does not have a valid length and is most likely not an array');
   }
 
   var existingCols = {}; // this is just to make lookup easier rather than traversing array each time. Will transform after
@@ -166,7 +166,7 @@ h54s.prototype.utils.convertTableObject = function(inObject) {
         thisSpec.encodedLength;
 
       if (checkAndIncrement(thisSpec) == -1) {
-        throw new Error('There is a type mismatch in the array between elements (columns) of the same name.');
+        throw new h54s.Error('typeError', 'There is a type mismatch in the array between elements (columns) of the same name.');
       }
     }
     j++;

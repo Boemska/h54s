@@ -54,6 +54,12 @@ module.exports = function (grunt) {
         singleRun: true
       },
     },
+    connect: {
+      angular: {
+        port: 1337,
+        combine: ['examples/angular', 'dist', 'test']
+      }
+    }
   });
 
   // Always show stack traces when Grunt prints out an uncaught exception.
@@ -63,9 +69,12 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('grunt-connect');
 
   grunt.registerTask('default', ['jshint', 'concat', 'karma:run']);
   grunt.registerTask('compress', 'uglify');
   grunt.registerTask('test', ['jshint', 'karma:run']);
   grunt.registerTask('watch', 'karma:dev');
+
+  grunt.registerTask('serveAngular', 'connect:angular');
 };
