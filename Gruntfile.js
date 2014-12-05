@@ -8,7 +8,7 @@ module.exports = function (grunt) {
   var devRelease  = 'dist/'+name+'.js';
   var minRelease  = 'dist/'+name+'.min.js';
 
-  var srcFiles    = ['src/helpers.js', 'src/h54s.js', 'src/methods.js'];
+  var srcFiles    = ['src/h54s.js', 'src/methods.js', 'src/utils.js'];
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
