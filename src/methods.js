@@ -101,6 +101,7 @@ h54s.prototype.setCredentials = function(user, pass) {
 */
 h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
   var callback;
+  var self = this;
   if((!this.user && !arguments[0]) || (!this.pass && !arguments[1])) {
     throw new h54s.Error('credentialsError', 'Credentials not set');
   }
@@ -127,6 +128,9 @@ h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
     if(/<form.+action="Logon.do".+/.test(res.responseText)) {
       callCallback(-1);
     } else {
+      //sas can ask for login again in 10 minutes if inactive
+      //with autoLogin = true it should login in call method
+      self.autoLogin = true;
       callCallback(res.status);
     }
   }).error(function(res) {

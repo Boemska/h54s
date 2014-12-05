@@ -181,5 +181,24 @@ describe('h54s', function() {
 
     });
 
+    it('Test login on call after first login and logout', function(done) {
+      this.timeout(10000);
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url
+      });
+
+      sasAdapter.login(serverData.user, serverData.pass, function(status) {
+        //logout and try to call sas program
+        sasAdapter.utils.ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
+          sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/startupService', function(err, res) {
+            assert.isUndefined(err, 'We got error on sas program ajax call');
+            assert.isObject(res, 'We expected object to be returned by call method');
+            done();
+          });
+        });
+      });
+
+    });
+
   });
 });
