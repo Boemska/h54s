@@ -1,76 +1,7 @@
-/*! h54s v0.0.8 - 2014-12-04 
+/*! h54s v0.0.8 - 2014-12-05 
  *  License: GPL 
  * Author: Boemska 
 */
-var ajax = (function () {
-  var xhr = function(type, url, data) {
-    var methods = {
-      success: function() {},
-      error: function() {}
-    };
-    var XHR     = XMLHttpRequest || ActiveXObject;
-    var request = new XHR('MSXML2.XMLHTTP.3.0');
-
-    request.open(type, url, true);
-    request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    request.onreadystatechange = function () {
-      if (request.readyState === 4) {
-        if (request.status >= 200 && request.status < 300) {
-          methods.success.call(methods, request);
-        } else {
-          methods.error.call(methods, request);
-        }
-      }
-    };
-
-    request.send(data);
-
-    return {
-      success: function (callback) {
-        methods.success = callback;
-        return this;
-      },
-      error: function (callback) {
-        methods.error = callback;
-        return this;
-      }
-    };
-  };
-
-  var serialize = function(obj) {
-    var str = [];
-    for(var p in obj)
-      if (obj.hasOwnProperty(p)) {
-        if(obj[p] instanceof Array) {
-          for(var i = 0, n = obj[p].length; i < n; i++) {
-            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p][i]));
-          }
-        } else {
-          str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-        }
-      }
-    return str.join("&");
-  };
-
-  return {
-    get: function(url, data) {
-      var dataStr;
-      if(typeof data === 'object') {
-        dataStr = serialize(data);
-      }
-      var urlWithParams = dataStr ? (url + '?' + dataStr) : '';
-      return xhr('GET', urlWithParams);
-    },
-    post: function(url, data) {
-      var dataStr;
-      if(typeof data === 'object') {
-        dataStr = serialize(data);
-      }
-      return xhr('POST', url, dataStr);
-    }
-  };
-})();
-
 /*
 * Represents html5 for sas adapter
 * @constructor
@@ -156,7 +87,7 @@ h54s.prototype.call = function(sasProgram, callback) {
     params[key] = this.sasParams[key];
   }
 
-  ajax.post(this.url, params).success(function(res) {
+  this.utils.ajax.post(this.url, params).success(function(res) {
     if(/<form.+action="Logon.do".+/.test(res.responseText) && self.autoLogin) {
       self.login(function(status) {
         if(status === 200) {
@@ -174,7 +105,7 @@ h54s.prototype.call = function(sasProgram, callback) {
           callback(undefined, resObj);
         } catch(e) {
           if(retryCount < self.counters.maxXhrRetries) {
-            ajax.post(self.url, params).success(this.success).error(this.error);
+            self.utils.ajax.post(self.url, params).success(this.success).error(this.error);
             retryCount++;
             console.log("Retrying #" + retryCount);
           } else {
@@ -236,7 +167,7 @@ h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
     }
   };
 
-  ajax.post(this.loginUrl, {
+  this.utils.ajax.post(this.loginUrl, {
     _debug: this.debug ? 1 : 0,
     _sasapp: "Stored Process Web App 9.3",
     _service: this.sasService,
@@ -268,7 +199,7 @@ h54s.prototype.addTable = function (inTable, macroName) {
 
   var result;
   try {
-    result = convertTableObject(inTable);
+    result = this.utils.convertTableObject(inTable);
   } catch(e) {
     throw e;
   }
@@ -284,13 +215,83 @@ h54s.prototype.addTable = function (inTable, macroName) {
   this.sasParams[macroName] = tableArray;
 };
 
+h54s.prototype.utils = {};
+h54s.prototype.utils.ajax = (function () {
+  var xhr = function(type, url, data) {
+    var methods = {
+      success: function() {},
+      error: function() {}
+    };
+    var XHR     = XMLHttpRequest || ActiveXObject;
+    var request = new XHR('MSXML2.XMLHTTP.3.0');
+
+    request.open(type, url, true);
+    request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    request.onreadystatechange = function () {
+      if (request.readyState === 4) {
+        if (request.status >= 200 && request.status < 300) {
+          methods.success.call(methods, request);
+        } else {
+          methods.error.call(methods, request);
+        }
+      }
+    };
+
+    request.send(data);
+
+    return {
+      success: function (callback) {
+        methods.success = callback;
+        return this;
+      },
+      error: function (callback) {
+        methods.error = callback;
+        return this;
+      }
+    };
+  };
+
+  var serialize = function(obj) {
+    var str = [];
+    for(var p in obj)
+      if (obj.hasOwnProperty(p)) {
+        if(obj[p] instanceof Array) {
+          for(var i = 0, n = obj[p].length; i < n; i++) {
+            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p][i]));
+          }
+        } else {
+          str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+        }
+      }
+    return str.join("&");
+  };
+
+  return {
+    get: function(url, data) {
+      var dataStr;
+      if(typeof data === 'object') {
+        dataStr = serialize(data);
+      }
+      var urlWithParams = dataStr ? (url + '?' + dataStr) : '';
+      return xhr('GET', urlWithParams);
+    },
+    post: function(url, data) {
+      var dataStr;
+      if(typeof data === 'object') {
+        dataStr = serialize(data);
+      }
+      return xhr('POST', url, dataStr);
+    }
+  };
+})();
+
 /*
 * Convert table object to Sas readable object
 *
 * @param {object} inObject - Object to convert
 *
 */
-function convertTableObject(inObject) {
+h54s.prototype.utils.convertTableObject = function(inObject) {
   var chunkThreshold = 32000; // this goes to 32k for SAS
   // first check that the object is an array
   if (typeof (inObject) !== 'object') {
@@ -414,4 +415,4 @@ function convertTableObject(inObject) {
     jsonLength: chunkArrayCount
   }; // the spec will be the macro[0], with the data split into arrays of macro[1-n]
   // means in terms of dojo xhr object at least they need to go into the same array
-}
+};
