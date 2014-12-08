@@ -199,3 +199,23 @@ h54s.prototype.utils.convertTableObject = function(inObject) {
   }; // the spec will be the macro[0], with the data split into arrays of macro[1-n]
   // means in terms of dojo xhr object at least they need to go into the same array
 };
+
+/*
+* Parse response from server in debug mode
+*
+* @param {object} responseText - response html from the server
+*
+*/
+h54s.prototype.utils.parseDebugRes = function(responseText) {
+  //disable jshint for unsafe characters
+  /* jshint -W100 */
+
+  //find json
+  var patt = /^(﻿--h54s-data-start--)([\S\s]*)(--h54s-data-end--)/m;
+  var matches = responseText.match(patt);
+
+  var jsonObj = JSON.parse(matches[2]);
+
+  return jsonObj;
+};
+

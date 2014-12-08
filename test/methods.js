@@ -200,5 +200,18 @@ describe('h54s', function() {
 
     });
 
+    it('Debug mode test', function(done) {
+      this.timeout(6000);
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url,
+        debug: true
+      });
+      sasAdapter.setCredentials(serverData.user, serverData.pass);
+      sasAdapter.call('/AJAX/h54s_test/startupService', function(err, res) {
+        assert.isUndefined(err, 'We got error on sas program ajax call');
+        done();
+      });
+    });
+
   });
 });

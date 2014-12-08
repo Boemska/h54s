@@ -9,7 +9,7 @@ h54s.prototype.call = function(sasProgram, callback) {
   var self = this;
   var callArgs = arguments;
   var retryCount = 0;
-  if (!callback && typeof callback !== 'function'){
+  if (!callback || typeof callback !== 'function'){
     throw new h54s.Error('argumentError', 'You must provide callback');
   }
   if(!sasProgram) {
@@ -29,7 +29,7 @@ h54s.prototype.call = function(sasProgram, callback) {
 
   var params = {
     _program: sasProgram,
-    _debug: this.debug ? 1 : 0,
+    _debug: this.debug ? 131 : 0,
     _service: this.sasService,
   };
 
@@ -49,9 +49,10 @@ h54s.prototype.call = function(sasProgram, callback) {
     } else if(/<form.+action="Logon.do".+/.test(res.responseText) && !self.autoLogin) {
       callback(new h54s.Error('notLoggedinError', 'You are not logged in'));
     } else {
+      var resObj;
       if(!self.debug) {
         try {
-          var resObj = JSON.parse(res.responseText);
+          resObj = JSON.parse(res.responseText);
           callback(undefined, resObj);
         } catch(e) {
           if(retryCount < self.counters.maxXhrRetries) {
@@ -63,7 +64,12 @@ h54s.prototype.call = function(sasProgram, callback) {
           }
         }
       } else {
-        //TODO: find and parse json
+        try {
+          resObj = self.utils.parseDebugRes(res.responseText);
+          callback(undefined, resObj);
+        } catch(e) {
+          callback(new h54s.Error('parseError', 'Unable to parse response json'));
+        }
       }
     }
   }).error(function(res) {
@@ -119,7 +125,6 @@ h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
   };
 
   this.utils.ajax.post(this.loginUrl, {
-    _debug: this.debug ? 1 : 0,
     _sasapp: "Stored Process Web App 9.3",
     _service: this.sasService,
     ux: this.user,
