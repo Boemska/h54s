@@ -1,4 +1,4 @@
-/*! h54s v0.0.10 - 2014-12-08 
+/*! h54s v0.0.10 - 2014-12-09 
  *  License: GPL 
  * Author: Boemska 
 */
@@ -95,6 +95,9 @@ h54s.prototype.call = function(sasProgram, callback) {
   for(var key in this.sasParams) {
     params[key] = this.sasParams[key];
   }
+
+  //clar sas params
+  this.sasParams = [];
 
   this.utils.ajax.post(this.url, params).success(function(res) {
     if(/<form.+action="Logon.do".+/.test(res.responseText) && self.autoLogin) {
