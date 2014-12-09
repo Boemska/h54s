@@ -219,3 +219,20 @@ h54s.prototype.utils.parseDebugRes = function(responseText) {
   return jsonObj;
 };
 
+//TODO: add support for date
+/*
+* Unescape all string values in returned object
+*
+* @param {object} obj
+*
+*/
+h54s.prototype.utils.unescapeValues = function(obj) {
+  for (var key in obj) {
+    if (typeof obj[key] === 'string') {
+      obj[key] = decodeURIComponent(obj[key]);
+    } else if(typeof obj === 'object') {
+      this.unescapeValues(obj[key]);
+    }
+  }
+  return obj;
+};

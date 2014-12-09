@@ -52,12 +52,18 @@ h54s.prototype.call = function(sasProgram, callback) {
     } else if(/<form.+action="Logon.do".+/.test(res.responseText) && !self.autoLogin) {
       callback(new h54s.Error('notLoggedinError', 'You are not logged in'));
     } else {
-      var resObj;
+      var resObj, escapedResObj;
       if(!self.debug) {
         try {
           resObj = JSON.parse(res.responseText);
-          callback(undefined, resObj);
+          escapedResObj = self.utils.unescapeValues(resObj);
+          callback(undefined, escapedResObj);
         } catch(e) {
+          //check if JSON.parse is throwing an error
+          //if it's not SyntaxError, it's error from the callback
+          if(e.name !== 'SyntaxError') {
+            throw e;
+          }
           if(retryCount < self.counters.maxXhrRetries) {
             self.utils.ajax.post(self.url, params).success(this.success).error(this.error);
             retryCount++;
@@ -69,8 +75,14 @@ h54s.prototype.call = function(sasProgram, callback) {
       } else {
         try {
           resObj = self.utils.parseDebugRes(res.responseText);
-          callback(undefined, resObj);
+          escapedResObj = self.utils.unescapeValues(resObj);
+          callback(undefined, escapedResObj);
         } catch(e) {
+          //check if JSON.parse is throwing an error
+          //if it's not SyntaxError, it's error from the callback
+          if(e.name !== 'SyntaxError') {
+            throw e;
+          }
           callback(new h54s.Error('parseError', 'Unable to parse response json'));
         }
       }
@@ -159,14 +171,15 @@ h54s.prototype.addTable = function (inTable, macroName) {
   inTableJson     = inTableJson.replace(/\"\"/gm, '\" \"');
   inTable         = JSON.parse(inTableJson);
 
+  if (typeof (macroName) !== 'string') {
+    throw new h54s.Error('argumentError', 'Second parameter must be a valid string');
+  }
+
   var result;
   try {
     result = this.utils.convertTableObject(inTable);
   } catch(e) {
     throw e;
-  }
-  if (typeof (macroName) !== 'string') {
-    throw new h54s.Error('argumentError', 'Second parameter must be a valid string');
   }
   var tableArray = [];
   tableArray.push(JSON.stringify(result.spec));
