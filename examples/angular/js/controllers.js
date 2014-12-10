@@ -47,7 +47,7 @@ app.controller('loginCtrl', ['$scope', '$location', 'sasAdapter', function($scop
   }
 }]);
 
-app.controller('dataCtrl', ['$scope', '$routeParams', 'sasAdapter', function($scope, $routeParams, sasAdapter) {
+app.controller('dataCtrl', ['$scope', '$location', '$routeParams', 'sasAdapter', function($scope, $location, $routeParams, sasAdapter) {
   $scope.loaded = false;
   sasAdapter.addTable([
     {
@@ -65,6 +65,10 @@ app.controller('dataCtrl', ['$scope', '$routeParams', 'sasAdapter', function($sc
     $scope.keys = Object.keys(res.outputdata[0]);
     $scope.loaded = true;
   }, function(err) {
-    alert(err.message);
+    if(err.type === 'notLoggedinError') {
+      $location.path('/login');
+    } else {
+      alert(err.message);
+    }
   })
 }]);
