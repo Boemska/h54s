@@ -1,4 +1,4 @@
-/*! h54s v0.0.11 - 2014-12-09 
+/*! h54s v0.0.11 - 2014-12-10 
  *  License: GPL 
  * Author: Boemska 
 */
@@ -96,9 +96,6 @@ h54s.prototype.call = function(sasProgram, callback) {
     params[key] = this.sasParams[key];
   }
 
-  //clar sas params
-  this.sasParams = [];
-
   this.utils.ajax.post(this.url, params).success(function(res) {
     if(/<form.+action="Logon.do".+/.test(res.responseText) && self.autoLogin) {
       self.login(function(status) {
@@ -114,6 +111,8 @@ h54s.prototype.call = function(sasProgram, callback) {
       var resObj, escapedResObj;
       if(!self.debug) {
         try {
+          //clar sas params
+          this.sasParams = [];
           resObj = JSON.parse(res.responseText);
           escapedResObj = self.utils.unescapeValues(resObj);
           callback(undefined, escapedResObj);
@@ -133,6 +132,8 @@ h54s.prototype.call = function(sasProgram, callback) {
         }
       } else {
         try {
+          //clar sas params
+          this.sasParams = [];
           resObj = self.utils.parseDebugRes(res.responseText);
           escapedResObj = self.utils.unescapeValues(resObj);
           callback(undefined, escapedResObj);
