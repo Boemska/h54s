@@ -1,0 +1,17 @@
+#dashboard-wrapper {
+  width: 500px;
+  padding-top: 100px;
+}
+
+.loadingText {
+  text-align: center;
+  margin-top: 150px;
+}
+
+.pagination>li>a:hover {
+  cursor: pointer;
+}
+
+#libTable tbody tr {
+  cursor: pointer;
+}

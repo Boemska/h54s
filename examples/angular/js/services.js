@@ -28,6 +28,9 @@ app.factory('sasAdapter', function($q) {
         }
       });
       return deferred.promise;
+    },
+    addTable: function(table, macro) {
+      sasAdapter.addTable(table, macro);
     }
   }
 });
