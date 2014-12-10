@@ -58,6 +58,10 @@ module.exports = function (grunt) {
       angular: {
         port: 1337,
         combine: ['examples/angular', 'dist', 'test']
+      },
+      extjs: {
+        port: 1337,
+        combine: ['examples/extjs', 'dist', 'test']
       }
     }
   });
@@ -77,4 +81,5 @@ module.exports = function (grunt) {
   grunt.registerTask('watch', 'karma:dev');
 
   grunt.registerTask('serveAngular', 'connect:angular');
+  grunt.registerTask('serveExtjs', 'connect:extjs');
 };
