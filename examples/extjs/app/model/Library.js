@@ -9,9 +9,6 @@ Ext.define('h54sExample.model.Library', {
     {
       type: 'string',
       name: 'libname'
-    }, {
-      type: 'string',
-      name: 'memname'
     }
   ]
 });

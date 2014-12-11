@@ -9,6 +9,10 @@ Ext.define('h54sExample.model.Table', {
     {
       type: 'string',
       name: 'libname'
+    }, {
+      type: 'string',
+      name: 'memname'
     }
   ]
+
 });

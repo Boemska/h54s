@@ -47,7 +47,20 @@ Ext.define('h54sExample.view.Dashboard', {
             name: 'filter',
             allowBlank: true,
             emptyText: 'Search',
-             flex: 2.5
+            flex: 2.5,
+            listeners: {
+              change: function(e) {
+                var store = Ext.getStore('TableStore');
+                store.filterBy(function(record, id) {
+                  var recValue = record.get('memname').toLowerCase();
+                  var value = e.getValue().toLowerCase();
+                  if (!e.getValue() || recValue.indexOf(value) !== -1)
+                    return true;
+                  else
+                    return false;
+                });
+              }
+            }
           }, {
             xtype: 'tbfill'
           }, {
@@ -76,7 +89,10 @@ Ext.define('h54sExample.view.Dashboard', {
                   } else if (err) {
                     alert(err.message);
                   } else {
-                    Ext.getStore('TableStore').setData(res.tablelist);
+                    var store = Ext.getStore('TableStore');
+                    store.getProxy().setData(res.tablelist);
+                    Ext.getCmp('tableGridPaging').setStore(store);
+                    store.loadPage(1);
                   }
                 });
               }
@@ -85,6 +101,7 @@ Ext.define('h54sExample.view.Dashboard', {
         ]
       },
       {
+        id: 'tableGrid',
         xtype: 'gridpanel',
         flex: 1,
         store: 'TableStore',
@@ -105,10 +122,28 @@ Ext.define('h54sExample.view.Dashboard', {
           }
         ],
         listeners: {
-          select: function() {
-            //show another grid with detail data
+          select: function(e) {
+            var row = e.getSelection()[0];
+            e.clearSelections();
+            e.view.refresh();
+            var detailWindow = Ext.create('h54sExample.view.TableWindow');
+            sasAdapter.addTable([
+              {
+                libname: row.data.libname,
+                memname: row.data.memname
+              }
+            ], 'data');
+            detailWindow.show();
           }
-        }
+        },
+        dockedItems: [{
+          id:'tableGridPaging',
+          xtype: 'pagingtoolbar',
+          store: Ext.getStore('TableStore'),
+          dock: 'bottom',
+          displayInfo: true,
+          displayMsg: '{0} - {1} of {2}'
+        }],
       },
     ]
   }],

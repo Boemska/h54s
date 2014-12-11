@@ -9,6 +9,7 @@ Ext.application({
   ],
   stores: [
     'LibraryListStore',
-    'TableStore'
+    'TableStore',
+    'DetailTableStore'
   ],
 });

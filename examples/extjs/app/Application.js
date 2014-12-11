@@ -4,7 +4,8 @@ Ext.define('h54sExample.Application', {
   stores: [],
 
   requires: [
-    'h54sExample.sasAdapter'
+    'h54sExample.sasAdapter',
+    'h54sExample.view.TableWindow'
   ],
 
   init: function() {
@@ -26,7 +27,7 @@ Ext.define('h54sExample.Application', {
         alert(err.message);
       } else {
         Ext.getCmp('mainPanel').setLoading(false);
-        Ext.getStore('LibraryListStore').setData(res.librarylist);
+        Ext.getStore('LibraryListStore').loadData(res.librarylist);
       }
     });
   },

@@ -5,6 +5,19 @@ Ext.define('h54sExample.store.TableStore', {
     'h54sExample.model.Table'
   ],
 
-  model: 'h54sExample.model.Table'
+  model: 'h54sExample.model.Table',
+
+  proxy: {
+    type: 'memory',
+    enablePaging: true,
+    reader: {
+      type: 'json'
+    }
+  },
+
+  autoLoad: true,
+  buffered:true,
+
+  pageSize : 20,
 
 });
