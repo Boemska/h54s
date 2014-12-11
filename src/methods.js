@@ -56,19 +56,17 @@ h54s.prototype.call = function(sasProgram, callback) {
           this.sasParams = [];
           resObj = JSON.parse(res.responseText);
           escapedResObj = self.utils.unescapeValues(resObj);
-          callback(undefined, escapedResObj);
         } catch(e) {
-          //check if JSON.parse is throwing an error
-          //if it's not SyntaxError, it's error from the callback
-          if(e.name !== 'SyntaxError') {
-            throw e;
-          }
           if(retryCount < self.counters.maxXhrRetries) {
             self.utils.ajax.post(self.url, params).success(this.success).error(this.error);
             retryCount++;
             console.log("Retrying #" + retryCount);
           } else {
             callback(new h54s.Error('parseError', 'Unable to parse response json'));
+          }
+        } finally {
+          if(resObj) {
+            callback(undefined, escapedResObj);
           }
         }
       } else {
@@ -77,14 +75,12 @@ h54s.prototype.call = function(sasProgram, callback) {
           this.sasParams = [];
           resObj = self.utils.parseDebugRes(res.responseText);
           escapedResObj = self.utils.unescapeValues(resObj);
-          callback(undefined, escapedResObj);
         } catch(e) {
-          //check if JSON.parse is throwing an error
-          //if it's not SyntaxError, it's error from the callback
-          if(e.name !== 'SyntaxError') {
-            throw e;
-          }
           callback(new h54s.Error('parseError', 'Unable to parse response json'));
+        } finally {
+          if(resObj) {
+            callback(undefined, escapedResObj);
+          }
         }
       }
     }
