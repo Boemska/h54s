@@ -80,13 +80,7 @@ Ext.define('h54sExample.view.Dashboard', {
                   }
                 ], 'lib');
                 sasAdapter.call('/AJAX/h54s_test/datasetList', function (err, res) {
-                  if (err && err.type === 'notLoggedinError') {
-                    me.logonWin.show(false, function () {
-                      setTimeout(function () {
-                        me.logonWin.down('textfield[name="ux"]').focus(true, 100);
-                      }, 400);
-                    });
-                  } else if (err) {
+                  if (err) {
                     alert(err.message);
                   } else {
                     var store = Ext.getStore('TableStore');

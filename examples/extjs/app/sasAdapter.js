@@ -9,7 +9,6 @@ Ext.define('h54sExample.sasAdapter', {
   },
 
   login: function(user, pass, callback) {
-    console.log(this._adapter);
     try {
       this._adapter.login(user, pass, function(status) {
         if(status === -1) {
@@ -25,7 +24,14 @@ Ext.define('h54sExample.sasAdapter', {
 
   call: function(sasProgram, callback) {
     try {
-      this._adapter.call(sasProgram, callback);
+      this._adapter.call(sasProgram, function(err, res) {
+        if(err && err.type === 'notLoggedinError') {
+          var loginWindow = Ext.create('h54sExample.view.LoginWindow');
+          loginWindow.show();
+        } else {
+          callback(err, res);
+        }
+      });
     } catch(e) {
       callback(e.message);
     }
