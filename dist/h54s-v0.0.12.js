@@ -1,4 +1,4 @@
-/*! h54s v0.0.11 - 2014-12-11 
+/*! h54s v0.0.12 - 2014-12-12 
  *  License: GPL 
  * Author: Boemska 
 */
@@ -121,6 +121,7 @@ h54s.prototype.call = function(sasProgram, callback) {
             retryCount++;
             console.log("Retrying #" + retryCount);
           } else {
+            self.utils.parseErrorResponse(res.responseText);
             callback(new h54s.Error('parseError', 'Unable to parse response json'));
           }
         } finally {
@@ -135,6 +136,7 @@ h54s.prototype.call = function(sasProgram, callback) {
           resObj = self.utils.parseDebugRes(res.responseText);
           escapedResObj = self.utils.unescapeValues(resObj);
         } catch(e) {
+          self.utils.parseErrorResponse(res.responseText);
           callback(new h54s.Error('parseError', 'Unable to parse response json'));
         } finally {
           if(resObj) {
@@ -221,7 +223,6 @@ h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
 * @param {string} macroName - Sas macro name
 *
 */
-
 h54s.prototype.addTable = function (inTable, macroName) {
   var inTableJson = JSON.stringify(inTable);
   inTableJson     = inTableJson.replace(/\"\"/gm, '\" \"');
@@ -244,6 +245,14 @@ h54s.prototype.addTable = function (inTable, macroName) {
     tableArray.push(outString);
   }
   this.sasParams[macroName] = tableArray;
+};
+
+/*
+* Get sas errors if there are some
+*
+*/
+h54s.prototype.getSasErrors = function() {
+  return this.utils.sasErrors;
 };
 
 h54s.prototype.utils = {};
@@ -483,4 +492,42 @@ h54s.prototype.utils.unescapeValues = function(obj) {
     }
   }
   return obj;
+};
+
+/*
+* Parse error response from server and save errors in memory
+*
+* @param {string} res - server response
+*
+*/
+h54s.prototype.utils.parseErrorResponse = function(res) {
+  patt = /ERROR(.*\.|.*\n.*\.)/g;
+  var errors = res.match(patt);
+  if(!errors) {
+    return;
+  }
+
+  for(var i = 0, n = errors.length; i < n; i++) {
+    errors[i] = errors[i].replace(/<[^>]*>/g, '').replace(/(\n|\s{2,})/g, ' ');
+    errors[i] = this.decodeHTMLEntities(errors[i]);
+  }
+  this.sasErrors = errors;
+};
+
+/*
+* Decode HTML entities
+*
+* @param {string} res - server response
+*
+*/
+h54s.prototype.utils.decodeHTMLEntities = function (html) {
+  var tempElement = document.createElement('span');
+  var str = html.replace(/&(#(?:x[0-9a-f]+|\d+)|[a-z]+);/gi,
+    function (str) {
+      tempElement.innerHTML = str;
+      str = tempElement.textContent || tempElement.innerText;
+      return str;
+    }
+  );
+  return str;
 };

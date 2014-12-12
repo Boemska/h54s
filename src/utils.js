@@ -236,3 +236,41 @@ h54s.prototype.utils.unescapeValues = function(obj) {
   }
   return obj;
 };
+
+/*
+* Parse error response from server and save errors in memory
+*
+* @param {string} res - server response
+*
+*/
+h54s.prototype.utils.parseErrorResponse = function(res) {
+  patt = /ERROR(.*\.|.*\n.*\.)/g;
+  var errors = res.match(patt);
+  if(!errors) {
+    return;
+  }
+
+  for(var i = 0, n = errors.length; i < n; i++) {
+    errors[i] = errors[i].replace(/<[^>]*>/g, '').replace(/(\n|\s{2,})/g, ' ');
+    errors[i] = this.decodeHTMLEntities(errors[i]);
+  }
+  this.sasErrors = errors;
+};
+
+/*
+* Decode HTML entities
+*
+* @param {string} res - server response
+*
+*/
+h54s.prototype.utils.decodeHTMLEntities = function (html) {
+  var tempElement = document.createElement('span');
+  var str = html.replace(/&(#(?:x[0-9a-f]+|\d+)|[a-z]+);/gi,
+    function (str) {
+      tempElement.innerHTML = str;
+      str = tempElement.textContent || tempElement.innerText;
+      return str;
+    }
+  );
+  return str;
+};

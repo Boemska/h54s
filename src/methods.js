@@ -62,6 +62,7 @@ h54s.prototype.call = function(sasProgram, callback) {
             retryCount++;
             console.log("Retrying #" + retryCount);
           } else {
+            self.utils.parseErrorResponse(res.responseText);
             callback(new h54s.Error('parseError', 'Unable to parse response json'));
           }
         } finally {
@@ -76,6 +77,7 @@ h54s.prototype.call = function(sasProgram, callback) {
           resObj = self.utils.parseDebugRes(res.responseText);
           escapedResObj = self.utils.unescapeValues(resObj);
         } catch(e) {
+          self.utils.parseErrorResponse(res.responseText);
           callback(new h54s.Error('parseError', 'Unable to parse response json'));
         } finally {
           if(resObj) {
@@ -162,7 +164,6 @@ h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
 * @param {string} macroName - Sas macro name
 *
 */
-
 h54s.prototype.addTable = function (inTable, macroName) {
   var inTableJson = JSON.stringify(inTable);
   inTableJson     = inTableJson.replace(/\"\"/gm, '\" \"');
@@ -185,4 +186,12 @@ h54s.prototype.addTable = function (inTable, macroName) {
     tableArray.push(outString);
   }
   this.sasParams[macroName] = tableArray;
+};
+
+/*
+* Get sas errors if there are some
+*
+*/
+h54s.prototype.getSasErrors = function() {
+  return this.utils.sasErrors;
 };
