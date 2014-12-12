@@ -4,16 +4,13 @@ Ext.define('h54sExample.view.TableWindow', {
   id: 'detailWindow',
   maximized: true,
   title: 'Detail View',
-  bodyBorder: false,
+  autoScroll: true,
 
   items: [
     {
       id: 'detailTableGrid',
       xtype: 'gridpanel',
       store: 'DetailTableStore',
-      layout: {
-        type: 'fit'
-      },
       dockedItems: [{
         id:'detailTableGridPaging',
         xtype: 'pagingtoolbar',
@@ -28,6 +25,7 @@ Ext.define('h54sExample.view.TableWindow', {
           detailWindow.setLoading();
           sasAdapter.call('/AJAX/h54s_test/getData', function (err, res) {
             if (err) {
+              //TODO: close the window and then alert
               alert(err.message);
             } else {
               var outputRow = res.outputdata[0];

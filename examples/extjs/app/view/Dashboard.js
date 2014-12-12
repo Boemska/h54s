@@ -11,8 +11,6 @@ Ext.define('h54sExample.view.Dashboard', {
     xtype: 'panel',
     width: 500,
     flex: 1,
-//    frame: true, // ovo mu napravi ovaj plavi okvir oko celog panela, cisto pomaze da vidis gde je panel, skini ga ako oces
-    bodyPadding: 5,
     id: 'mainPanel',
     style: {
       marginTop: '100px'
@@ -20,7 +18,6 @@ Ext.define('h54sExample.view.Dashboard', {
     layout: {
       type: 'vbox',
       align: 'stretch',
-
     },
 
     listeners: {
@@ -32,11 +29,8 @@ Ext.define('h54sExample.view.Dashboard', {
     items: [
       {
         xtype: 'container',
-        flex: 0,
         layout: {
-          type: 'hbox',
-          pack: 'start',
-          align: 'stretch'
+          type: 'hbox'
         },
         style: {
           marginBottom: '5px'
@@ -47,7 +41,7 @@ Ext.define('h54sExample.view.Dashboard', {
             name: 'filter',
             allowBlank: true,
             emptyText: 'Search',
-            flex: 2.5,
+            width: 250,
             listeners: {
               change: function(e) {
                 var store = Ext.getStore('TableStore');
@@ -66,11 +60,9 @@ Ext.define('h54sExample.view.Dashboard', {
           }, {
             xtype: 'combobox',
             emptyText: 'Library',
-            align: 'right',
             store: 'LibraryListStore',
             displayField: 'libname',
             queryMode: 'local',
-            typeAhead: true,
             listeners: {
               select: function (e) {
                 var me = this;

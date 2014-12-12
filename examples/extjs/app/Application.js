@@ -9,14 +9,7 @@ Ext.define('h54sExample.Application', {
     'h54sExample.view.LoginWindow'
   ],
 
-  init: function() {
-    console.log('init');
-    Ext.getBody().setStyle('overflow', 'auto');
-  },
-
   launch: function () {
-    var me = this;
-
     sasAdapter.call('/AJAX/h54s_test/libraryList', function (err, res) {
       if (err) {
         alert(err.message);

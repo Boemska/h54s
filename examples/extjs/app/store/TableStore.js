@@ -15,9 +15,6 @@ Ext.define('h54sExample.store.TableStore', {
     }
   },
 
-  autoLoad: true,
-  buffered:true,
-
   pageSize : 20,
 
 });
