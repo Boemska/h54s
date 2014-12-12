@@ -14,16 +14,6 @@ Ext.define('h54sExample.view.LoginWindow', {
   },
   items: [
     {
-      xtype: 'label',
-      flex: 1,
-      hidden: true,
-      margin: '0 0 10 0',
-      text: 'Invalid User ID or Password.',
-      style: {
-        color: 'red'
-      }
-    },
-    {
       xtype: 'textfield',
       flex: 1,
       name: 'ux',
@@ -47,6 +37,14 @@ Ext.define('h54sExample.view.LoginWindow', {
             this.up('window').onOkClick();
           }
         }
+      }
+    }, {
+      xtype: 'label',
+      flex: 1,
+      hidden: true,
+      margin: '0 0 10 0',
+      style: {
+        color: 'red'
       }
     }, {
       xtype: 'container',
@@ -78,12 +76,12 @@ Ext.define('h54sExample.view.LoginWindow', {
 
     sasAdapter.login(user, pass, function (err) {
       if (err) {
-        //TODO: add message to the window instead of the alert
-        alert(err);
+        invalidLogonLabel.setText(err);
+        invalidLogonLabel.show();
         return;
       }
       win.close();
-      Ext.getCmp('mainPanel').setLoading(false);
+      sasAdapter.retry();
     });
   }
 

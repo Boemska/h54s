@@ -4,7 +4,6 @@ Ext.define('h54sExample.view.Dashboard', {
   layout: {
     type: 'vbox',
     align: 'center',
-
   },
 
   items: [{
