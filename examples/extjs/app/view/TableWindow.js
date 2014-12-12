@@ -21,11 +21,12 @@ Ext.define('h54sExample.view.TableWindow', {
       }],
       listeners: {
         afterrender: function(e) {
+          var me = this;
           var detailWindow = Ext.getCmp('detailWindow');
           detailWindow.setLoading();
           sasAdapter.call('/AJAX/h54s_test/getData', function (err, res) {
             if (err) {
-              //TODO: close the window and then alert
+              me.up('#detailWindow').close();
               alert(err.message);
             } else {
               var outputRow = res.outputdata[0];
