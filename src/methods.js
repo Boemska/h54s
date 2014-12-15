@@ -67,6 +67,7 @@ h54s.prototype.call = function(sasProgram, callback) {
           }
         } finally {
           if(resObj) {
+            self.utils.addApplicationLogs(resObj);
             callback(undefined, escapedResObj);
           }
         }
@@ -81,6 +82,7 @@ h54s.prototype.call = function(sasProgram, callback) {
           callback(new h54s.Error('parseError', 'Unable to parse response json'));
         } finally {
           if(resObj) {
+            self.utils.addApplicationLogs(resObj);
             callback(undefined, escapedResObj);
           }
         }
@@ -194,4 +196,12 @@ h54s.prototype.addTable = function (inTable, macroName) {
 */
 h54s.prototype.getSasErrors = function() {
   return this.utils.sasErrors;
+};
+
+/*
+* Get application logs
+*
+*/
+h54s.prototype.getApplicationLogs = function() {
+  return this.utils._logs;
 };

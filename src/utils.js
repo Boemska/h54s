@@ -1,4 +1,5 @@
 h54s.prototype.utils = {};
+h54s.prototype.utils._logs = [];
 h54s.prototype.utils.ajax = (function () {
   var xhr = function(type, url, data) {
     var methods = {
@@ -268,4 +269,22 @@ h54s.prototype.utils.decodeHTMLEntities = function (html) {
     }
   );
   return str;
+};
+
+/*
+* Adds application logs to an array of logs
+*
+* @param {string} res - server response
+*
+*/
+h54s.prototype.utils.addApplicationLogs = function(res) {
+  if(res.logmessage === 'blank') {
+    return;
+  }
+  this._logs.push(res.logmessage);
+
+  //100 log messages max
+  if(this._logs.length > 100) {
+    this._logs.shift();
+  }
 };

@@ -1,4 +1,4 @@
-/*! h54s v0.0.12 - 2014-12-12 
+/*! h54s v0.0.13 - 2014-12-15 
  *  License: GPL 
  * Author: Boemska 
 */
@@ -126,12 +126,13 @@ h54s.prototype.call = function(sasProgram, callback) {
           }
         } finally {
           if(resObj) {
+            self.utils.addApplicationLogs(resObj);
             callback(undefined, escapedResObj);
           }
         }
       } else {
         try {
-          //clar sas params
+          //clear sas params
           this.sasParams = [];
           resObj = self.utils.parseDebugRes(res.responseText);
           escapedResObj = self.utils.unescapeValues(resObj);
@@ -140,6 +141,7 @@ h54s.prototype.call = function(sasProgram, callback) {
           callback(new h54s.Error('parseError', 'Unable to parse response json'));
         } finally {
           if(resObj) {
+            self.utils.addApplicationLogs(resObj);
             callback(undefined, escapedResObj);
           }
         }
@@ -255,7 +257,16 @@ h54s.prototype.getSasErrors = function() {
   return this.utils.sasErrors;
 };
 
+/*
+* Get application logs
+*
+*/
+h54s.prototype.getApplicationLogs = function() {
+  return this.utils._logs;
+};
+
 h54s.prototype.utils = {};
+h54s.prototype.utils._logs = [];
 h54s.prototype.utils.ajax = (function () {
   var xhr = function(type, url, data) {
     var methods = {
@@ -376,13 +387,11 @@ h54s.prototype.utils.convertTableObject = function(inObject) {
     var chunkRowCount             = 0;
 
     for (var key in inObject[i]) {
-      // this.logd('i and j are ', i, j);
       var thisSpec  = {};
       var thisValue = inObject[i][key];
       // get type... if it is an object then convert it to json and store as a string
       var thisType  = typeof (thisValue);
       if (thisType == 'number') { // straightforward number
-        // this.logd('Number on ', i, j, key);
         thisSpec.colName                    = key;
         thisSpec.colType                    = 'num';
         thisSpec.colLength                  = 8;
@@ -391,7 +400,6 @@ h54s.prototype.utils.convertTableObject = function(inObject) {
 
       }
       if (thisType == 'string') { // straightforward string
-        // this.logd('String on ', i, j, key);
         thisSpec.colName    = key;
         thisSpec.colType    = 'string';
         thisSpec.colLength  = thisValue.length;
@@ -433,14 +441,12 @@ h54s.prototype.utils.convertTableObject = function(inObject) {
     if (chunkArrayCount + chunkRowCount > chunkThreshold) {
       targetArray[currentTarget].splice(j - 1, 1); // get rid of that last row
       currentTarget++; // move onto the next array
-      this.logd('checkAndGetTypeObject: Constructing chunk #' + currentTarget);
       targetArray[currentTarget] = []; // make it an array
       i--; // go back to the last row in the source
       j = 0; // initialise new row counter for new array
       chunkArrayCount = 0; // this is the new chunk max size
     } else {
       chunkArrayCount = chunkArrayCount + chunkRowCount;
-      // this.logd('not incrementing array, on ' + chunkArrayCount);
     }
   }
 
@@ -530,4 +536,22 @@ h54s.prototype.utils.decodeHTMLEntities = function (html) {
     }
   );
   return str;
+};
+
+/*
+* Adds application logs to an array of logs
+*
+* @param {string} res - server response
+*
+*/
+h54s.prototype.utils.addApplicationLogs = function(res) {
+  if(res.logmessage === 'blank') {
+    return;
+  }
+  this._logs.push(res.logmessage);
+
+  //100 log messages max
+  if(this._logs.length > 100) {
+    this._logs.shift();
+  }
 };

@@ -81,5 +81,21 @@ describe('h54s', function() {
       });
     });
 
+    it('Application logs', function(done) {
+      this.timeout(4000);
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url,
+        debug: true
+      });
+      sasAdapter.setCredentials(serverData.user, serverData.pass);
+      sasAdapter.call('/AJAX/h54s_test/startupService', function(err, res) {
+        assert.isUndefined(err, 'We got error on sas program ajax call');
+        var logs = sasAdapter.getApplicationLogs();
+        assert.isArray(logs, 'getApplicationLogs() should return array');
+        assert.equal(logs.length, 0, 'Application logs should be empty array');
+        done();
+      });
+    });
+
   });
 });
