@@ -68,6 +68,7 @@ app.controller('dataCtrl', ['$scope', '$location', '$routeParams', 'sasAdapter',
     if(err.type === 'notLoggedinError') {
       $location.path('/login');
     } else {
+      $location.path('/');
       alert(err.message);
     }
   })
