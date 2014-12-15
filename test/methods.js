@@ -84,7 +84,7 @@ describe('h54s', function() {
         hostUrl: serverData.url
       });
       //logout because we are already logged in in previeous tests
-      sasAdapter.utils.ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
+      sasAdapter._utils.ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
         assert.equal(200, res.status, 'Log out is not successful');
         sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/startupService', function(err, res) {
           assert.equal(err.message, 'You are not logged in', 'Should throw error because user is not logged in');
@@ -103,7 +103,7 @@ describe('h54s', function() {
         pass: serverData.pass
       });
       //logout because we are already logged in in previeous tests
-      sasAdapter.utils.ajax.get(serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
+      sasAdapter._utils.ajax.get(serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
         assert.equal(200, res.status, 'Log out is not successful');
         sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/startupService', function(err, res) {
           assert.isUndefined(err, 'We got error on sas program ajax call');
@@ -191,7 +191,7 @@ describe('h54s', function() {
 
       sasAdapter.login(serverData.user, serverData.pass, function(status) {
         //logout and try to call sas program
-        sasAdapter.utils.ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
+        sasAdapter._utils.ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
           sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/startupService', function(err, res) {
             assert.isUndefined(err, 'We got error on sas program ajax call');
             assert.isObject(res, 'We expected object to be returned by call method');

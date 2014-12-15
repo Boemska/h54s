@@ -37,7 +37,7 @@ h54s.prototype.call = function(sasProgram, callback) {
     params[key] = this.sasParams[key];
   }
 
-  this.utils.ajax.post(this.url, params).success(function(res) {
+  this._utils.ajax.post(this.url, params).success(function(res) {
     if(/<form.+action="Logon.do".+/.test(res.responseText) && self.autoLogin) {
       self.login(function(status) {
         if(status === 200) {
@@ -55,19 +55,19 @@ h54s.prototype.call = function(sasProgram, callback) {
           //clar sas params
           this.sasParams = [];
           resObj = JSON.parse(res.responseText);
-          escapedResObj = self.utils.unescapeValues(resObj);
+          escapedResObj = self._utils.unescapeValues(resObj);
         } catch(e) {
           if(retryCount < self.counters.maxXhrRetries) {
-            self.utils.ajax.post(self.url, params).success(this.success).error(this.error);
+            self._utils.ajax.post(self.url, params).success(this.success).error(this.error);
             retryCount++;
             console.log("Retrying #" + retryCount);
           } else {
-            self.utils.parseErrorResponse(res.responseText);
+            self._utils.parseErrorResponse(res.responseText);
             callback(new h54s.Error('parseError', 'Unable to parse response json'));
           }
         } finally {
           if(resObj) {
-            self.utils.addApplicationLogs(resObj);
+            self._utils.addApplicationLogs(resObj);
             callback(undefined, escapedResObj);
           }
         }
@@ -75,14 +75,14 @@ h54s.prototype.call = function(sasProgram, callback) {
         try {
           //clear sas params
           this.sasParams = [];
-          resObj = self.utils.parseDebugRes(res.responseText);
-          escapedResObj = self.utils.unescapeValues(resObj);
+          resObj = self._utils.parseDebugRes(res.responseText);
+          escapedResObj = self._utils.unescapeValues(resObj);
         } catch(e) {
-          self.utils.parseErrorResponse(res.responseText);
+          self._utils.parseErrorResponse(res.responseText);
           callback(new h54s.Error('parseError', 'Unable to parse response json'));
         } finally {
           if(resObj) {
-            self.utils.addApplicationLogs(resObj);
+            self._utils.addApplicationLogs(resObj);
             callback(undefined, escapedResObj);
           }
         }
@@ -140,7 +140,7 @@ h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
     }
   };
 
-  this.utils.ajax.post(this.loginUrl, {
+  this._utils.ajax.post(this.loginUrl, {
     _sasapp: "Stored Process Web App 9.3",
     _service: this.sasService,
     ux: this.user,
@@ -177,7 +177,7 @@ h54s.prototype.addTable = function (inTable, macroName) {
 
   var result;
   try {
-    result = this.utils.convertTableObject(inTable);
+    result = this._utils.convertTableObject(inTable);
   } catch(e) {
     throw e;
   }
@@ -195,7 +195,7 @@ h54s.prototype.addTable = function (inTable, macroName) {
 *
 */
 h54s.prototype.getSasErrors = function() {
-  return this.utils.sasErrors;
+  return this._utils.sasErrors;
 };
 
 /*
@@ -203,5 +203,5 @@ h54s.prototype.getSasErrors = function() {
 *
 */
 h54s.prototype.getApplicationLogs = function() {
-  return this.utils._logs;
+  return this._utils._logs;
 };

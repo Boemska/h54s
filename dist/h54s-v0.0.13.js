@@ -96,7 +96,7 @@ h54s.prototype.call = function(sasProgram, callback) {
     params[key] = this.sasParams[key];
   }
 
-  this.utils.ajax.post(this.url, params).success(function(res) {
+  this._utils.ajax.post(this.url, params).success(function(res) {
     if(/<form.+action="Logon.do".+/.test(res.responseText) && self.autoLogin) {
       self.login(function(status) {
         if(status === 200) {
@@ -114,19 +114,19 @@ h54s.prototype.call = function(sasProgram, callback) {
           //clar sas params
           this.sasParams = [];
           resObj = JSON.parse(res.responseText);
-          escapedResObj = self.utils.unescapeValues(resObj);
+          escapedResObj = self._utils.unescapeValues(resObj);
         } catch(e) {
           if(retryCount < self.counters.maxXhrRetries) {
-            self.utils.ajax.post(self.url, params).success(this.success).error(this.error);
+            self._utils.ajax.post(self.url, params).success(this.success).error(this.error);
             retryCount++;
             console.log("Retrying #" + retryCount);
           } else {
-            self.utils.parseErrorResponse(res.responseText);
+            self._utils.parseErrorResponse(res.responseText);
             callback(new h54s.Error('parseError', 'Unable to parse response json'));
           }
         } finally {
           if(resObj) {
-            self.utils.addApplicationLogs(resObj);
+            self._utils.addApplicationLogs(resObj);
             callback(undefined, escapedResObj);
           }
         }
@@ -134,14 +134,14 @@ h54s.prototype.call = function(sasProgram, callback) {
         try {
           //clear sas params
           this.sasParams = [];
-          resObj = self.utils.parseDebugRes(res.responseText);
-          escapedResObj = self.utils.unescapeValues(resObj);
+          resObj = self._utils.parseDebugRes(res.responseText);
+          escapedResObj = self._utils.unescapeValues(resObj);
         } catch(e) {
-          self.utils.parseErrorResponse(res.responseText);
+          self._utils.parseErrorResponse(res.responseText);
           callback(new h54s.Error('parseError', 'Unable to parse response json'));
         } finally {
           if(resObj) {
-            self.utils.addApplicationLogs(resObj);
+            self._utils.addApplicationLogs(resObj);
             callback(undefined, escapedResObj);
           }
         }
@@ -199,7 +199,7 @@ h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
     }
   };
 
-  this.utils.ajax.post(this.loginUrl, {
+  this._utils.ajax.post(this.loginUrl, {
     _sasapp: "Stored Process Web App 9.3",
     _service: this.sasService,
     ux: this.user,
@@ -236,7 +236,7 @@ h54s.prototype.addTable = function (inTable, macroName) {
 
   var result;
   try {
-    result = this.utils.convertTableObject(inTable);
+    result = this._utils.convertTableObject(inTable);
   } catch(e) {
     throw e;
   }
@@ -254,7 +254,7 @@ h54s.prototype.addTable = function (inTable, macroName) {
 *
 */
 h54s.prototype.getSasErrors = function() {
-  return this.utils.sasErrors;
+  return this._utils.sasErrors;
 };
 
 /*
@@ -262,12 +262,12 @@ h54s.prototype.getSasErrors = function() {
 *
 */
 h54s.prototype.getApplicationLogs = function() {
-  return this.utils._logs;
+  return this._utils._logs;
 };
 
-h54s.prototype.utils = {};
-h54s.prototype.utils._logs = [];
-h54s.prototype.utils.ajax = (function () {
+h54s.prototype._utils = {};
+h54s.prototype._utils._logs = [];
+h54s.prototype._utils.ajax = (function () {
   var xhr = function(type, url, data) {
     var methods = {
       success: function() {},
@@ -342,7 +342,7 @@ h54s.prototype.utils.ajax = (function () {
 * @param {object} inObject - Object to convert
 *
 */
-h54s.prototype.utils.convertTableObject = function(inObject) {
+h54s.prototype._utils.convertTableObject = function(inObject) {
   var chunkThreshold = 32000; // this goes to 32k for SAS
   // first check that the object is an array
   if (typeof (inObject) !== 'object') {
@@ -469,7 +469,7 @@ h54s.prototype.utils.convertTableObject = function(inObject) {
 * @param {object} responseText - response html from the server
 *
 */
-h54s.prototype.utils.parseDebugRes = function(responseText) {
+h54s.prototype._utils.parseDebugRes = function(responseText) {
   //disable jshint for unsafe characters
   /* jshint -W100 */
 
@@ -489,7 +489,7 @@ h54s.prototype.utils.parseDebugRes = function(responseText) {
 * @param {object} obj
 *
 */
-h54s.prototype.utils.unescapeValues = function(obj) {
+h54s.prototype._utils.unescapeValues = function(obj) {
   for (var key in obj) {
     if (typeof obj[key] === 'string') {
       obj[key] = decodeURIComponent(obj[key]);
@@ -506,7 +506,7 @@ h54s.prototype.utils.unescapeValues = function(obj) {
 * @param {string} res - server response
 *
 */
-h54s.prototype.utils.parseErrorResponse = function(res) {
+h54s.prototype._utils.parseErrorResponse = function(res) {
   patt = /ERROR(.*\.|.*\n.*\.)/g;
   var errors = res.match(patt);
   if(!errors) {
@@ -526,7 +526,7 @@ h54s.prototype.utils.parseErrorResponse = function(res) {
 * @param {string} res - server response
 *
 */
-h54s.prototype.utils.decodeHTMLEntities = function (html) {
+h54s.prototype._utils.decodeHTMLEntities = function (html) {
   var tempElement = document.createElement('span');
   var str = html.replace(/&(#(?:x[0-9a-f]+|\d+)|[a-z]+);/gi,
     function (str) {
@@ -544,7 +544,7 @@ h54s.prototype.utils.decodeHTMLEntities = function (html) {
 * @param {string} res - server response
 *
 */
-h54s.prototype.utils.addApplicationLogs = function(res) {
+h54s.prototype._utils.addApplicationLogs = function(res) {
   if(res.logmessage === 'blank') {
     return;
   }
