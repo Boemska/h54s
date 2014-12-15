@@ -3,6 +3,7 @@ describe('h54s', function() {
 
     //TODO: Implement and test date escape
     it('All values in returned object should be escaped - string and date', function(done) {
+      this.timeout(4000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
@@ -29,6 +30,7 @@ describe('h54s', function() {
     });
 
     it('All values in returned object with debug=true should be escaped - string and date', function(done) {
+      this.timeout(4000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url,
         debug: true

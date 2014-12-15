@@ -79,6 +79,7 @@ describe('h54s', function() {
     });
 
     it('Call sas program without logging in', function(done) {
+      this.timeout(6000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
@@ -125,6 +126,7 @@ describe('h54s', function() {
     });
 
     it('Log in with wrong credentials', function(done) {
+      this.timeout(4000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
