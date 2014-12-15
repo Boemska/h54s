@@ -119,13 +119,11 @@ h54s.prototype.utils.convertTableObject = function(inObject) {
     var chunkRowCount             = 0;
 
     for (var key in inObject[i]) {
-      // this.logd('i and j are ', i, j);
       var thisSpec  = {};
       var thisValue = inObject[i][key];
       // get type... if it is an object then convert it to json and store as a string
       var thisType  = typeof (thisValue);
       if (thisType == 'number') { // straightforward number
-        // this.logd('Number on ', i, j, key);
         thisSpec.colName                    = key;
         thisSpec.colType                    = 'num';
         thisSpec.colLength                  = 8;
@@ -134,7 +132,6 @@ h54s.prototype.utils.convertTableObject = function(inObject) {
 
       }
       if (thisType == 'string') { // straightforward string
-        // this.logd('String on ', i, j, key);
         thisSpec.colName    = key;
         thisSpec.colType    = 'string';
         thisSpec.colLength  = thisValue.length;
@@ -176,14 +173,12 @@ h54s.prototype.utils.convertTableObject = function(inObject) {
     if (chunkArrayCount + chunkRowCount > chunkThreshold) {
       targetArray[currentTarget].splice(j - 1, 1); // get rid of that last row
       currentTarget++; // move onto the next array
-      this.logd('checkAndGetTypeObject: Constructing chunk #' + currentTarget);
       targetArray[currentTarget] = []; // make it an array
       i--; // go back to the last row in the source
       j = 0; // initialise new row counter for new array
       chunkArrayCount = 0; // this is the new chunk max size
     } else {
       chunkArrayCount = chunkArrayCount + chunkRowCount;
-      // this.logd('not incrementing array, on ' + chunkArrayCount);
     }
   }
 

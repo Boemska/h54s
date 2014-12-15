@@ -72,7 +72,7 @@ h54s.prototype.call = function(sasProgram, callback) {
         }
       } else {
         try {
-          //clar sas params
+          //clear sas params
           this.sasParams = [];
           resObj = self.utils.parseDebugRes(res.responseText);
           escapedResObj = self.utils.unescapeValues(resObj);
