@@ -82,10 +82,9 @@ describe('h54s', function() {
     });
 
     it('Application logs', function(done) {
-      this.timeout(4000);
+      this.timeout(10000);
       var sasAdapter = new h54s({
-        hostUrl: serverData.url,
-        debug: true
+        hostUrl: serverData.url
       });
       sasAdapter.setCredentials(serverData.user, serverData.pass);
       sasAdapter.call('/AJAX/h54s_test/startupService', function(err, res) {
@@ -93,8 +92,24 @@ describe('h54s', function() {
         var logs = sasAdapter.getApplicationLogs();
         assert.isArray(logs, 'getApplicationLogs() should return array');
         assert.equal(logs.length, 0, 'Application logs should be empty array');
-        done();
+
+        sasAdapter.setCredentials(serverData.user, serverData.pass);
+        sasAdapter.addTable([
+          {
+            data: 'test'
+          }
+        ], 'data');
+        sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res) {
+          assert.isUndefined(err, 'We got error on sas program ajax call');
+          var logs = sasAdapter.getApplicationLogs();
+          assert.isArray(logs, 'getApplicationLogs() should return array');
+          if(logs.length === 0) {
+            assert.fail(logs.length, ' > 0', 'Application logs should not be empty array');
+          }
+          done();
+        });
       });
+
     });
 
     it('Test date send and receive', function(done) {
