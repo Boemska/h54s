@@ -46,7 +46,9 @@ h54s = function(config) {
 };
 
 h54s.Error = function(type, message) {
-  Error.captureStackTrace(this);
+  if(Error.captureStackTrace) {
+    Error.captureStackTrace(this);
+  }
   this.message = message;
   this.type = type;
 };

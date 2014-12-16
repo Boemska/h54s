@@ -5,6 +5,7 @@ Ext.define('h54sExample.view.TableWindow', {
   maximized: true,
   title: 'Detail View',
   autoScroll: true,
+  layout: 'fit',
 
   items: [
     {
