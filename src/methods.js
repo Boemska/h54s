@@ -49,13 +49,14 @@ h54s.prototype.call = function(sasProgram, callback) {
     } else if(/<form.+action="Logon.do".+/.test(res.responseText) && !self.autoLogin) {
       callback(new h54s.Error('notLoggedinError', 'You are not logged in'));
     } else {
-      var resObj, escapedResObj;
+      var resObj, unescapedResObj;
       if(!self.debug) {
         try {
           //clar sas params
           this.sasParams = [];
           resObj = JSON.parse(res.responseText);
-          escapedResObj = self._utils.unescapeValues(resObj);
+          resObj = self._utils.convertDates(resObj);
+          unescapedResObj = self._utils.unescapeValues(resObj);
         } catch(e) {
           if(retryCount < self.counters.maxXhrRetries) {
             self._utils.ajax.post(self.url, params).success(this.success).error(this.error);
@@ -68,7 +69,7 @@ h54s.prototype.call = function(sasProgram, callback) {
         } finally {
           if(resObj) {
             self._utils.addApplicationLogs(resObj);
-            callback(undefined, escapedResObj);
+            callback(undefined, unescapedResObj);
           }
         }
       } else {
@@ -76,14 +77,15 @@ h54s.prototype.call = function(sasProgram, callback) {
           //clear sas params
           this.sasParams = [];
           resObj = self._utils.parseDebugRes(res.responseText);
-          escapedResObj = self._utils.unescapeValues(resObj);
+          resObj = self._utils.convertDates(resObj);
+          unescapedResObj = self._utils.unescapeValues(resObj);
         } catch(e) {
           self._utils.parseErrorResponse(res.responseText);
           callback(new h54s.Error('parseError', 'Unable to parse response json'));
         } finally {
           if(resObj) {
             self._utils.addApplicationLogs(resObj);
-            callback(undefined, escapedResObj);
+            callback(undefined, unescapedResObj);
           }
         }
       }
@@ -167,10 +169,6 @@ h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
 *
 */
 h54s.prototype.addTable = function (inTable, macroName) {
-  var inTableJson = JSON.stringify(inTable);
-  inTableJson     = inTableJson.replace(/\"\"/gm, '\" \"');
-  inTable         = JSON.parse(inTableJson);
-
   if (typeof (macroName) !== 'string') {
     throw new h54s.Error('argumentError', 'Second parameter must be a valid string');
   }

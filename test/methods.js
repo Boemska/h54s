@@ -95,7 +95,7 @@ describe('h54s', function() {
     });
 
     it('Test auto login', function(done) {
-      this.timeout(6000);
+      this.timeout(10000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url,
         autoLogin: true,

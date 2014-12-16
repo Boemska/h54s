@@ -1,4 +1,4 @@
-/*! h54s v0.0.13 - 2014-12-15 
+/*! h54s v0.0.14 - 2014-12-16 
  *  License: GPL 
  * Author: Boemska 
 */
@@ -108,13 +108,14 @@ h54s.prototype.call = function(sasProgram, callback) {
     } else if(/<form.+action="Logon.do".+/.test(res.responseText) && !self.autoLogin) {
       callback(new h54s.Error('notLoggedinError', 'You are not logged in'));
     } else {
-      var resObj, escapedResObj;
+      var resObj, unescapedResObj;
       if(!self.debug) {
         try {
           //clar sas params
           this.sasParams = [];
           resObj = JSON.parse(res.responseText);
-          escapedResObj = self._utils.unescapeValues(resObj);
+          resObj = self._utils.convertDates(resObj);
+          unescapedResObj = self._utils.unescapeValues(resObj);
         } catch(e) {
           if(retryCount < self.counters.maxXhrRetries) {
             self._utils.ajax.post(self.url, params).success(this.success).error(this.error);
@@ -127,7 +128,7 @@ h54s.prototype.call = function(sasProgram, callback) {
         } finally {
           if(resObj) {
             self._utils.addApplicationLogs(resObj);
-            callback(undefined, escapedResObj);
+            callback(undefined, unescapedResObj);
           }
         }
       } else {
@@ -135,14 +136,15 @@ h54s.prototype.call = function(sasProgram, callback) {
           //clear sas params
           this.sasParams = [];
           resObj = self._utils.parseDebugRes(res.responseText);
-          escapedResObj = self._utils.unescapeValues(resObj);
+          resObj = self._utils.convertDates(resObj);
+          unescapedResObj = self._utils.unescapeValues(resObj);
         } catch(e) {
           self._utils.parseErrorResponse(res.responseText);
           callback(new h54s.Error('parseError', 'Unable to parse response json'));
         } finally {
           if(resObj) {
             self._utils.addApplicationLogs(resObj);
-            callback(undefined, escapedResObj);
+            callback(undefined, unescapedResObj);
           }
         }
       }
@@ -226,10 +228,6 @@ h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
 *
 */
 h54s.prototype.addTable = function (inTable, macroName) {
-  var inTableJson = JSON.stringify(inTable);
-  inTableJson     = inTableJson.replace(/\"\"/gm, '\" \"');
-  inTable         = JSON.parse(inTableJson);
-
   if (typeof (macroName) !== 'string') {
     throw new h54s.Error('argumentError', 'Second parameter must be a valid string');
   }
@@ -343,6 +341,7 @@ h54s.prototype._utils.ajax = (function () {
 *
 */
 h54s.prototype._utils.convertTableObject = function(inObject) {
+  var self = this;
   var chunkThreshold = 32000; // this goes to 32k for SAS
   // first check that the object is an array
   if (typeof (inObject) !== 'object') {
@@ -391,15 +390,14 @@ h54s.prototype._utils.convertTableObject = function(inObject) {
       var thisValue = inObject[i][key];
       // get type... if it is an object then convert it to json and store as a string
       var thisType  = typeof (thisValue);
-      if (thisType == 'number') { // straightforward number
+      var isDate = thisValue instanceof Date;
+      if (thisType === 'number') { // straightforward number
         thisSpec.colName                    = key;
         thisSpec.colType                    = 'num';
         thisSpec.colLength                  = 8;
         thisSpec.encodedLength              = thisValue.toString().length;
         targetArray[currentTarget][j][key]  = thisValue;
-
-      }
-      if (thisType == 'string') { // straightforward string
+      } else if (thisType === 'string' && !isDate) { // straightforward string
         thisSpec.colName    = key;
         thisSpec.colType    = 'string';
         thisSpec.colLength  = thisValue.length;
@@ -409,21 +407,18 @@ h54s.prototype._utils.convertTableObject = function(inObject) {
           targetArray[currentTarget][j][key] = escape(thisValue);
         }
         thisSpec.encodedLength = targetArray[currentTarget][j][key].length;
-      }
-      if (thisType == 'object') { // interesting bit. If it is a date then it will have a toDate
-        if (typeof (thisValue.toDateString) !== 'undefined') { // it is a date
-          thisSpec.colName                    = key;
-          thisSpec.colType                    = 'date';
-          thisSpec.colLength                  = 8;
-          targetArray[currentTarget][j][key]  = this.formatDate(thisValue, "dd/MM/yyyy");
-          thisSpec.encodedLength              = targetArray[currentTarget][j][key].toString().length;
-        } else {
-          thisSpec.colName                    = key;
-          thisSpec.colType                    = 'json';
-          thisSpec.colLength                  = JSON.stringify(thisValue).length;
-          targetArray[currentTarget][j][key]  = escape(JSON.stringify(thisValue));
-          thisSpec.encodedLength              = targetArray[currentTarget][j][key].length;
-        }
+      } else if(isDate) {
+        thisSpec.colName                    = key;
+        thisSpec.colType                    = 'date';
+        thisSpec.colLength                  = 8;
+        targetArray[currentTarget][j][key]  = self.toSasDateTime(thisValue);
+        thisSpec.encodedLength              = targetArray[currentTarget][j][key].toString().length;
+      } else if (thisType == 'object') {
+        thisSpec.colName                    = key;
+        thisSpec.colType                    = 'json';
+        thisSpec.colLength                  = JSON.stringify(thisValue).length;
+        targetArray[currentTarget][j][key]  = escape(JSON.stringify(thisValue));
+        thisSpec.encodedLength              = targetArray[currentTarget][j][key].length;
       }
       chunkRowCount = chunkRowCount +
         6 +
@@ -507,7 +502,7 @@ h54s.prototype._utils.unescapeValues = function(obj) {
 *
 */
 h54s.prototype._utils.parseErrorResponse = function(res) {
-  patt = /ERROR(.*\.|.*\n.*\.)/g;
+  var patt = /ERROR(.*\.|.*\n.*\.)/g;
   var errors = res.match(patt);
   if(!errors) {
     return;
@@ -554,4 +549,70 @@ h54s.prototype._utils.addApplicationLogs = function(res) {
   if(this._logs.length > 100) {
     this._logs.shift();
   }
+};
+
+/*
+* Convert javascript date to sas time
+*
+* @param {object} jsDate - javascript Date object
+*
+*/
+h54s.prototype._utils.toSasDateTime = function (jsDate) {
+  var basedate = new Date("January 1, 1960 00:00:00");
+  var currdate = jsDate;
+
+  // offsets for UTC and timezones and BST
+  var baseOffset = basedate.getTimezoneOffset(); // in minutes
+  var currOffset = currdate.getTimezoneOffset(); // in minutes
+
+  // convert currdate to a sas datetime
+  var offsetSecs = (currOffset - baseOffset) * 60; // offsetDiff is in minutes to start with
+  var baseDateSecs = basedate.getTime() / 1000; // get rid of ms
+  var currdateSecs = currdate.getTime() / 1000; // get rid of ms
+  var sasDatetime = Math.round(currdateSecs - baseDateSecs - offsetSecs); // adjust
+
+  return sasDatetime;
+};
+
+/*
+* Convert sas time to javascript date
+*
+* @param {number} sasDate - sas Tate object
+*
+*/
+h54s.prototype._utils.fromSasDateTime = function (sasDate) {
+  var basedate = new Date("January 1, 1960 00:00:00");
+  var currdate = sasDate;
+
+  // offsets for UTC and timezones and BST
+  var baseOffset = basedate.getTimezoneOffset(); // in minutes
+
+  // convert sas datetime to a current valid javascript date
+  var basedateMs = basedate.getTime(); // in ms
+  var currdateMs = currdate * 1000; // to ms
+  var sasDatetime = currdateMs + basedateMs;
+  var jsDate = new Date();
+  jsDate.setTime(sasDatetime); // first time to get offset BST daylight savings etc
+  var currOffset = jsDate.getTimezoneOffset(); // adjust for offset in minutes
+  var offsetVar = (baseOffset - currOffset) * 60 * 1000; // difference in milliseconds
+  var offsetTime = sasDatetime - offsetVar; // finding BST and daylight savings
+  jsDate.setTime(offsetTime); // update with offset
+  return jsDate;
+};
+
+/*
+* Convert sas timestamps to javascript Date object
+*
+* @param {object} obj
+*
+*/
+h54s.prototype._utils.convertDates = function(obj) {
+  for (var key in obj) {
+    if (typeof obj[key] === 'number' && key.indexOf('dt_') === 0) {
+      obj[key] = this.fromSasDateTime(obj[key]);
+    } else if(typeof obj === 'object') {
+      this.convertDates(obj[key]);
+    }
+  }
+  return obj;
 };

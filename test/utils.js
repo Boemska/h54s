@@ -97,5 +97,27 @@ describe('h54s', function() {
       });
     });
 
+    it('Test date send and receive', function(done) {
+      this.timeout(6000);
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url,
+        debug: true
+      });
+      var date = new Date();
+      sasAdapter.setCredentials(serverData.user, serverData.pass);
+      sasAdapter.addTable([
+        {
+          dt_some_date: date
+        }
+      ], 'data');
+      sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res) {
+        var resSeconds = Math.round(res.outputdata[0].dt_some_date.getTime() / 1000);
+        var dateSeconds = Math.round(date.getTime() / 1000);
+        assert.isUndefined(err, 'We got error on sas program ajax call');
+        assert.equal(resSeconds, dateSeconds, 'Date is not the same');
+        done();
+      });
+    });
+
   });
 });

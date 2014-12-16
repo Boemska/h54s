@@ -1,6 +1,6 @@
 {
   "name": "h54s",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "HTML5 Data Adapter for SAS",
   "main": "index.js",
   "scripts": {
