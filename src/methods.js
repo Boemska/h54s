@@ -52,7 +52,7 @@ h54s.prototype.call = function(sasProgram, callback) {
       var resObj, unescapedResObj;
       if(!self.debug) {
         try {
-          //clar sas params
+          //clear sas params
           this.sasParams = [];
           resObj = JSON.parse(res.responseText);
           resObj = self._utils.convertDates(resObj);
@@ -76,7 +76,7 @@ h54s.prototype.call = function(sasProgram, callback) {
         try {
           //clear sas params
           this.sasParams = [];
-          resObj = self._utils.parseDebugRes(res.responseText);
+          resObj = self._utils.parseDebugRes(res.responseText, sasProgram, params);
           resObj = self._utils.convertDates(resObj);
           unescapedResObj = self._utils.unescapeValues(resObj);
         } catch(e) {
@@ -85,7 +85,11 @@ h54s.prototype.call = function(sasProgram, callback) {
         } finally {
           if(resObj) {
             self._utils.addApplicationLogs(resObj);
-            callback(undefined, unescapedResObj);
+            if(resObj.hasErrors) {
+              callback(new h54s.Error('sasError', 'Sas program completed with errors'), unescapedResObj);
+            } else {
+              callback(undefined, unescapedResObj);
+            }
           }
         }
       }
@@ -201,5 +205,29 @@ h54s.prototype.getSasErrors = function() {
 *
 */
 h54s.prototype.getApplicationLogs = function() {
-  return this._utils._logs;
+  return this._utils._applicationLogs;
+};
+
+/*
+* Get debug data
+*
+*/
+h54s.prototype.getDebugData = function() {
+  return this._utils._debugData;
+};
+
+/*
+* Enter debug mode
+*
+*/
+h54s.prototype.setDebugMode = function() {
+  this.debug = true;
+};
+
+/*
+* Exit debug mode
+*
+*/
+h54s.prototype.unsetDebugMode = function() {
+  this.debug = true;
 };

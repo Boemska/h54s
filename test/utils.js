@@ -134,5 +134,55 @@ describe('h54s', function() {
       });
     });
 
+    it('Set debug mode and get errors when first request fails', function(done) {
+      this.timeout(10000);
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url
+      });
+      sasAdapter.setCredentials(serverData.user, serverData.pass);
+      sasAdapter.addTable([
+        {
+          libname: 'WORK',
+          memname: 'CHOSENLIB'
+        }
+      ], 'data');
+      sasAdapter.call('/AJAX/h54s_test/getData', function(err, res) {
+        assert.isObject(err, 'We should get error object');
+        assert.equal(err.type, 'parseError', 'We should get parseError');
+        var sasErrors = sasAdapter.getSasErrors();
+        assert.isArray(sasErrors, 'sasErrors should be array');
+        if(sasErrors.length === 0) {
+          assert.notOk(sasErrors, 'sasErrors array should not be empty');
+        }
+
+        sasAdapter.setDebugMode();
+        sasAdapter.addTable([
+          {
+            libname: 'WORK',
+            memname: 'CHOSENLIB'
+          }
+        ], 'data');
+        sasAdapter.call('/AJAX/h54s_test/getData', function(err, res) {
+          assert.isObject(err, 'We should get error object');
+          assert.equal(err.type, 'sasError', 'We should get sasError');
+          var debugData = sasAdapter.getDebugData();
+          var sasErrors = sasAdapter.getSasErrors();
+          if(sasErrors.length === 0) {
+            assert.notOk(sasErrors, 'sasErrors array should not be empty');
+          }
+          if(debugData.length === 0) {
+            assert.notOk(debugData, 'sasErrors array should not be empty');
+          } else {
+            assert.isString(debugData[0].debugHtml, 'debugHtml should be string');
+            assert.isString(debugData[0].debugText, 'debugText should be string');
+            assert.isString(debugData[0].sasProgram, 'sasProgram should be string');
+            assert.isObject(debugData[0].params, 'params should be array');
+            assert.isDefined(debugData[0].time, 'debug time is undefined');
+          }
+          done();
+        });
+      });
+    });
+
   });
 });

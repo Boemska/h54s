@@ -1,4 +1,4 @@
-/*! h54s v0.1.0 - 2014-12-16 
+/*! h54s v0.1.1 - 2014-12-18 
  *  License: GPL 
  * Author: Boemska 
 */
@@ -167,7 +167,7 @@ h54s.prototype.call = function(sasProgram, callback) {
       var resObj, unescapedResObj;
       if(!self.debug) {
         try {
-          //clar sas params
+          //clear sas params
           this.sasParams = [];
           resObj = JSON.parse(res.responseText);
           resObj = self._utils.convertDates(resObj);
@@ -191,7 +191,7 @@ h54s.prototype.call = function(sasProgram, callback) {
         try {
           //clear sas params
           this.sasParams = [];
-          resObj = self._utils.parseDebugRes(res.responseText);
+          resObj = self._utils.parseDebugRes(res.responseText, sasProgram, params);
           resObj = self._utils.convertDates(resObj);
           unescapedResObj = self._utils.unescapeValues(resObj);
         } catch(e) {
@@ -200,7 +200,11 @@ h54s.prototype.call = function(sasProgram, callback) {
         } finally {
           if(resObj) {
             self._utils.addApplicationLogs(resObj);
-            callback(undefined, unescapedResObj);
+            if(resObj.hasErrors) {
+              callback(new h54s.Error('sasError', 'Sas program completed with errors'), unescapedResObj);
+            } else {
+              callback(undefined, unescapedResObj);
+            }
           }
         }
       }
@@ -316,11 +320,36 @@ h54s.prototype.getSasErrors = function() {
 *
 */
 h54s.prototype.getApplicationLogs = function() {
-  return this._utils._logs;
+  return this._utils._applicationLogs;
+};
+
+/*
+* Get debug data
+*
+*/
+h54s.prototype.getDebugData = function() {
+  return this._utils._debugData;
+};
+
+/*
+* Enter debug mode
+*
+*/
+h54s.prototype.setDebugMode = function() {
+  this.debug = true;
+};
+
+/*
+* Exit debug mode
+*
+*/
+h54s.prototype.unsetDebugMode = function() {
+  this.debug = true;
 };
 
 h54s.prototype._utils = {};
-h54s.prototype._utils._logs = [];
+h54s.prototype._utils._applicationLogs = [];
+h54s.prototype._utils._debugData = [];
 h54s.prototype._utils.ajax = (function () {
   var xhr = function(type, url, data) {
     var methods = {
@@ -520,20 +549,44 @@ h54s.prototype._utils.convertTableObject = function(inObject) {
 * @param {object} responseText - response html from the server
 *
 */
-h54s.prototype._utils.parseDebugRes = function(responseText) {
+h54s.prototype._utils.parseDebugRes = function(responseText, sasProgram, params) {
   //disable jshint for unsafe characters
   /* jshint -W100 */
 
   //find json
-  var patt = /^(﻿--h54s-data-start--)([\S\s]*)(--h54s-data-end--)/m;
+  var patt = /^(﻿?--h54s-data-start--)([\S\s]*)(--h54s-data-end--)/m;
   var matches = responseText.match(patt);
 
   var jsonObj = JSON.parse(matches[2]);
 
+  var page = responseText.replace(patt, '');
+  var htmlBodyPatt = /<body.*>([\s\S]*)<\/body>/;
+  var bodyMatches = page.match(htmlBodyPatt);
+
+  //remove html tags
+  var debugText = bodyMatches[1].replace(/<[^>]*>/g, '');
+  debugText = this.decodeHTMLEntities(debugText);
+
+  this._debugData.push({
+    debugHtml: bodyMatches[1],
+    debugText: debugText,
+    sasProgram: sasProgram,
+    params: params,
+    time: new Date()
+  });
+
+  //max 20 debug objects
+  if(this._debugData.length > 20) {
+    this._debugData.shift();
+  }
+
+  if(debugText.indexOf('ERROR:') !== -1) {
+    jsonObj.hasErrors = true;
+  }
+
   return jsonObj;
 };
 
-//TODO: add support for date
 /*
 * Unescape all string values in returned object
 *
@@ -599,11 +652,11 @@ h54s.prototype._utils.addApplicationLogs = function(res) {
   if(res.logmessage === 'blank') {
     return;
   }
-  this._logs.push(res.logmessage);
+  this._applicationLogs.push(res.logmessage);
 
   //100 log messages max
-  if(this._logs.length > 100) {
-    this._logs.shift();
+  if(this._applicationLogs.length > 100) {
+    this._applicationLogs.shift();
   }
 };
 
