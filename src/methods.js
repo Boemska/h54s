@@ -61,14 +61,14 @@ h54s.prototype.call = function(sasProgram, callback) {
           if(retryCount < self.counters.maxXhrRetries) {
             self._utils.ajax.post(self.url, params).success(this.success).error(this.error);
             retryCount++;
-            console.log("Retrying #" + retryCount);
+            self._utils.addApplicationLogs("Retrying #" + retryCount);
           } else {
             self._utils.parseErrorResponse(res.responseText);
             callback(new h54s.Error('parseError', 'Unable to parse response json'));
           }
         } finally {
           if(resObj) {
-            self._utils.addApplicationLogs(resObj);
+            self._utils.addApplicationLogs(resObj.logmessage);
             callback(undefined, unescapedResObj);
           }
         }
@@ -84,7 +84,7 @@ h54s.prototype.call = function(sasProgram, callback) {
           callback(new h54s.Error('parseError', 'Unable to parse response json'));
         } finally {
           if(resObj) {
-            self._utils.addApplicationLogs(resObj);
+            self._utils.addApplicationLogs(resObj.logmessage);
             if(resObj.hasErrors) {
               callback(new h54s.Error('sasError', 'Sas program completed with errors'), unescapedResObj);
             } else {
@@ -95,6 +95,7 @@ h54s.prototype.call = function(sasProgram, callback) {
       }
     }
   }).error(function(res) {
+    self._utils.addApplicationLogs('Request failed with status: ' + res.status);
     callback(new h54s.Error(res.statusText));
   });
 };
@@ -153,6 +154,7 @@ h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
     px: this.pass,
   }).success(function(res) {
     if(/<form.+action="Logon.do".+/.test(res.responseText)) {
+      self._utils.addApplicationLogs('Wrong username or password');
       callCallback(-1);
     } else {
       //sas can ask for login again in 10 minutes if inactive
@@ -161,6 +163,7 @@ h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
       callCallback(res.status);
     }
   }).error(function(res) {
+    self._utils.addApplicationLogs('Login failed with status code: ' + res.status);
     callCallback(res.status);
   });
 };

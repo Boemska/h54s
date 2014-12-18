@@ -87,29 +87,24 @@ describe('h54s', function() {
         hostUrl: serverData.url
       });
       sasAdapter.setCredentials(serverData.user, serverData.pass);
-      sasAdapter.call('/AJAX/h54s_test/startupService', function(err, res) {
+      sasAdapter.addTable([
+        {
+          data: 'test'
+        }
+      ], 'data');
+      sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res) {
         assert.isUndefined(err, 'We got error on sas program ajax call');
         var logs = sasAdapter.getApplicationLogs();
         assert.isArray(logs, 'getApplicationLogs() should return array');
-        assert.equal(logs.length, 0, 'Application logs should be empty array');
-
-        sasAdapter.setCredentials(serverData.user, serverData.pass);
-        sasAdapter.addTable([
-          {
-            data: 'test'
-          }
-        ], 'data');
-        sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res) {
-          assert.isUndefined(err, 'We got error on sas program ajax call');
-          var logs = sasAdapter.getApplicationLogs();
-          assert.isArray(logs, 'getApplicationLogs() should return array');
-          if(logs.length === 0) {
-            assert.fail(logs.length, ' > 0', 'Application logs should not be empty array');
-          }
-          done();
-        });
+        if(logs.length === 0) {
+          assert.fail(logs.length, ' > 0', 'Application logs should not be empty array');
+        } else {
+          assert.isString(logs[0].message, 'Application log object should have message property of type string');
+          assert.equal(res.logmessage, logs[logs.length - 1].message, 'Last log message should be equal as logmessage from response');
+          assert.isDefined(logs[0].time, 'Application log object should have time property');
+        }
+        done();
       });
-
     });
 
     it('Test date send and receive', function(done) {

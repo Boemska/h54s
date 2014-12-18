@@ -299,11 +299,15 @@ h54s.prototype._utils.decodeHTMLEntities = function (html) {
 * @param {string} res - server response
 *
 */
-h54s.prototype._utils.addApplicationLogs = function(res) {
-  if(res.logmessage === 'blank') {
+h54s.prototype._utils.addApplicationLogs = function(message) {
+  if(message === 'blank') {
     return;
   }
-  this._applicationLogs.push(res.logmessage);
+  var log = {
+    message: message,
+    time: new Date()
+  };
+  this._applicationLogs.push(log);
 
   //100 log messages max
   if(this._applicationLogs.length > 100) {
