@@ -347,7 +347,7 @@ h54s.prototype.setDebugMode = function() {
 *
 */
 h54s.prototype.unsetDebugMode = function() {
-  this.debug = true;
+  this.debug = false;
 };
 
 h54s.prototype._utils = {};
