@@ -162,17 +162,26 @@ describe('h54s', function() {
           assert.equal(err.type, 'sasError', 'We should get sasError');
           var debugData = sasAdapter.getDebugData();
           var sasErrors = sasAdapter.getSasErrors();
+          var i;
           if(sasErrors.length === 0) {
             assert.notOk(sasErrors, 'sasErrors array should not be empty');
+          } else {
+            for(i = 0; i < sasErrors.length; i++) {
+              assert.isString(sasErrors[i].message, 'error message should be string');
+              assert.isString(sasErrors[i].sasProgram, 'error sasProgram should be string');
+              assert.isDefined(sasErrors[i].time, 'error time is undefined');
+            }
           }
           if(debugData.length === 0) {
             assert.notOk(debugData, 'sasErrors array should not be empty');
           } else {
-            assert.isString(debugData[0].debugHtml, 'debugHtml should be string');
-            assert.isString(debugData[0].debugText, 'debugText should be string');
-            assert.isString(debugData[0].sasProgram, 'sasProgram should be string');
-            assert.isObject(debugData[0].params, 'params should be array');
-            assert.isDefined(debugData[0].time, 'debug time is undefined');
+            for(i = 0; i < debugData.length; i++) {
+              assert.isString(debugData[i].debugHtml, 'debugHtml should be string');
+              assert.isString(debugData[i].debugText, 'debugText should be string');
+              assert.isString(debugData[i].sasProgram, 'sasProgram should be string');
+              assert.isObject(debugData[i].params, 'params should be array');
+              assert.isDefined(debugData[i].time, 'debug time is undefined');
+            }
           }
           done();
         });

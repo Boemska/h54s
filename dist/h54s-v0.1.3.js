@@ -1,4 +1,4 @@
-/*! h54s v0.1.2 - 2014-12-18 
+/*! h54s v0.1.3 - 2014-12-19 
  *  License: GPL 
  * Author: Boemska 
 */
@@ -178,7 +178,7 @@ h54s.prototype.call = function(sasProgram, callback) {
             retryCount++;
             self._utils.addApplicationLogs("Retrying #" + retryCount);
           } else {
-            self._utils.parseErrorResponse(res.responseText);
+            self._utils.parseErrorResponse(res.responseText, sasProgram);
             callback(new h54s.Error('parseError', 'Unable to parse response json'));
           }
         } finally {
@@ -195,7 +195,7 @@ h54s.prototype.call = function(sasProgram, callback) {
           resObj = self._utils.convertDates(resObj);
           unescapedResObj = self._utils.unescapeValues(resObj);
         } catch(e) {
-          self._utils.parseErrorResponse(res.responseText);
+          self._utils.parseErrorResponse(res.responseText, sasProgram);
           callback(new h54s.Error('parseError', 'Unable to parse response json'));
         } finally {
           if(resObj) {
@@ -315,7 +315,7 @@ h54s.prototype.addTable = function (inTable, macroName) {
 *
 */
 h54s.prototype.getSasErrors = function() {
-  return this._utils.sasErrors;
+  return this._utils._sasErrors;
 };
 
 /*
@@ -353,6 +353,7 @@ h54s.prototype.unsetDebugMode = function() {
 h54s.prototype._utils = {};
 h54s.prototype._utils._applicationLogs = [];
 h54s.prototype._utils._debugData = [];
+h54s.prototype._utils._sasErrors = [];
 h54s.prototype._utils.ajax = (function () {
   var xhr = function(type, url, data) {
     var methods = {
@@ -587,6 +588,8 @@ h54s.prototype._utils.parseDebugRes = function(responseText, sasProgram, params)
     jsonObj.hasErrors = true;
   }
 
+  this.parseErrorResponse(responseText, sasProgram);
+
   return jsonObj;
 };
 
@@ -611,20 +614,31 @@ h54s.prototype._utils.unescapeValues = function(obj) {
 * Parse error response from server and save errors in memory
 *
 * @param {string} res - server response
+* #param {string} sasProgram - sas progrma which returned the response
 *
 */
-h54s.prototype._utils.parseErrorResponse = function(res) {
+h54s.prototype._utils.parseErrorResponse = function(res, sasProgram) {
   var patt = /ERROR(.*\.|.*\n.*\.)/g;
   var errors = res.match(patt);
   if(!errors) {
     return;
   }
 
+  var errMessage;
   for(var i = 0, n = errors.length; i < n; i++) {
-    errors[i] = errors[i].replace(/<[^>]*>/g, '').replace(/(\n|\s{2,})/g, ' ');
-    errors[i] = this.decodeHTMLEntities(errors[i]);
+    errMessage = errors[i].replace(/<[^>]*>/g, '').replace(/(\n|\s{2,})/g, ' ');
+    errMessage = this.decodeHTMLEntities(errors[i]);
+    errors[i] = {
+      sasProgram: sasProgram,
+      message: errMessage,
+      time: new Date()
+    };
   }
-  this.sasErrors = errors;
+  this._sasErrors = this._sasErrors.concat(errors);
+
+  while(this._sasErrors.length > 100) {
+    this._sasErrors.shift();
+  }
 };
 
 /*

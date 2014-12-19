@@ -63,7 +63,7 @@ h54s.prototype.call = function(sasProgram, callback) {
             retryCount++;
             self._utils.addApplicationLogs("Retrying #" + retryCount);
           } else {
-            self._utils.parseErrorResponse(res.responseText);
+            self._utils.parseErrorResponse(res.responseText, sasProgram);
             callback(new h54s.Error('parseError', 'Unable to parse response json'));
           }
         } finally {
@@ -80,7 +80,7 @@ h54s.prototype.call = function(sasProgram, callback) {
           resObj = self._utils.convertDates(resObj);
           unescapedResObj = self._utils.unescapeValues(resObj);
         } catch(e) {
-          self._utils.parseErrorResponse(res.responseText);
+          self._utils.parseErrorResponse(res.responseText, sasProgram);
           callback(new h54s.Error('parseError', 'Unable to parse response json'));
         } finally {
           if(resObj) {
@@ -200,7 +200,7 @@ h54s.prototype.addTable = function (inTable, macroName) {
 *
 */
 h54s.prototype.getSasErrors = function() {
-  return this._utils.sasErrors;
+  return this._utils._sasErrors;
 };
 
 /*
