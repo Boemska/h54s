@@ -2,6 +2,7 @@
   <div ng-if="!loaded" class="loadingText">Loading...</div>
   <div ng-if="loaded" id="dashboard-wrapper" class="center-block">
 
+    <button id="debug-btn" ng-if="debugMode" ng-click="showDebugWindow()" type="button" class="btn btn-primary center-block">Show debug data and logs</button>
     <div id="libTable">
       <table st-table="displayedCollection" st-safe-src="rowCollection" class="table table-hover">
         <thead>

@@ -1,4 +1,4 @@
-app.factory('sasAdapter', function($q) {
+app.factory('sasAdapter', function($q, $rootScope) {
   var sasAdapter = new h54s({
     hostUrl: serverData.url
   });
@@ -31,6 +31,24 @@ app.factory('sasAdapter', function($q) {
     },
     addTable: function(table, macro) {
       sasAdapter.addTable(table, macro);
+    },
+    setDebugMode: function() {
+      if(!sasAdapter.debug) {
+        sasAdapter.setDebugMode();
+        $rootScope.debugMode = true;
+      } else {
+        sasAdapter.unsetDebugMode();
+        $rootScope.debugMode = false;
+      }
+    },
+    getDebugData: function() {
+      return sasAdapter.getDebugData();
+    },
+    getApplicationLogs: function() {
+      return sasAdapter.getApplicationLogs();
+    },
+    getSasErrors: function() {
+      return sasAdapter.getSasErrors();
     }
   }
 });

@@ -1,6 +1,7 @@
 #dashboard-wrapper {
   width: 500px;
   padding-top: 100px;
+  position: relative;
 }
 
 .loadingText {
@@ -14,4 +15,42 @@
 
 #libTable tbody tr {
   cursor: pointer;
+}
+
+#debugWindow {
+  position: fixed;
+  top: 0px;
+  left: 0;
+  right: 0;
+  width: 800px;
+  max-width: 100%;
+  margin: auto;
+  height: 100%;
+  background: #fff;
+  border: 1px solid #ddd;
+}
+
+#debug-btn {
+  position: absolute;
+  top: 50px;
+  right: 0;
+}
+
+.tab-pane {
+  overflow-y: auto;
+}
+
+.logItem {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+#debugWindow .tab-content {
+  padding: 5px 10px;
+}
+
+#debugWindow button.close {
+  margin-top: 10px;
+  margin-right: 5px;
 }

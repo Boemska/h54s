@@ -1,4 +1,4 @@
-app.controller('dashboardCtrl', ['$scope', '$location', 'sasAdapter', function($scope, $location, sasAdapter) {
+app.controller('dashboardCtrl', ['$scope', '$location', 'sasAdapter', '$rootScope', function($scope, $location, sasAdapter, $rootScope) {
   $scope.loaded = false;
   sasAdapter.call('/AJAX/h54s_test/libraryList').then(function(res) {
     $scope.libraryList = res.librarylist;
@@ -30,6 +30,14 @@ app.controller('dashboardCtrl', ['$scope', '$location', 'sasAdapter', function($
     var path = '/data/' + libname + '/' + memname;
     $location.path(path);
   };
+
+  $rootScope.$watch('debugMode', function() {
+    $scope.debugMode = $rootScope.debugMode;
+  });
+
+  $scope.showDebugWindow = function() {
+    $rootScope.showDebugWindow = true;
+  }
 
 }]);
 
@@ -72,4 +80,75 @@ app.controller('dataCtrl', ['$scope', '$location', '$routeParams', 'sasAdapter',
       alert(err.message);
     }
   })
+}]);
+
+app.controller('appCtrl', ['$scope', '$location', 'sasAdapter', function($scope, $location, sasAdapter) {
+  var keys = [
+    {
+      code: 17,
+      name: 'ctrl',
+      pressed: false
+    }, {
+      code: 18,
+      name: 'alt',
+      pressed: false
+    }, {
+      code: 68,
+      name: 'd',
+      pressed: false
+    }
+  ];
+  var allPressed;
+
+  $scope.keydown = function(e) {
+    allPressed = true;
+    for(var i = 0; i < keys.length; i++) {
+      if(e.keyCode === keys[i].code) {
+        keys[i].pressed = true;
+      }
+      if(!keys[i].pressed) {
+        allPressed = false;
+      }
+    }
+
+    if(allPressed) {
+      sasAdapter.setDebugMode();
+    }
+  };
+
+  $scope.keyup = function(e) {
+    for(var i = 0; i < keys.length; i++) {
+      if(e.keyCode === keys[i].code) {
+        keys[i].pressed = false;
+      }
+    }
+  }
+}]);
+
+app.controller('debugWindowCtrl', ['$scope', 'sasAdapter', '$rootScope', '$sce', function($scope, sasAdapter, $rootScope, $sce) {
+
+  $rootScope.$watch('showDebugWindow', function() {
+    if($rootScope.showDebugWindow) {
+      $scope.appLogs = sasAdapter.getApplicationLogs();
+      $scope.debugData = sasAdapter.getDebugData().map(function(el) {
+        return {
+          time: el.time,
+          message: $sce.trustAsHtml(el.debugHtml)
+        };
+      });
+      $scope.sasErrors = sasAdapter.getSasErrors();
+      console.log($scope.sasErrors);
+      setHeight();
+    }
+  });
+
+  $scope.closeDebugWindow = function() {
+    $rootScope.showDebugWindow = false;
+  }
+
+  function setHeight() {
+    var headerHeight = $('.nav.nav-tabs').height();
+    var height = $(window).height() - headerHeight;
+    $('#debugWindow div').height(height);
+  }
 }]);
