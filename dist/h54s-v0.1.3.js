@@ -554,11 +554,8 @@ h54s.prototype._utils.convertTableObject = function(inObject) {
 *
 */
 h54s.prototype._utils.parseDebugRes = function(responseText, sasProgram, params) {
-  //disable jshint for unsafe characters
-  /* jshint -W100 */
-
   //find json
-  var patt = /^(﻿?--h54s-data-start--)([\S\s]*)(--h54s-data-end--)/m;
+  var patt = /^(.?--h54s-data-start--)([\S\s]*)(--h54s-data-end--)/m;
   var matches = responseText.match(patt);
 
   var jsonObj = JSON.parse(matches[2]);
