@@ -614,7 +614,7 @@ h54s.prototype._utils.unescapeValues = function(obj) {
 * Parse error response from server and save errors in memory
 *
 * @param {string} res - server response
-* #param {string} sasProgram - sas progrma which returned the response
+* #param {string} sasProgram - sas program which returned the response
 *
 */
 h54s.prototype._utils.parseErrorResponse = function(res, sasProgram) {
@@ -627,7 +627,7 @@ h54s.prototype._utils.parseErrorResponse = function(res, sasProgram) {
   var errMessage;
   for(var i = 0, n = errors.length; i < n; i++) {
     errMessage = errors[i].replace(/<[^>]*>/g, '').replace(/(\n|\s{2,})/g, ' ');
-    errMessage = this.decodeHTMLEntities(errors[i]);
+    errMessage = this.decodeHTMLEntities(errMessage);
     errors[i] = {
       sasProgram: sasProgram,
       message: errMessage,

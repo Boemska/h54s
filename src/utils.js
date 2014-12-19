@@ -275,7 +275,7 @@ h54s.prototype._utils.parseErrorResponse = function(res, sasProgram) {
   var errMessage;
   for(var i = 0, n = errors.length; i < n; i++) {
     errMessage = errors[i].replace(/<[^>]*>/g, '').replace(/(\n|\s{2,})/g, ' ');
-    errMessage = this.decodeHTMLEntities(errors[i]);
+    errMessage = this.decodeHTMLEntities(errMessage);
     errors[i] = {
       sasProgram: sasProgram,
       message: errMessage,
