@@ -137,7 +137,6 @@ app.controller('debugWindowCtrl', ['$scope', 'sasAdapter', '$rootScope', '$sce',
         };
       });
       $scope.sasErrors = sasAdapter.getSasErrors();
-      console.log($scope.sasErrors);
       setHeight();
     }
   });
