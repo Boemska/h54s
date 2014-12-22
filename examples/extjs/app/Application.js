@@ -6,7 +6,8 @@ Ext.define('h54sExample.Application', {
   requires: [
     'h54sExample.sasAdapter',
     'h54sExample.view.TableWindow',
-    'h54sExample.view.LoginWindow'
+    'h54sExample.view.LoginWindow',
+    'h54sExample.view.DebugWindow'
   ],
 
   launch: function () {
@@ -17,6 +18,23 @@ Ext.define('h54sExample.Application', {
         Ext.getCmp('mainPanel').setLoading(false);
         Ext.getStore('LibraryListStore').loadData(res.librarylist);
       }
+    });
+
+    var map = new Ext.util.KeyMap(Ext.getBody(), {
+      key: 68,
+      ctrl: true,
+      alt: true,
+      handler: function() {
+        if(!sasAdapter.getDebugMode()) {
+          sasAdapter.setDebugMode();
+          Ext.getCmp('debugWindowBtn').show();
+        } else {
+          sasAdapter.unsetDebugMode();
+          Ext.getCmp('debugWindowBtn').hide();
+        }
+      },
+      scope: this,
+      defaultEventAction: "stopEvent"
     });
   }
 });

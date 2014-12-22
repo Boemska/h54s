@@ -8,12 +8,33 @@ Ext.define('h54sExample.view.Dashboard', {
 
   items: [{
     xtype: 'panel',
+    height: 100,
+    width: 500,
+    items: [
+      {
+        id: 'debugWindowBtn',
+        xtype: 'button',
+        text: 'Show debug data and logs',
+        hidden: true,
+        height: '34px',
+        style: {
+          position: 'absolute',
+          top: '50px',
+          right: '0'
+        },
+        listeners: {
+          click: function() {
+            var debugWindow = Ext.create('h54sExample.view.DebugWindow');
+            debugWindow.show();
+          }
+        }
+      }
+    ]
+  }, {
+    xtype: 'panel',
     width: 500,
     flex: 1,
     id: 'mainPanel',
-    style: {
-      marginTop: '100px'
-    },
     layout: {
       type: 'vbox',
       align: 'stretch',
@@ -42,9 +63,9 @@ Ext.define('h54sExample.view.Dashboard', {
             emptyText: 'Search',
             width: 250,
             listeners: {
-              change: function(e) {
+              change: function (e) {
                 var store = Ext.getStore('TableStore');
-                store.filterBy(function(record, id) {
+                store.filterBy(function (record, id) {
                   var recValue = record.get('memname').toLowerCase();
                   var value = e.getValue().toLowerCase();
                   if (!e.getValue() || recValue.indexOf(value) !== -1)
@@ -107,7 +128,7 @@ Ext.define('h54sExample.view.Dashboard', {
           }
         ],
         listeners: {
-          select: function(e) {
+          select: function (e) {
             var row = e.getSelection()[0];
             e.clearSelections();
             e.view.refresh();
@@ -122,7 +143,7 @@ Ext.define('h54sExample.view.Dashboard', {
           }
         },
         dockedItems: [{
-          id:'tableGridPaging',
+          id: 'tableGridPaging',
           xtype: 'pagingtoolbar',
           store: Ext.getStore('TableStore'),
           dock: 'bottom',

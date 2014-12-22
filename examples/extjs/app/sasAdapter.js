@@ -45,5 +45,29 @@ Ext.define('h54sExample.sasAdapter', {
 
   retry: function() {
     this.call(this.sasProgram, this.callback);
+  },
+
+  setDebugMode: function() {
+    this._adapter.setDebugMode();
+  },
+
+  unsetDebugMode: function() {
+    this._adapter.unsetDebugMode();
+  },
+
+  getDebugMode: function() {
+    return this._adapter.debug;
+  },
+
+  getSasErrors: function() {
+    return this._adapter.getSasErrors();
+  },
+
+  getDebugData: function() {
+    return this._adapter.getDebugData();
+  },
+
+  getApplicationLogs: function() {
+    return this._adapter.getApplicationLogs();
   }
 });
