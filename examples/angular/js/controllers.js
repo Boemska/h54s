@@ -148,7 +148,7 @@ app.controller('debugWindowCtrl', ['$scope', 'sasAdapter', '$rootScope', '$sce',
 
   function setHeight() {
     var headerHeight = $('.nav.nav-tabs').height();
-    var height = $(window).height() - headerHeight;
+    var height = $(window).height() - headerHeight - 10;
     $('#debugWindow div').height(height);
   }
 }]);
