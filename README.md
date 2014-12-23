@@ -58,14 +58,18 @@ adapter.call('/sas_programs/test', function(err, res){
   }
 });
 ```
->`err` is a custom javascript Error object with one extra field - type
+>`err` is a custom javascript Error object with one extra field - type.
+
 >`err.type` could be "loginError", "notLoggedinError", "parseError", "sasError", or http response text if ajax request failed.
 
 `err.type` meaning:
 
 >"loginError" is returned if autoLogin is set but log in credentials are wrong or not set at all.
+
 >"notLoggedinError" is returned if autoLogin is not set.
+
 >"parseError" is returned if the adapter can't parse json response from server.
+
 >"parseError" is returned only if debug mode is set (`debug: true` in config object). It indicates that SAS program has some errors.
 
 ###setCredentials(user, pass)
@@ -128,7 +132,9 @@ var errors = adapter.getSasErrors();
 ```
 
 >errors[i].sasProgram - SAS program which has errors
+
 >errors[i].message - error message
+
 >errors[i].time - the time of the response with errors (javascript Date object)
 
 ###getApplicationLogs()
@@ -147,9 +153,13 @@ var debugData = adapter.getDebugData();
 ```
 
 >debugData[i].debugHtml - SAS html output
+
 >debugData[i].debugText - SAS text output (stripped html)
+
 >debugData[i].sasProgram - SAS program called
+
 >debugData[i].params - parameters sent to SAS program
+
 >debugData[i].time - the time of the response (javascript Date object)
 
 
