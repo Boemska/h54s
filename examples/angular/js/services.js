@@ -52,3 +52,14 @@ app.factory('sasAdapter', function($q, $rootScope) {
     }
   }
 });
+
+app.factory('stateData', function() {
+  var libs = {
+    librarylist: null,
+    current: {
+      name: null,
+      rows: null
+    }
+  }
+  return libs;
+})
