@@ -45,7 +45,6 @@ Ext.define('h54sExample.view.DebugWindow', {
           listeners: {
             activate: function (tab) {
               var debugArray = sasAdapter.getDebugData();
-              var html = "<div>";
               for (var i = 0; i < debugArray.length; i++) {
                 this.add({
                   xtype: 'container',
@@ -80,7 +79,6 @@ Ext.define('h54sExample.view.DebugWindow', {
 
                 });
               }
-              html += "</div>";
               this.doLayout();
             },
             added: function () {
