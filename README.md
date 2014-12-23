@@ -16,29 +16,29 @@ Default configuration looks like this:
 
 ```
 {
-systemtype: 'SAS',
-sasService: 'default',
-url: '/SASStoredProcess/do',
-debug: false,
-loginUrl: '/SASLogon/Logon.do',
-sasParams: [],
-autoLogin: false
+  systemtype: 'SAS',
+  sasService: 'default',
+  url: '/SASStoredProcess/do',
+  debug: false,
+  loginUrl: '/SASLogon/Logon.do',
+  sasParams: [],
+  autoLogin: false
 }
 ```
 
 You can also provide hostUrl if your SAS instance is on another domain:
 ```
 var adapter = new h54s({
-hostUrl: 'http://www.example.com/'
+  hostUrl: 'http://www.example.com/'
 });
 ```
 
 Or login credentials:
 ```
 var adapter = new h54s({
-user: 'username',
-pass: 'password',
-autoLogin: true
+  user: 'username',
+  pass: 'password',
+  autoLogin: true
 });
 ```
 Note that autoLogin: true will automatically try to log in on first SAS program call.
@@ -50,12 +50,12 @@ Calls SAS program and returns data in callback function.
 Example:
 ```
 adapter.call('/sas_programs/test', function(err, res){
-if(err) {
-//Houston we have a problem
-} else {
-//res is an object returned from the server
-console.log(res);
-}
+  if(err) {
+    //Houston we have a problem
+  } else {
+    //res is an object returned from the server
+    console.log(res);
+  }
 });
 ```
 >`err` is a custom javascript Error object with one extra field - type
@@ -80,28 +80,28 @@ Log in.
 Example:
 ```
 adapter.login('username', 'password', function(status) {
-if(status === -1) {
-//Wrong username or password
-} else if(status === 200) {
-//Success - user is logged in
-} else {
-//ajax call failed
-//status is value of http request status code
-}
+  if(status === -1) {
+    //Wrong username or password
+  } else if(status === 200) {
+    //Success - user is logged in
+  } else {
+    //ajax call failed
+    //status is value of http request status code
+  }
 });
 ```
 or:
 ```
 adapter.setCredentials('username', 'password');
-adapter.login(function(status) {
-if(status === -1) {
-//Wrong username or password
-} else if(status === 200) {
-//Success - user is logged in
-} else {
-//ajax call failed
-//status is value of http request status code
-}
+  adapter.login(function(status) {
+  if(status === -1) {
+    //Wrong username or password
+  } else if(status === 200) {
+    //Success - user is logged in
+  } else {
+    //ajax call failed
+    //status is value of http request status code
+  }
 });
 ```
 
@@ -110,10 +110,10 @@ Adds an array of objects which are then sent to the server with first `call`.
 
 ```
 adapter.addTable([
-{
-libname: 'WORK',
-memname: 'CHOSENLIB'
-}
+  {
+    libname: 'WORK',
+    memname: 'CHOSENLIB'
+  }
 ], 'data');
 ```
 
