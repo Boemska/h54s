@@ -3,7 +3,7 @@ Ext.define('h54sExample.view.DebugWindow', {
 
   id: 'debugWindow',
   width: 800,
-  height: '100%',
+  height: Ext.getBody().getViewSize().height,
   title: 'Debug Information',
   draggable: false,
   closable: true,
