@@ -28,6 +28,8 @@
   height: 100%;
   background: #fff;
   border: 1px solid #ddd;
+  background-color: #fff;
+  z-index: 100;
 }
 
 #debug-btn {

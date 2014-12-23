@@ -23,9 +23,24 @@
         </div>
       </div>
       <div role="tabpanel" class="tab-pane" id="debugData">
-        <div ng-repeat="log in debugData" class="logItem">
-          <p>{{log.time.toString()}}:</p>
-          <div ng-bind-html="log.message">{{log.message}}</div>
+        <div id="accordion" role="tablist" aria-multiselectable="true">
+          <div ng-repeat="log in debugData" class="logItem">
+            <p>{{log.time.toString()}}:</p>
+            <div class="panel panel-default">
+              <div class="panel-heading" role="tab" id="headingOne">
+                <a data-toggle="collapse" data-parent="#accordion" data-target="#collapse{{$index}}" href="" aria-expanded="false" aria-controls="collapse{{$index}}">
+                  {{log.sasProgram}}
+                </a>
+              </div>
+              <div id="collapse{{$index}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+    <!--
+                <div class="panel-body">
+                </div>
+    -->
+                <div ng-bind-html="log.message">{{log.message}}</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div role="tabpanel" class="tab-pane" id="sasErrors">

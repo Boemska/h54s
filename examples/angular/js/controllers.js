@@ -133,7 +133,8 @@ app.controller('debugWindowCtrl', ['$scope', 'sasAdapter', '$rootScope', '$sce',
       $scope.debugData = sasAdapter.getDebugData().map(function(el) {
         return {
           time: el.time,
-          message: $sce.trustAsHtml(el.debugHtml)
+          message: $sce.trustAsHtml(el.debugHtml),
+          sasProgram: el.sasProgram
         };
       });
       $scope.sasErrors = sasAdapter.getSasErrors();
