@@ -26,7 +26,7 @@ Ext.define('h54sExample.view.DebugWindow', {
               for (var i = 0; i < logArray.length; i++) {
                 html += '<p>' + logArray[i].time.toString() + '</p>';
                 html += '<pre>' + logArray[i].message + '</pre>';
-                html += '<div style="border-bottom: 1px solid #ddd; margin: 20px 0"></div>'
+                html += '<hr class="x-component  x-component-default" style="margin-top:20px;margin-bottom:15px;">'
               }
               html += "</div>";
               this.update(html);
@@ -40,19 +40,48 @@ Ext.define('h54sExample.view.DebugWindow', {
         },
         {
           title: 'Debug Data',
-          autoScroll: true,
           bodyPadding: 10,
+          overflowY: 'scroll',
           listeners: {
             activate: function (tab) {
               var debugArray = sasAdapter.getDebugData();
               var html = "<div>";
               for (var i = 0; i < debugArray.length; i++) {
-                html += '<p>' + debugArray[i].time.toString() + '</p>';
-                html += '<pre>' + debugArray[i].debugHtml + '</pre>';
-                html += '<div style="border-bottom: 1px solid #ddd; margin: 20px 0"></div>'
+                this.add({
+                  xtype: 'container',
+                  items: [
+                    {
+                      xtype: 'label',
+                      text: debugArray[i].time.toString()
+                    },
+                    {
+                      layout: 'fit',
+                      xtype: 'panel',
+                      title: debugArray[i].sasProgram,
+                      html: debugArray[i].debugHtml,
+                      collapsible: true,
+                      collapsed: true,
+                      autoScroll: true,
+                      style: {
+                        'word-wrap': 'break-word !important'
+                      }
+                    },
+                    {
+                      xtype: 'component',
+                      autoEl: {
+                        tag: 'hr'
+                      },
+                      style: {
+                        marginTop: '20px',
+                        marginBottom: '15px'
+                      }
+                    }
+                  ]
+
+                });
               }
               html += "</div>";
-              this.update(html);
+              this.doLayout();
             },
             added: function () {
               var debugArray = sasAdapter.getDebugData();
@@ -73,7 +102,7 @@ Ext.define('h54sExample.view.DebugWindow', {
                 html += '<p>' + errArray[i].time.toString() + '</p>';
                 html += '<p>Sas Program: ' + errArray[i].sasProgram + '</p>';
                 html += '<pre>' + errArray[i].message + '</pre>';
-                html += '<div style="border-bottom: 1px solid #ddd; margin: 20px 0"></div>'
+                html += '<hr class="x-component  x-component-default" style="margin-top:20px;margin-bottom:15px;">'
               }
               html += "</div>";
               this.update(html);
