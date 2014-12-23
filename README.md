@@ -198,7 +198,7 @@ adapter.unsetDebugMode();
 2. Run `npm install`
 3. Install grunt-cli if it's not installed already - `npm install -g grunt-cli`.
 4. Edit host url, user and pass in /test/_server_data.js.
-5. Run `grunt`. It will run jshint, concatenate the files in /src, and run karma tests. There are more grunt tasks like:
+5. Run `grunt`. It will run jshint, concatenate the files in /src, and run karma tests. There are more grunt tasks.
   1. `grunt compress` - Create minified h54s file.
   2. `grunt test` - Runs jshint and karma tests.
   3. `grunt watch` - Runs tests on file change.
