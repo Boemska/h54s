@@ -50,7 +50,7 @@ app.factory('sasAdapter', function($q, $rootScope) {
     getSasErrors: function() {
       return sasAdapter.getSasErrors();
     }
-  }
+  };
 });
 
 app.factory('stateData', function() {
@@ -60,6 +60,6 @@ app.factory('stateData', function() {
       name: null,
       rows: null
     }
-  }
+  };
   return libs;
-})
+});

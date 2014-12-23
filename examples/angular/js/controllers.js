@@ -49,7 +49,7 @@ app.controller('dashboardCtrl', ['$scope', '$location', 'sasAdapter', '$rootScop
 
   $scope.showDebugWindow = function() {
     $rootScope.showDebugWindow = true;
-  }
+  };
 
 }]);
 
@@ -64,7 +64,7 @@ app.controller('loginCtrl', ['$scope', '$location', 'sasAdapter', function($scop
     }, function(err) {
       $scope.error = err.message;
     });
-  }
+  };
 }]);
 
 app.controller('dataCtrl', ['$scope', '$location', '$routeParams', 'sasAdapter', function($scope, $location, $routeParams, sasAdapter) {
@@ -91,7 +91,7 @@ app.controller('dataCtrl', ['$scope', '$location', '$routeParams', 'sasAdapter',
       $location.path('/');
       alert(err.message);
     }
-  })
+  });
 }]);
 
 app.controller('appCtrl', ['$scope', '$location', 'sasAdapter', function($scope, $location, sasAdapter) {
@@ -134,7 +134,7 @@ app.controller('appCtrl', ['$scope', '$location', 'sasAdapter', function($scope,
         keys[i].pressed = false;
       }
     }
-  }
+  };
 }]);
 
 app.controller('debugWindowCtrl', ['$scope', 'sasAdapter', '$rootScope', '$sce', function($scope, sasAdapter, $rootScope, $sce) {
@@ -156,7 +156,7 @@ app.controller('debugWindowCtrl', ['$scope', 'sasAdapter', '$rootScope', '$sce',
 
   $scope.closeDebugWindow = function() {
     $rootScope.showDebugWindow = false;
-  }
+  };
 
   function setHeight() {
     var headerHeight = $('.nav.nav-tabs').height();

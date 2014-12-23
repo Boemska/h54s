@@ -26,7 +26,7 @@ Ext.define('h54sExample.view.DebugWindow', {
               for (var i = 0; i < logArray.length; i++) {
                 html += '<p>' + logArray[i].time.toString() + '</p>';
                 html += '<pre>' + logArray[i].message + '</pre>';
-                html += '<hr class="x-component  x-component-default" style="margin-top:20px;margin-bottom:15px;">'
+                html += '<hr class="x-component  x-component-default" style="margin-top:20px;margin-bottom:15px;">';
               }
               html += "</div>";
               this.update(html);
@@ -102,7 +102,7 @@ Ext.define('h54sExample.view.DebugWindow', {
                 html += '<p>' + errArray[i].time.toString() + '</p>';
                 html += '<p>Sas Program: ' + errArray[i].sasProgram + '</p>';
                 html += '<pre>' + errArray[i].message + '</pre>';
-                html += '<hr class="x-component  x-component-default" style="margin-top:20px;margin-bottom:15px;">'
+                html += '<hr class="x-component  x-component-default" style="margin-top:20px;margin-bottom:15px;">';
               }
               html += "</div>";
               this.update(html);
@@ -123,7 +123,10 @@ Ext.define('h54sExample.view.DebugWindow', {
         } else if (num < 100) {
           width = '24px';
         }
-        return '&nbsp;<span ' + 'style="width: ' + width + '; ' + 'height: 15px; border-radius: 15px; background-color:#157FCC; display:inline-block; color: #fff">' + num + '</span>';
+        return '&nbsp;<span ' +
+          'style="width: ' + width + '; ' +
+          'height: 15px; border-radius: 15px; background-color:#157FCC; display:inline-block; color: #fff">' +
+          num + '</span>';
       }
     }
   ]

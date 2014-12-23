@@ -1,4 +1,4 @@
-/** 
+/**
 * @version 1.4.5
 * @license MIT
 */
@@ -412,7 +412,7 @@ ng.module('smart-table')
                         ctrl.preventPipeOnWatch();
                         ctrl.pipe = function () {
                             return scope.stPipe(ctrl.tableState(), ctrl);
-                        }
+                        };
                     }
                 }
             }

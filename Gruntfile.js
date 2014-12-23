@@ -17,7 +17,7 @@ module.exports = function (grunt) {
         trailing: true
       },
       target: {
-        src: ['src/**/*.js', 'test/**/*.js']
+        src: ['src/**/*.js', 'test/**/*.js', 'examples/**/*.js']
       }
     },
     concat: {
