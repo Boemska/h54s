@@ -72,12 +72,16 @@ adapter.call('/sas_programs/test', function(err, res){
 
 >"parseError" is returned only if debug mode is set (`debug: true` in config object). It indicates that SAS program has some errors.
 
+---
+
 ###setCredentials(user, pass)
 Sets log in credentials.
 Example:
 ```
 adapter.setCredentials('username', 'password');
 ```
+
+---
 
 ###login(user, pass, callback)
 Log in.
@@ -109,6 +113,8 @@ adapter.setCredentials('username', 'password');
 });
 ```
 
+---
+
 ###addTable(tableArray, macroName)
 Adds an array of objects which are then sent to the server with first `call`.
 
@@ -122,6 +128,8 @@ adapter.addTable([
 ```
 
 >Note that tableArray is deleted after first SAS call.
+
+---
 
 ###getSasErrors()
 Returns SAS program errors.
@@ -137,6 +145,8 @@ var errors = adapter.getSasErrors();
 
 >errors[i].time - the time of the response with errors (javascript Date object)
 
+---
+
 ###getApplicationLogs()
 Array of log strings:
 ```
@@ -145,6 +155,7 @@ var appLogs = adapter.getApplicationLogs();
 
 >appLogs[i] is string returned from server, or added by adapter
 
+---
 
 ###getDebugData()
 When in debugging mode (`debug: true`), adapter will save every response from the server.
@@ -162,6 +173,7 @@ var debugData = adapter.getDebugData();
 
 >debugData[i].time - the time of the response (javascript Date object)
 
+---
 
 ###setDebugMode()
 Set debugging mode - `debug:true`:
@@ -176,6 +188,7 @@ Unset  debugging mode - `debug:false`:
 adapter.unsetDebugMode();
 ```
 
+---
 ---
 
 ##Development
