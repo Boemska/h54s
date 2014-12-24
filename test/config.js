@@ -2,12 +2,12 @@ describe('h54s', function() {
   describe('init:', function() {
 
     it('should throw error if config data is missing or empty', function(done) {
-      expect(function() {
+      proclaim.doesNotThrow(function() {
         var sasAdapter = new h54s();
-      }).not.to.throw(Error);
-      expect(function() {
+      });
+      proclaim.doesNotThrow(function() {
         var sasAdapter = new h54s({});
-      }).not.to.throw(Error);
+      });
       done();
     });
 

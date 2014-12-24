@@ -3,20 +3,20 @@ describe('h54s', function() {
 
     it('Should throw error if arguments are not provided', function(done) {
       var sasAdapter = new h54s();
-      expect(function() {
+      proclaim.throws(function() {
         sasAdapter.call();
-      }).to.throw(Error);
-      expect(function() {
+      });
+      proclaim.throws(function() {
         sasAdapter.call({});
-      }).to.throw(Error);
-      expect(function() {
+      });
+      proclaim.throws(function() {
         sasAdapter.call({
           sasProgram: 'test'
         });
-      }).to.throw(Error);
-      expect(function() {
+      });
+      proclaim.throws(function() {
         sasAdapter.call('test');
-      }).to.throw(Error);
+      });
       sasAdapter.call('test', function() {});
       done();
     });
@@ -25,10 +25,10 @@ describe('h54s', function() {
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
-      expect(function() {
+      proclaim.throws(function() {
         sasAdapter.setCredentials();
         sasAdapter.setCredentials('username');
-      }).to.throw(Error);
+      });
       sasAdapter.setCredentials('username', 'pass');
       done();
     });
@@ -37,9 +37,9 @@ describe('h54s', function() {
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
-      expect(function() {
+      proclaim.throws(function() {
         sasAdapter.login();
-      }).to.throw(Error);
+      });
       done();
     });
 
@@ -50,7 +50,7 @@ describe('h54s', function() {
         loginUrl: '/invalidUrl'
       });
       sasAdapter.login(serverData.user, serverData.pass, function(status) {
-        assert.equal(404, status, "We got wrong status code");
+        assert.equal(status, 404, "We got wrong status code");
         done();
       });
     });
@@ -61,7 +61,7 @@ describe('h54s', function() {
         hostUrl: serverData.url
       });
       sasAdapter.login(serverData.user, serverData.pass, function(status) {
-        assert.equal(200, status, "We got wrong status code");
+        assert.equal(status, 200, "We got wrong status code");
         done();
       });
     });
@@ -73,7 +73,7 @@ describe('h54s', function() {
       });
       sasAdapter.setCredentials(serverData.user, serverData.pass);
       sasAdapter.login(function(status) {
-        assert.equal(200, status, "We got wrong status code");
+        assert.equal(status, 200, "We got wrong status code");
         done();
       });
     });
@@ -85,7 +85,7 @@ describe('h54s', function() {
       });
       //logout because we are already logged in in previeous tests
       sasAdapter._utils.ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
-        assert.equal(200, res.status, 'Log out is not successful');
+        assert.equal(res.status, 200, 'Log out is not successful');
         sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/startupService', function(err, res) {
           assert.equal(err.message, 'You are not logged in', 'Should throw error because user is not logged in');
           assert.isUndefined(res, 'We got error, res should be undefined');
@@ -104,7 +104,7 @@ describe('h54s', function() {
       });
       //logout because we are already logged in in previeous tests
       sasAdapter._utils.ajax.get(serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
-        assert.equal(200, res.status, 'Log out is not successful');
+        assert.equal(res.status, 200, 'Log out is not successful');
         sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/startupService', function(err, res) {
           assert.isUndefined(err, 'We got error on sas program ajax call');
           assert.isObject(res, 'We expected object to be returned by call method');
@@ -120,7 +120,7 @@ describe('h54s', function() {
         url: '/'
       });
       sasAdapter.call('filePath', function(err, res) {
-        assert.equal('Unable to parse response json', err.message, 'We should get json parsing error');
+        assert.equal(err.message, 'Unable to parse response json', 'We should get json parsing error');
         done();
       });
     });
@@ -132,7 +132,7 @@ describe('h54s', function() {
       });
       sasAdapter.setCredentials('username', 'pass');
       sasAdapter.login(function(status) {
-        assert.equal(-1, status, 'We got wrong status code');
+        assert.equal(status, -1, 'We got wrong status code');
         done();
       });
     });
