@@ -21,6 +21,7 @@ Ext.define('h54sExample.view.LoginWindow', {
       listeners: {
         specialkey: function (f, e) {
           if (e.getKey() == e.ENTER || e.getKey() === e.TAB) {
+            e.preventDefault();
             this.up('window').down('textfield[name="px"]').focus(true, 10);
           }
         }
@@ -35,6 +36,10 @@ Ext.define('h54sExample.view.LoginWindow', {
         specialkey: function (f, e) {
           if (e.getKey() == e.ENTER) {
             this.up('window').onOkClick();
+          }
+          if(e.getKey() === e.TAB) {
+            e.preventDefault();
+            Ext.getCmp('loginSubmit').focus(false, 10);
           }
         }
       }
@@ -56,6 +61,7 @@ Ext.define('h54sExample.view.LoginWindow', {
       },
       items: [
         {
+          id: 'loginSubmit',
           xtype: 'button',
           width: 120,
           text: 'Sign in',
