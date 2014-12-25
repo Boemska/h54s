@@ -57,6 +57,9 @@ module.exports = function(config) {
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     browsers: ['Chrome_without_security'],
 
+    //for ie8 - browsers: ['IE']
+    browserNoActivityTimeout: 50000,
+
     customLaunchers: {
       Chrome_without_security: {
         base: 'Chrome',
