@@ -27,7 +27,7 @@ Ext.define('h54sExample.sasAdapter', {
     this.callback = callback;
     try {
       this._adapter.call(sasProgram, function(err, res) {
-        if(err && err.type === 'notLoggedinError') {
+        if(err && (err.type === 'notLoggedinError' || err.type === 'loginError')) {
           var loginWindow = Ext.create('h54sExample.view.LoginWindow');
           loginWindow.show();
         } else {
