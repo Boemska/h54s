@@ -137,52 +137,6 @@ describe('h54s', function() {
       });
     });
 
-    it('Add table test', function(done) {
-      this.timeout(4000);
-      var sasAdapter = new h54s({
-        hostUrl: serverData.url,
-        autoLogin: true,
-        user: serverData.user,
-        pass: serverData.pass
-      });
-
-      var timeMs    = new Date('Mon Sep 29 2014 12:00:00 GMT+0200 (CEST)').getTime();
-      var timeMsEnd = timeMs + 60 * 60 * 1000 * 24 * 30;
-
-      var sasStart  = toSasDatetime(new Date(timeMs));
-      var sasEnd    = toSasDatetime(new Date(timeMsEnd));
-
-      sasAdapter.addTable([{
-        javastart: timeMs,
-        javaend: timeMsEnd,
-        sasstart: sasStart,
-        sasend: sasEnd
-      }],'timespan');
-      sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/drillHour', function(err, res) {
-        assert.isUndefined(err, 'We got unexpected error');
-        assert.isObject(res, 'Result should be object');
-        done();
-      });
-
-      function toSasDatetime (jsDate) {
-        var basedate = new Date(Date.now() - 100 * 60 * 60 * 24 * 2);
-        var currdate = jsDate;
-
-        // offsets for UTC and timezones and BST
-        var baseOffset = basedate.getTimezoneOffset(); // in minutes
-        var currOffset = currdate.getTimezoneOffset(); // in minutes
-
-        // convert currdate to a sas datetime
-        var offsetSecs = (currOffset - baseOffset) * 60; // offsetDiff is in minutes to start with
-        var baseDateSecs = basedate.getTime() / 1000; // get rid of ms
-        var currdateSecs = currdate.getTime() / 1000; // get rid of ms
-        var sasDatetime = Math.round(currdateSecs - baseDateSecs - offsetSecs); // adjust
-
-        return sasDatetime;
-      }
-
-    });
-
     it('Test login on call after first login and logout', function(done) {
       this.timeout(10000);
       var sasAdapter = new h54s({
