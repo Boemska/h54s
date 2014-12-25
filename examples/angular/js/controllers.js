@@ -9,7 +9,7 @@ app.controller('dashboardCtrl', ['$scope', '$location', 'sasAdapter', '$rootScop
       $scope.loaded = true;
       stateData.librarylist = res.librarylist;
     }, function(err) {
-      if(err.type === 'notLoggedinError') {
+      if(err.type === 'notLoggedinError' || err.type === 'loginError') {
         $location.path('/login');
       }
     });
@@ -34,7 +34,11 @@ app.controller('dashboardCtrl', ['$scope', '$location', 'sasAdapter', '$rootScop
       $scope.rowCollection = res.tablelist;
       stateData.current.rows = res.tablelist;
     }, function(err) {
-      alert(err.message);
+      if(err.type === 'notLoggedinError' || err.type === 'loginError') {
+        $location.path('/login');
+      } else {
+        alert(err.message);
+      }
     });
   };
 
@@ -85,7 +89,7 @@ app.controller('dataCtrl', ['$scope', '$location', '$routeParams', 'sasAdapter',
     $scope.keys = Object.keys(res.outputdata[0]);
     $scope.loaded = true;
   }, function(err) {
-    if(err.type === 'notLoggedinError') {
+    if(err.type === 'notLoggedinError' || err.type === 'loginError') {
       $location.path('/login');
     } else {
       $location.path('/');

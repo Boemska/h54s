@@ -49,6 +49,9 @@ app.factory('sasAdapter', function($q, $rootScope) {
     },
     getSasErrors: function() {
       return sasAdapter.getSasErrors();
+    },
+    setCredentials: function(user, pass) {
+      return sasAdapter.setCredentials(user, pass);
     }
   };
 });
