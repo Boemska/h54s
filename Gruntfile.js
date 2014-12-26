@@ -17,7 +17,7 @@ module.exports = function (grunt) {
         trailing: true
       },
       target: {
-        src: ['src/**/*.js', 'test/**/*.js', 'examples/**/*.js']
+        src: ['src/**/*.js', 'test/**/*.js', 'examples/**/*.js', '!examples/extjs2/lib/*']
       }
     },
     concat: {
@@ -62,6 +62,10 @@ module.exports = function (grunt) {
       extjs: {
         port: 1337,
         combine: ['examples/extjs', 'dist', 'test']
+      },
+      extjs2: {
+        port: 1337,
+        combine: ['examples/extjs2', 'dist', 'test']
       }
     }
   });
@@ -82,4 +86,5 @@ module.exports = function (grunt) {
 
   grunt.registerTask('serveAngular', 'connect:angular');
   grunt.registerTask('serveExtjs', 'connect:extjs');
+  grunt.registerTask('serveExtjs2', 'connect:extjs2');
 };
