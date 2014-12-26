@@ -303,10 +303,11 @@ Ext.define('h54sExample.Application', {
     }
 
     var lev0Data = [];
-    for (var i = 0 ; i < donutLev0.length ; i++){
-      var rec = donutLev0[i];
+    var rec, i, point;
+    for (i = 0 ; i < donutLev0.length ; i++){
+      rec = donutLev0[i];
 
-      var point = {
+      point = {
         name: rec.value,
         y: rec.count,
         level: 0,
@@ -323,10 +324,10 @@ Ext.define('h54sExample.Application', {
 
 
     var chartData = [];
-    for (var i = 0 ; i < donutLev1.length ; i++){
-      var rec = donutLev1[i];
+    for (i = 0 ; i < donutLev1.length ; i++){
+      rec = donutLev1[i];
 
-      var point = {
+      point = {
         name: rec.value,
         y: rec.count,
         level: 1,
@@ -345,10 +346,10 @@ Ext.define('h54sExample.Application', {
     }
 
     var chartDataLev2 = [];
-    for (var i = 0 ; i < donutLev2.length ; i++){
-      var rec = donutLev2[i];
+    for (i = 0 ; i < donutLev2.length ; i++){
+      rec = donutLev2[i];
 
-      var point = {
+      point = {
         name: rec.value,
         y: rec.count,
         level: 2,
@@ -498,7 +499,8 @@ Ext.define('h54sExample.Application', {
       return value;
     };
 
-    for (var i = 0 ; i < fields.length ; i++){
+    var i;
+    for (i = 0 ; i < fields.length ; i++){
       var descField = fields[i];
 
       var columnXType = 'gridcolumn';
@@ -526,7 +528,7 @@ Ext.define('h54sExample.Application', {
     var ds = res.toplevelProcess;
 
     var newData = [];
-    for (var i = 0 ; i < ds.length ; i++){
+    for (i = 0 ; i < ds.length ; i++){
       var row = ds[i];
       newData.push(row);
     }
@@ -596,11 +598,12 @@ Ext.define('h54sExample.Application', {
     }
 
     var lev0Data = [];
-    for (var i = 0 ; i < donutLev0.length ; i++){
+    var i, rec, point;
+    for (i = 0 ; i < donutLev0.length ; i++){
       // btw. level 0 always have 0 point...
-      var rec = donutLev0[i];
+      rec = donutLev0[i];
 
-      var point = {
+      point = {
         name: rec.value,
         y: rec.count,
         level: 0,
@@ -613,10 +616,10 @@ Ext.define('h54sExample.Application', {
     }
 
     var chartData = [];
-    for (var i = 0 ; i < donutLev1.length ; i++){
-      var rec = donutLev1[i];
+    for (i = 0 ; i < donutLev1.length ; i++){
+      rec = donutLev1[i];
 
-      var point = {
+      point = {
         name: rec.value,
         y: rec.count,
         level: 1,
@@ -635,10 +638,10 @@ Ext.define('h54sExample.Application', {
     }
 
     var chartDataLev2 = [];
-    for (var i = 0 ; i < donutLev2.length ; i++){
-      var rec = donutLev2[i];
+    for (i = 0 ; i < donutLev2.length ; i++){
+      rec = donutLev2[i];
 
-      var point = {
+      point = {
         name: rec.value,
         y: rec.count,
         level: 2,
@@ -685,9 +688,9 @@ Ext.define('h54sExample.Application', {
       var pieChart = $('#pieSubdirectory-innerCt').highcharts();
       var centre = '';
       if (point.breadcrumbCentre !== undefined){
-        var centre = point.breadcrumbCentre;
+        centre = point.breadcrumbCentre;
       } else {
-        var centre = pieChart.series[0].data[0].name;
+        centre = pieChart.series[0].data[0].name;
       }
 
       if (centre === undefined || centre === '/'){
@@ -759,6 +762,16 @@ Ext.define('h54sExample.Application', {
         ];
       }
 
+      var handlerFn = function(e){
+        var breadcrumbPoint = {
+          breadcrumbLevel: 0,
+          breadcrumbCentre: this.currentPath,
+          breadcrumbY: 0,
+          currentDir: this.currentDir
+        };
+        me.onSubdirectoryClick(breadcrumbPoint);
+      };
+
       for (var i = 0 ; buttons && i < buttons.length ; i++){
         var buttonText = buttons[i] + '/';
         path += buttonText;
@@ -774,15 +787,7 @@ Ext.define('h54sExample.Application', {
           disabled: disabled,
           currentPath: buttonPath,
           currentDir: dir,
-          handler: function(e){
-            var breadcrumbPoint = {
-              breadcrumbLevel: 0,
-              breadcrumbCentre: this.currentPath,
-              breadcrumbY: 0,
-              currentDir: this.currentDir
-            };
-            me.onSubdirectoryClick(breadcrumbPoint);
-          }
+          handler: handlerFn
         });
         breadcrumb.add(button);
       }
