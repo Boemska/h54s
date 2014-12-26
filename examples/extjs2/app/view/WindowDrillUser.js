@@ -3,16 +3,12 @@ Ext.define('h54sExample.view.WindowDrillUser', {
   alias: 'widget.windowdrilluser',
 
   requires: [
-    'h54sExample.view.WindowDrillHourViewModel1',
     'h54sExample.view.MyContainer2',
     'Ext.grid.Panel',
     'Ext.grid.column.Number',
     'Ext.grid.View'
   ],
 
-  viewModel: {
-    type: 'windowdrilluser'
-  },
   height: 500,
   width: 700,
   title: 'User',

@@ -3,7 +3,6 @@ Ext.define('h54sExample.view.WindowDrillHour', {
   alias: 'widget.windowdrillhour',
 
   requires: [
-    'h54sExample.view.WindowDrillHourViewModel',
     'Ext.grid.Panel',
     'Ext.grid.column.Number',
     'Ext.grid.View',
@@ -11,9 +10,6 @@ Ext.define('h54sExample.view.WindowDrillHour', {
     'Ext.XTemplate'
   ],
 
-  viewModel: {
-    type: 'windowdrillhour'
-  },
   height: 500,
   width: 700,
   layout: 'fit',

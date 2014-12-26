@@ -3,15 +3,11 @@ Ext.define('h54sExample.view.MainViewport', {
   alias: 'widget.mainviewport',
 
   requires: [
-    'h54sExample.view.MainViewportViewModel',
     'Ext.grid.Panel',
     'Ext.grid.column.Number',
     'Ext.grid.View'
   ],
 
-  viewModel: {
-    type: 'mainviewport'
-  },
   layout: 'fit',
   defaultListenerScope: true,
 
