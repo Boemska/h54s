@@ -9,6 +9,7 @@ Ext.define('h54sExample.view.DebugWindow', {
   maximizable: true,
   collapsible: true,
   focusOnToFront: false,
+  constrainHeader: true,
 
   layout: 'fit',
   items: [
@@ -137,6 +138,10 @@ Ext.define('h54sExample.view.DebugWindow', {
       var width = Math.min(Ext.getBody().getViewSize().width, 800);
       this.setWidth(width);
       this.setHeight(Ext.getBody().getViewSize().height);
+    },
+    restore: function() {
+      //just remove focus from window by focusing anything else
+      Ext.getCmp('toplevelProcess').focus();
     }
   }
 });
