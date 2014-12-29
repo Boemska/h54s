@@ -2,13 +2,13 @@ Ext.define('h54sExample.view.DebugWindow', {
   extend: 'Ext.window.Window',
 
   id: 'debugWindow',
-  width: 800,
+  width: Math.min(Ext.getBody().getViewSize().width, 800),
   height: Ext.getBody().getViewSize().height,
   title: 'Debug Information',
-//  draggable: false,
   closable: true,
   maximizable: true,
   collapsible: true,
+  focusOnToFront: false,
 
   layout: 'fit',
   items: [
@@ -132,6 +132,11 @@ Ext.define('h54sExample.view.DebugWindow', {
   listeners: {
     close: function() {
       sasAdapter.unsetDebugMode();
+    },
+    afterrender: function() {
+      var width = Math.min(Ext.getBody().getViewSize().width, 800);
+      this.setWidth(width);
+      this.setHeight(Ext.getBody().getViewSize().height);
     }
   }
 });
