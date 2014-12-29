@@ -11,30 +11,30 @@ Ext.define('h54sExample.Application', {
   views: [
     'h54sExample.view.MainViewport',
     'h54sExample.view.HighchartsContainer',
-    'h54sExample.view.MyContainer2',
     'h54sExample.view.DateWindow',
     'h54sExample.view.WindowDrillHour',
-    'h54sExample.view.WindowDrillUser'
+    'h54sExample.view.DebugWindow',
+    'h54sExample.view.LoginWindow'
   ],
 
   launch: function () {
+    var map = new Ext.util.KeyMap(Ext.getBody(), {
+      key: 68,
+      ctrl: true,
+      alt: true,
+      handler: function() {
+        if(!sasAdapter.getDebugMode()) {
+          sasAdapter.setDebugMode();
+          Ext.create('h54sExample.view.DebugWindow').show();
+        } else {
+          sasAdapter.unsetDebugMode();
+          Ext.getCmp('debugWindow').close();
+        }
+      },
+      scope: this,
+      defaultEventAction: "stopEvent"
+    });
 
-    //    var map = new Ext.util.KeyMap(Ext.getBody(), {
-    //      key: 68,
-    //      ctrl: true,
-    //      alt: true,
-    //      handler: function() {
-    //        if(!sasAdapter.getDebugMode()) {
-    //          sasAdapter.setDebugMode();
-    //          Ext.getCmp('debugWindowBtn').show();
-    //        } else {
-    //          sasAdapter.unsetDebugMode();
-    //          Ext.getCmp('debugWindowBtn').hide();
-    //        }
-    //      },
-    //      scope: this,
-    //      defaultEventAction: "stopEvent"
-    //    });
     this.startupService();
   },
 
