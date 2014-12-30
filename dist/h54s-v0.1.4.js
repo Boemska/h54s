@@ -1,4 +1,4 @@
-/*! h54s v0.1.3 - 2014-12-19 
+/*! h54s v0.1.4 - 2014-12-30 
  *  License: GPL 
  * Author: Boemska 
 */
@@ -558,8 +558,6 @@ h54s.prototype._utils.parseDebugRes = function(responseText, sasProgram, params)
   var patt = /^(.?--h54s-data-start--)([\S\s]*)(--h54s-data-end--)/m;
   var matches = responseText.match(patt);
 
-  var jsonObj = JSON.parse(matches[2]);
-
   var page = responseText.replace(patt, '');
   var htmlBodyPatt = /<body.*>([\s\S]*)<\/body>/;
   var bodyMatches = page.match(htmlBodyPatt);
@@ -581,11 +579,12 @@ h54s.prototype._utils.parseDebugRes = function(responseText, sasProgram, params)
     this._debugData.shift();
   }
 
+  this.parseErrorResponse(responseText, sasProgram);
+
+  var jsonObj = JSON.parse(matches[2]);
   if(debugText.indexOf('ERROR:') !== -1) {
     jsonObj.hasErrors = true;
   }
-
-  this.parseErrorResponse(responseText, sasProgram);
 
   return jsonObj;
 };
