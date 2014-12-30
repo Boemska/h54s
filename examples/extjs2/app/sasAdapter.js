@@ -1,6 +1,7 @@
 Ext.define('h54sExample.sasAdapter', {
   alternateClassName: 'sasAdapter',
   singleton: true,
+  msgWindow: Ext.create('h54sExample.view.MessageWindow'),
 
   constructor: function() {
     this._adapter = new h54s({
@@ -23,10 +24,17 @@ Ext.define('h54sExample.sasAdapter', {
   },
 
   call: function(sasProgram, callback) {
+    var me = this;
+    //remember program and callback for retry
     this.sasProgram = sasProgram;
     this.callback = callback;
+
+    var msg = this.msgWindow.addLoadingMessage(sasProgram);
+
     try {
       this._adapter.call(sasProgram, function(err, res) {
+        msg.setLoaded();
+
         if(err && (err.type === 'notLoggedinError' || err.type === 'loginError')) {
           var loginWindow = Ext.create('h54sExample.view.LoginWindow');
           var loading = Ext.get('loadingWrapper');
@@ -35,6 +43,7 @@ Ext.define('h54sExample.sasAdapter', {
           }
           loginWindow.show();
         } else {
+          me.msgWindow.addUserMessage(res.usermessage);
           callback(err, res);
         }
       });

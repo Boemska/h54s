@@ -5,6 +5,7 @@ Ext.define('h54sExample.Application', {
   stores: [],
 
   requires: [
+    'h54sExample.view.MessageWindow',
     'h54sExample.sasAdapter',
   ],
 
