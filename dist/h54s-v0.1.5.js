@@ -1,6 +1,6 @@
 /*! h54s v0.1.5 - 2015-01-08 
  *  License: GPL 
- * Author: Boemska 
+ *  Author: Boemska 
 */
 if (!Object.create) {
   Object.create = function(proto, props) {
@@ -389,6 +389,7 @@ h54s.prototype._utils = {};
 h54s.prototype._utils._applicationLogs = [];
 h54s.prototype._utils._debugData = [];
 h54s.prototype._utils._sasErrors = [];
+
 h54s.prototype._utils.ajax = (function () {
   var xhr = function(type, url, data) {
     var methods = {

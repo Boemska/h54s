@@ -2,6 +2,7 @@ h54s.prototype._utils = {};
 h54s.prototype._utils._applicationLogs = [];
 h54s.prototype._utils._debugData = [];
 h54s.prototype._utils._sasErrors = [];
+
 h54s.prototype._utils.ajax = (function () {
   var xhr = function(type, url, data) {
     var methods = {
