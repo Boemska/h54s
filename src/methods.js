@@ -234,3 +234,37 @@ h54s.prototype.setDebugMode = function() {
 h54s.prototype.unsetDebugMode = function() {
   this.debug = false;
 };
+
+/*
+* Clear application logs
+*
+*/
+h54s.prototype.clearApplicationLogs = function() {
+  this._utils._applicationLogs = [];
+};
+
+/*
+* Clear debug data
+*
+*/
+h54s.prototype.clearDebugData = function() {
+  this._utils._debugData = [];
+};
+
+/*
+* Clear Sas errors
+*
+*/
+h54s.prototype.clearSasErrors = function() {
+  this._utils._sasErrors = [];
+};
+
+/*
+* Clear all logs
+*
+*/
+h54s.prototype.clearAllLogs = function() {
+  this.clearApplicationLogs();
+  this.clearDebugData();
+  this.clearSasErrors();
+};
