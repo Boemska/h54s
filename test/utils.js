@@ -2,7 +2,7 @@ describe('h54s', function() {
   describe('utils test:', function() {
 
     //TODO: Implement and test date escape
-    it('All values in returned object should be escaped - string and date', function(done) {
+    it('All strings in returned object should be escaped', function(done) {
       this.timeout(4000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url
@@ -15,15 +15,15 @@ describe('h54s', function() {
         var donutLev2 = res.donutLev2;
         var n, i;
         for(i = 0, n = topLevelProcess.length; i < n; i++) {
-          assert.equal(topLevelProcess[i].programname, decodeURIComponent(topLevelProcess[i].programname), 'String not decoded');
-          assert.equal(topLevelProcess[i].shortName, decodeURIComponent(topLevelProcess[i].shortName), 'String not decoded');
+          assert.equal(topLevelProcess[i].programname, unescape(topLevelProcess[i].programname), 'String not decoded');
+          assert.equal(topLevelProcess[i].shortName, unescape(topLevelProcess[i].shortName), 'String not decoded');
 
         }
         for(i = 0, n = donutLev1.length; i< n; i++) {
-          assert.equal(donutLev1[i].value, decodeURIComponent(donutLev1[i].value), 'String not decoded');
+          assert.equal(donutLev1[i].value, unescape(donutLev1[i].value), 'String not decoded');
         }
         for(i = 0, n = donutLev2.length; i< n; i++) {
-          assert.equal(donutLev2[i].value, decodeURIComponent(donutLev2[i].value), 'String not decoded');
+          assert.equal(donutLev2[i].value, unescape(donutLev2[i].value), 'String not decoded');
         }
         done();
       });

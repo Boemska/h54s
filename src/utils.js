@@ -246,7 +246,7 @@ h54s.prototype._utils.parseDebugRes = function(responseText, sasProgram, params)
 h54s.prototype._utils.unescapeValues = function(obj) {
   for (var key in obj) {
     if (typeof obj[key] === 'string') {
-      obj[key] = decodeURIComponent(obj[key]);
+      obj[key] = unescape(obj[key]);
     } else if(typeof obj === 'object') {
       this.unescapeValues(obj[key]);
     }
