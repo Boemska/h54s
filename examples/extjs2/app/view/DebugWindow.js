@@ -21,98 +21,90 @@ Ext.define('h54sExample.view.DebugWindow', {
           title: 'Application Logs',
           autoScroll: true,
           bodyPadding: 10,
-          listeners: {
-            activate: function (tab) {
-              var logArray = sasAdapter.getApplicationLogs();
-              var html = "<div>";
-              for (var i = 0; i < logArray.length; i++) {
-                html += '<p>' + logArray[i].time.toString() + '</p>';
-                html += '<pre>' + logArray[i].message + '</pre>';
-                html += '<hr class="x-component  x-component-default" style="margin-top:20px;margin-bottom:15px;">';
-              }
-              html += "</div>";
-              this.update(html);
-            },
-            added: function () {
-              var logArray = sasAdapter.getApplicationLogs();
-              var badgeHtml = this.up().getBadge(logArray.length);
-              this.setTitle(this.title + badgeHtml);
+
+          updateTab: function () {
+            var logArray = sasAdapter.getApplicationLogs();
+            var html = "<div>";
+            for (var i = 0; i < logArray.length; i++) {
+              html += '<p>' + logArray[i].time.toString() + '</p>';
+              html += '<pre>' + logArray[i].message + '</pre>';
+              html += '<hr class="x-component  x-component-default" style="margin-top:20px;margin-bottom:15px;">';
             }
-          },
+            html += "</div>";
+            this.update(html);
+
+            var badgeHtml = this.up().getBadge(logArray.length);
+            this.setTitle('Application Logs' + badgeHtml);
+          }
         },
         {
           title: 'Debug Data',
           bodyPadding: 10,
           overflowY: 'scroll',
-          listeners: {
-            activate: function (tab) {
-              var debugArray = sasAdapter.getDebugData();
-              for (var i = 0; i < debugArray.length; i++) {
-                this.add({
-                  xtype: 'container',
-                  items: [
-                    {
-                      xtype: 'label',
-                      text: debugArray[i].time.toString()
-                    },
-                    {
-                      layout: 'fit',
-                      xtype: 'panel',
-                      title: debugArray[i].sasProgram,
-                      html: debugArray[i].debugHtml,
-                      collapsible: true,
-                      collapsed: true,
-                      autoScroll: true,
-                      style: {
-                        'word-wrap': 'break-word !important'
-                      }
-                    },
-                    {
-                      xtype: 'component',
-                      autoEl: {
-                        tag: 'hr'
-                      },
-                      style: {
-                        marginTop: '20px',
-                        marginBottom: '15px'
-                      }
-                    }
-                  ]
 
-                });
-              }
-              this.doLayout();
-            },
-            added: function () {
-              var debugArray = sasAdapter.getDebugData();
-              var badgeHtml = this.up().getBadge(debugArray.length);
-              this.setTitle(this.title + badgeHtml);
+          updateTab: function () {
+            var debugArray = sasAdapter.getDebugData();
+            this.removeAll(true);
+            for (var i = 0; i < debugArray.length; i++) {
+              this.add({
+                xtype: 'container',
+                items: [
+                  {
+                    xtype: 'label',
+                    text: debugArray[i].time.toString()
+                  },
+                  {
+                    layout: 'fit',
+                    xtype: 'panel',
+                    title: debugArray[i].sasProgram,
+                    html: debugArray[i].debugHtml,
+                    collapsible: true,
+                    collapsed: true,
+                    autoScroll: true,
+                    style: {
+                      'word-wrap': 'break-word !important'
+                    }
+                  },
+                  {
+                    xtype: 'component',
+                    autoEl: {
+                      tag: 'hr'
+                    },
+                    style: {
+                      marginTop: '20px',
+                      marginBottom: '15px'
+                    }
+                  }
+                ]
+
+              });
             }
-          },
+            this.doLayout();
+
+            var badgeHtml = this.up().getBadge(debugArray.length);
+            this.setTitle('Debug Data' + badgeHtml);
+          }
         },
         {
           title: 'Sas Errors',
           autoScroll: true,
           bodyPadding: 10,
-          listeners: {
-            activate: function (tab) {
-              var errArray = sasAdapter.getSasErrors();
-              var html = "<div>";
-              for (var i = 0; i < errArray.length; i++) {
-                html += '<p>' + errArray[i].time.toString() + '</p>';
-                html += '<p>Sas Program: ' + errArray[i].sasProgram + '</p>';
-                html += '<pre>' + errArray[i].message + '</pre>';
-                html += '<hr class="x-component  x-component-default" style="margin-top:20px;margin-bottom:15px;">';
-              }
-              html += "</div>";
-              this.update(html);
-            },
-            added: function () {
-              var errArray = sasAdapter.getSasErrors();
-              var badgeHtml = this.up().getBadge(errArray.length);
-              this.setTitle(this.title + badgeHtml);
+
+          updateTab: function () {
+            var errArray = sasAdapter.getSasErrors();
+            var html = "<div>";
+            for (var i = 0; i < errArray.length; i++) {
+              html += '<p>' + errArray[i].time.toString() + '</p>';
+              html += '<p>Sas Program: ' + errArray[i].sasProgram + '</p>';
+              html += '<pre>' + errArray[i].message + '</pre>';
+              html += '<hr class="x-component  x-component-default" style="margin-top:20px;margin-bottom:15px;">';
             }
-          },
+            html += "</div>";
+            this.update(html);
+
+            var badgeHtml = this.up().getBadge(errArray.length);
+            this.setTitle('Sas Errors' + badgeHtml);
+          }
         }
       ],
 
@@ -131,17 +123,25 @@ Ext.define('h54sExample.view.DebugWindow', {
     }
   ],
   listeners: {
-    close: function() {
+    close: function () {
       sasAdapter.unsetDebugMode();
     },
-    afterrender: function() {
+    afterrender: function () {
       var width = Math.min(Ext.getBody().getViewSize().width, 800);
       this.setWidth(width);
       this.setHeight(Ext.getBody().getViewSize().height);
+
+      this.updateData();
     },
-    restore: function() {
+    restore: function () {
       //just remove focus from window by focusing anything else
       Ext.getCmp('toplevelProcess').focus();
     }
+  },
+
+  updateData: function () {
+    this.down('tabpanel').items.each(function (el) {
+      el.updateTab();
+    });
   }
 });

@@ -43,9 +43,19 @@ Ext.define('h54sExample.sasAdapter', {
           }
           loginWindow.show();
         } else {
-          me.msgWindow.addUserMessage(res.usermessage);
+          if(res && res.usermessage) {
+            me.msgWindow.addUserMessage(res.usermessage);
+          }
           callback(err, res);
         }
+
+        //update debug data
+        setTimeout(function() {
+          var debugWindow = Ext.getCmp('debugWindow');
+          if(debugWindow) {
+            debugWindow.updateData();
+          }
+        }, 10);
       });
     } catch(e) {
       callback(e.message);
