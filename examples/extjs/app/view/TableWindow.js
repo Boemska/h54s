@@ -18,7 +18,12 @@ Ext.define('h54sExample.view.TableWindow', {
         store: Ext.getStore('TableStore'),
         dock: 'bottom',
         displayInfo: true,
-        displayMsg: '{0} - {1} of {2}'
+        displayMsg: '{0} - {1} of {2}',
+        listeners: {
+          afterrender: function() {
+            this.child('#refresh').hide();
+          }
+        }
       }],
       listeners: {
         afterrender: function(e) {
