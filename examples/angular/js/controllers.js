@@ -162,6 +162,21 @@ app.controller('debugWindowCtrl', ['$scope', 'sasAdapter', '$rootScope', '$sce',
     $rootScope.showDebugWindow = false;
   };
 
+  $scope.clearSasErrors = function() {
+    sasAdapter.clearSasErrors();
+    $scope.sasErrors = [];
+  };
+
+  $scope.clearDebugData = function() {
+    sasAdapter.clearDebugData();
+    $scope.debugData = [];
+  };
+
+  $scope.clearApplicationLogs = function() {
+    sasAdapter.clearApplicationLogs();
+    $scope.appLogs = [];
+  };
+
   function setHeight() {
     var headerHeight = $('.nav.nav-tabs').height();
     var height = $(window).height() - headerHeight - 10;

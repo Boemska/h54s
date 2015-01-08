@@ -56,3 +56,9 @@
   margin-top: 10px;
   margin-right: 5px;
 }
+
+.clear-btn {
+  position: absolute;
+  right: 28px;
+  bottom: 10px;
+}

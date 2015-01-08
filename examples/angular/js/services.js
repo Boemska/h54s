@@ -52,6 +52,15 @@ app.factory('sasAdapter', function($q, $rootScope) {
     },
     setCredentials: function(user, pass) {
       return sasAdapter.setCredentials(user, pass);
+    },
+    clearApplicationLogs: function() {
+      sasAdapter.clearApplicationLogs();
+    },
+    clearDebugData: function() {
+      sasAdapter.clearDebugData();
+    },
+    clearSasErrors: function() {
+      sasAdapter.clearSasErrors();
     }
   };
 });
