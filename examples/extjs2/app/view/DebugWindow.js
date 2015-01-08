@@ -12,12 +12,36 @@ Ext.define('h54sExample.view.DebugWindow', {
   constrainHeader: true,
 
   layout: 'fit',
+  buttons : [
+    {
+      text    : 'Clear',
+      handler : function() {
+        var win = this.up('window');
+        var tab = win.down('tabpanel').getActiveTab();
+        switch(tab.itemId) {
+          case 'appLogs':
+            sasAdapter.clearApplicationLogs();
+            break;
+          case 'debugData':
+            sasAdapter.clearDebugData();
+            break;
+          case 'sasErrors':
+            sasAdapter.clearSasErrors();
+            break;
+        }
+        tab.updateTab();
+        tab.updateBadge();
+        tab.removeAll(true);
+      }
+    }
+  ],
   items: [
     {
       xtype: 'tabpanel',
       activeTab: 0,
       items: [
         {
+          itemId: 'appLogs',
           title: 'Application Logs',
           autoScroll: true,
           bodyPadding: 10,
@@ -38,6 +62,7 @@ Ext.define('h54sExample.view.DebugWindow', {
           }
         },
         {
+          itemId: 'debugData',
           title: 'Debug Data',
           bodyPadding: 10,
           overflowY: 'scroll',
@@ -86,6 +111,7 @@ Ext.define('h54sExample.view.DebugWindow', {
           }
         },
         {
+          itemId: 'sasErrors',
           title: 'Sas Errors',
           autoScroll: true,
           bodyPadding: 10,
