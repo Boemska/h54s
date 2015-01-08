@@ -52,7 +52,7 @@ Ext.define('h54sExample.view.TableWindow', {
                   menuDisabled: true
                 });
 
-                if (!isNaN(outputRow[key])){
+                if (!isNaN(parseInt(outputRow[key]))) {
                   extFields.push({name: key, type: 'number' });
                 } else {
                   extFields.push({name: key, type: 'string'});
