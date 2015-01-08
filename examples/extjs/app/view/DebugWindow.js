@@ -10,107 +10,159 @@ Ext.define('h54sExample.view.DebugWindow', {
   maximizable: true,
 
   layout: 'fit',
+  buttons : [
+    {
+      text    : 'Clear',
+      handler : function() {
+        var win = this.up('window');
+        var tab = win.down('tabpanel').getActiveTab();
+        switch(tab.itemId) {
+          case 'appLogs':
+            sasAdapter.clearApplicationLogs();
+            break;
+          case 'debugData':
+            sasAdapter.clearDebugData();
+            break;
+          case 'sasErrors':
+            sasAdapter.clearSasErrors();
+            break;
+        }
+        tab.updateTab();
+        tab.updateBadge();
+        tab.removeAll(true);
+      }
+    }
+  ],
   items: [
     {
       xtype: 'tabpanel',
       activeTab: 0,
       items: [
         {
+          itemId: 'appLogs',
           title: 'Application Logs',
           autoScroll: true,
           bodyPadding: 10,
+
           listeners: {
             activate: function (tab) {
-              var logArray = sasAdapter.getApplicationLogs();
-              var html = "<div>";
-              for (var i = 0; i < logArray.length; i++) {
-                html += '<p>' + logArray[i].time.toString() + '</p>';
-                html += '<pre>' + logArray[i].message + '</pre>';
-                html += '<hr class="x-component  x-component-default" style="margin-top:20px;margin-bottom:15px;">';
-              }
-              html += "</div>";
-              this.update(html);
+              this.updateTab();
             },
             added: function () {
-              var logArray = sasAdapter.getApplicationLogs();
-              var badgeHtml = this.up().getBadge(logArray.length);
-              this.setTitle(this.title + badgeHtml);
+              this.updateBadge();
             }
           },
+
+          updateTab: function() {
+            var logArray = sasAdapter.getApplicationLogs();
+            var html = "<div>";
+            for (var i = 0; i < logArray.length; i++) {
+              html += '<p>' + logArray[i].time.toString() + '</p>';
+              html += '<pre>' + logArray[i].message + '</pre>';
+              html += '<hr class="x-component  x-component-default" style="margin-top:20px;margin-bottom:15px;">';
+            }
+            html += "</div>";
+            this.update(html);
+          },
+          updateBadge: function() {
+            var logArray = sasAdapter.getApplicationLogs();
+            var badgeHtml = this.up().getBadge(logArray.length);
+            this.setTitle('Application Logs' + badgeHtml);
+          }
         },
         {
+          itemId: 'debugData',
           title: 'Debug Data',
           bodyPadding: 10,
           overflowY: 'scroll',
+
           listeners: {
             activate: function (tab) {
-              var debugArray = sasAdapter.getDebugData();
-              for (var i = 0; i < debugArray.length; i++) {
-                this.add({
-                  xtype: 'container',
-                  items: [
-                    {
-                      xtype: 'label',
-                      text: debugArray[i].time.toString()
-                    },
-                    {
-                      layout: 'fit',
-                      xtype: 'panel',
-                      title: debugArray[i].sasProgram,
-                      html: debugArray[i].debugHtml,
-                      collapsible: true,
-                      collapsed: true,
-                      autoScroll: true,
-                      style: {
-                        'word-wrap': 'break-word !important'
-                      }
-                    },
-                    {
-                      xtype: 'component',
-                      autoEl: {
-                        tag: 'hr'
-                      },
-                      style: {
-                        marginTop: '20px',
-                        marginBottom: '15px'
-                      }
-                    }
-                  ]
-
-                });
-              }
-              this.doLayout();
+              this.updateTab();
             },
             added: function () {
-              var debugArray = sasAdapter.getDebugData();
-              var badgeHtml = this.up().getBadge(debugArray.length);
-              this.setTitle(this.title + badgeHtml);
+              this.updateBadge();
             }
           },
+
+          updateTab: function() {
+            var debugArray = sasAdapter.getDebugData();
+            for (var i = 0; i < debugArray.length; i++) {
+              this.add({
+                xtype: 'container',
+                items: [
+                  {
+                    xtype: 'label',
+                    text: debugArray[i].time.toString()
+                  },
+                  {
+                    layout: 'fit',
+                    xtype: 'panel',
+                    title: debugArray[i].sasProgram,
+                    html: debugArray[i].debugHtml,
+                    collapsible: true,
+                    collapsed: true,
+                    autoScroll: true,
+                    style: {
+                      'word-wrap': 'break-word !important'
+                    }
+                  },
+                  {
+                    xtype: 'component',
+                    autoEl: {
+                      tag: 'hr'
+                    },
+                    style: {
+                      marginTop: '20px',
+                      marginBottom: '15px'
+                    }
+                  }
+                ]
+
+              });
+            }
+            this.doLayout();
+          },
+
+          updateBadge: function() {
+            var debugArray = sasAdapter.getDebugData();
+            var badgeHtml = this.up().getBadge(debugArray.length);
+            this.setTitle('Debug Data' + badgeHtml);
+          }
         },
         {
+          itemId: 'sasErrors',
           title: 'Sas Errors',
           autoScroll: true,
           bodyPadding: 10,
+
           listeners: {
             activate: function (tab) {
-              var errArray = sasAdapter.getSasErrors();
-              var html = "<div>";
-              for (var i = 0; i < errArray.length; i++) {
-                html += '<p>' + errArray[i].time.toString() + '</p>';
-                html += '<p>Sas Program: ' + errArray[i].sasProgram + '</p>';
-                html += '<pre>' + errArray[i].message + '</pre>';
-                html += '<hr class="x-component  x-component-default" style="margin-top:20px;margin-bottom:15px;">';
-              }
-              html += "</div>";
-              this.update(html);
+              this.updateTab();
             },
             added: function () {
-              var errArray = sasAdapter.getSasErrors();
-              var badgeHtml = this.up().getBadge(errArray.length);
-              this.setTitle(this.title + badgeHtml);
+              this.updateBadge();
             }
           },
+
+          updateTab: function() {
+            var errArray = sasAdapter.getSasErrors();
+            var html = "<div>";
+            for (var i = 0; i < errArray.length; i++) {
+              html += '<p>' + errArray[i].time.toString() + '</p>';
+              html += '<p>Sas Program: ' + errArray[i].sasProgram + '</p>';
+              html += '<pre>' + errArray[i].message + '</pre>';
+              html += '<hr class="x-component  x-component-default" style="margin-top:20px;margin-bottom:15px;">';
+            }
+            html += "</div>";
+            this.update(html);
+          },
+
+          updateBadge:function() {
+            var errArray = sasAdapter.getSasErrors();
+            var badgeHtml = this.up().getBadge(errArray.length);
+            this.setTitle('Sas Errors' + badgeHtml);
+          }
         }
       ],
 
