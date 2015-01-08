@@ -9,6 +9,7 @@ h54s.prototype.call = function(sasProgram, callback) {
   var self = this;
   var callArgs = arguments;
   var retryCount = 0;
+  var dbg = this.debug;
   if (!callback || typeof callback !== 'function'){
     throw new h54s.Error('argumentError', 'You must provide callback');
   }
@@ -50,7 +51,7 @@ h54s.prototype.call = function(sasProgram, callback) {
       callback(new h54s.Error('notLoggedinError', 'You are not logged in'));
     } else {
       var resObj, unescapedResObj;
-      if(!self.debug) {
+      if(!dbg) {
         try {
           //clear sas params
           this.sasParams = [];
