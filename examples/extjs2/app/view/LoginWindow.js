@@ -24,6 +24,9 @@ Ext.define('h54sExample.view.LoginWindow', {
             e.preventDefault();
             this.up('window').down('textfield[name="px"]').focus(true, 10);
           }
+        },
+        change: function(f, e) {
+          this.up('window').down('label').hide();;
         }
       }
     }, {
@@ -41,6 +44,9 @@ Ext.define('h54sExample.view.LoginWindow', {
             e.preventDefault();
             Ext.getCmp('loginSubmit').focus(false, 10);
           }
+        },
+        change: function(f, e) {
+          this.up('window').down('label').hide();;
         }
       }
     }, {
