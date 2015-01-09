@@ -39,6 +39,26 @@ Ext.define('h54sExample.view.MessageWindow', {
         label.setText(label.text + 'error');
         me._animateLabel(label);
         label.setStyle('color', 'red');
+      },
+      remove: function() {
+        label.animate({
+          duration: 100,
+          to: {
+            opacity: 0
+          },
+          listeners: {
+            afteranimate: function() {
+              setTimeout(function() {
+                me.remove(label);
+              }, 101);
+              if(me.items.items.length <= 1) {
+                me.close();
+                //reset min width
+                me.setMinWidth('initial');
+              }
+            }
+          }
+        });
       }
     };
   },

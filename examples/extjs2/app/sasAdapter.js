@@ -39,6 +39,7 @@ Ext.define('h54sExample.sasAdapter', {
           if (loading){
             loading.remove();
           }
+          msg.remove();
           loginWindow.show();
         } else {
           if(err) {
