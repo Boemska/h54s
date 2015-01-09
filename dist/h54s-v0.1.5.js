@@ -1,4 +1,4 @@
-/*! h54s v0.1.5 - 2015-01-08 
+/*! h54s v0.1.5 - 2015-01-09 
  *  License: GPL 
  *  Author: Boemska 
 */
@@ -183,7 +183,7 @@ h54s.prototype.call = function(sasProgram, callback) {
             callback(new h54s.Error('parseError', 'Unable to parse response json'));
           }
         } finally {
-          if(resObj) {
+          if(unescapedResObj) {
             self._utils.addApplicationLogs(resObj.logmessage);
             callback(undefined, unescapedResObj);
           }
@@ -199,7 +199,7 @@ h54s.prototype.call = function(sasProgram, callback) {
           self._utils.parseErrorResponse(res.responseText, sasProgram);
           callback(new h54s.Error('parseError', 'Unable to parse response json'));
         } finally {
-          if(resObj) {
+          if(unescapedResObj) {
             self._utils.addApplicationLogs(resObj.logmessage);
             if(resObj.hasErrors) {
               callback(new h54s.Error('sasError', 'Sas program completed with errors'), unescapedResObj);
