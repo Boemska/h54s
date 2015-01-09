@@ -26,7 +26,7 @@ Ext.define('h54sExample.view.LoginWindow', {
           }
         },
         change: function(f, e) {
-          this.up('window').down('label').hide();;
+          this.up('window').down('label').hide();
         }
       }
     }, {
@@ -46,7 +46,7 @@ Ext.define('h54sExample.view.LoginWindow', {
           }
         },
         change: function(f, e) {
-          this.up('window').down('label').hide();;
+          this.up('window').down('label').hide();
         }
       }
     }, {
