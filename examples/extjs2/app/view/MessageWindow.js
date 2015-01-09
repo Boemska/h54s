@@ -33,29 +33,38 @@ Ext.define('h54sExample.view.MessageWindow', {
     return {
       setLoaded: function() {
         label.setText(label.text + 'loaded');
-
-        setTimeout(function() {
-          label.animate({
-            duration: 100,
-            to: {
-              opacity: 0
-            },
-            listeners: {
-              afteranimate: function() {
-                setTimeout(function() {
-                  me.remove(label);
-                }, 101);
-                if(me.items.items.length <= 1) {
-                  me.close();
-                  //reset min width
-                  me.setMinWidth('initial');
-                }
-              }
-            }
-          });
-        }, 3000);
+        me._animateLabel(label);
+      },
+      setError: function() {
+        label.setText(label.text + 'error');
+        me._animateLabel(label);
+        label.setStyle('color', 'red');
       }
     };
+  },
+
+  _animateLabel: function(label) {
+    var me = this;
+    setTimeout(function() {
+      label.animate({
+        duration: 100,
+        to: {
+          opacity: 0
+        },
+        listeners: {
+          afteranimate: function() {
+            setTimeout(function() {
+              me.remove(label);
+            }, 101);
+            if(me.items.items.length <= 1) {
+              me.close();
+              //reset min width
+              me.setMinWidth('initial');
+            }
+          }
+        }
+      });
+    }, 3000);
   },
 
   addUserMessage: function(msg) {

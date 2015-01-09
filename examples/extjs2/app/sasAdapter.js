@@ -33,8 +33,6 @@ Ext.define('h54sExample.sasAdapter', {
 
     try {
       this._adapter.call(sasProgram, function(err, res) {
-        msg.setLoaded();
-
         if(err && (err.type === 'notLoggedinError' || err.type === 'loginError')) {
           var loginWindow = Ext.create('h54sExample.view.LoginWindow');
           var loading = Ext.get('loadingWrapper');
@@ -43,6 +41,11 @@ Ext.define('h54sExample.sasAdapter', {
           }
           loginWindow.show();
         } else {
+          if(err) {
+            msg.setError();
+          } else {
+            msg.setLoaded();
+          }
           if(res && res.usermessage) {
             me.msgWindow.addUserMessage(res.usermessage);
           }

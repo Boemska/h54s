@@ -30,7 +30,6 @@ Ext.define('h54sExample.view.DebugWindow', {
             break;
         }
         tab.updateTab();
-        tab.updateBadge();
         tab.removeAll(true);
       }
     }
