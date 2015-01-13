@@ -11,6 +11,9 @@
       <li role="presentation">
         <a ng-click="showSasErrorsTab($event)" href="" data-target="#sasErrors" data-toggle="tab">Sas Errors <span class="badge">{{sasErrors.length}}</span></a>
       </li>
+      <li role="presentation">
+        <a ng-click="showFailedRequestsTab($event)" href="" data-target="#failedReq" data-toggle="tab">Failed Requests <span class="badge">{{failedRequests.length}}</span></a>
+      </li>
       <button type="button" class="close" ng-click="closeDebugWindow()"><span aria-hidden="true">&times;</span></button>
     </ul>
 
@@ -28,7 +31,7 @@
           <div ng-repeat="log in debugData" class="logItem">
             <p>{{log.time.toString()}}:</p>
             <div class="panel panel-default">
-              <div class="panel-heading" role="tab" id="headingOne">
+              <div class="panel-heading" role="tab" id="headingOne{{$index}}">
                 <a data-toggle="collapse" data-parent="#accordion" data-target="#collapse{{$index}}" href="" aria-expanded="false" aria-controls="collapse{{$index}}">
                   {{log.sasProgram}}
                 </a>
@@ -48,6 +51,24 @@
           <pre>{{err.message}}</pre>
         </div>
         <button class="btn btn-primary clear-btn" type="submit" ng-click="clearSasErrors()">Clear</button>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="failedReq">
+        <div id="accordion2" role="tablist" aria-multiselectable="true">
+          <div ng-repeat="log in failedRequests" class="logItem">
+            <p>{{log.time.toString()}}:</p>
+            <div class="panel panel-default">
+              <div class="panel-heading" role="tab" id="headingTwo{{$index}}">
+                <a data-toggle="collapse" data-parent="#accordion2" data-target="#collapseTwo{{$index}}" href="" aria-expanded="false" aria-controls="collapseTwo{{$index}}">
+                  {{log.sasProgram}}
+                </a>
+              </div>
+              <div id="collapseTwo{{$index}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo{{$index}}">
+                <div ng-bind-html="log.message">{{log.message}}</div>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-primary clear-btn" type="submit" ng-click="clearFailedRequests()">Clear</button>
+        </div>
       </div>
     </div>
 

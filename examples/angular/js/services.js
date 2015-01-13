@@ -50,6 +50,9 @@ app.factory('sasAdapter', function($q, $rootScope) {
     getSasErrors: function() {
       return sasAdapter.getSasErrors();
     },
+    getFailedRequests: function() {
+      return sasAdapter.getFailedRequests();
+    },
     setCredentials: function(user, pass) {
       return sasAdapter.setCredentials(user, pass);
     },
@@ -61,6 +64,9 @@ app.factory('sasAdapter', function($q, $rootScope) {
     },
     clearSasErrors: function() {
       sasAdapter.clearSasErrors();
+    },
+    clearFailedRequests: function() {
+      sasAdapter.clearFailedRequests();
     }
   };
 });

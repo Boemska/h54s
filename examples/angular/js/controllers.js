@@ -154,6 +154,13 @@ app.controller('debugWindowCtrl', ['$scope', 'sasAdapter', '$rootScope', '$sce',
         };
       });
       $scope.sasErrors = sasAdapter.getSasErrors();
+      $scope.failedRequests = sasAdapter.getFailedRequests().map(function(el) {
+        return {
+          time: el.time,
+          message: $sce.trustAsHtml(el.responseHtml),
+          sasProgram: el.sasProgram
+        };
+      });
       setHeight();
     }
   });
@@ -175,6 +182,11 @@ app.controller('debugWindowCtrl', ['$scope', 'sasAdapter', '$rootScope', '$sce',
   $scope.clearApplicationLogs = function() {
     sasAdapter.clearApplicationLogs();
     $scope.appLogs = [];
+  };
+
+  $scope.clearFailedRequests = function() {
+    sasAdapter.clearFailedRequests();
+    $scope.failedRequests = [];
   };
 
   function setHeight() {
