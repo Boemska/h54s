@@ -26,6 +26,9 @@ Ext.define('h54sExample.view.DebugWindow', {
           case 'sasErrors':
             sasAdapter.clearSasErrors();
             break;
+          case 'failedReq':
+            sasAdapter.clearFailedRequests();
+            break;
         }
         tab.updateTab();
         tab.updateBadge();
@@ -162,6 +165,66 @@ Ext.define('h54sExample.view.DebugWindow', {
             var errArray = sasAdapter.getSasErrors();
             var badgeHtml = this.up().getBadge(errArray.length);
             this.setTitle('Sas Errors' + badgeHtml);
+          }
+        },
+        {
+          itemId: 'failedReq',
+          title: 'Failed Requests',
+          bodyPadding: 10,
+          overflowY: 'scroll',
+
+          listeners: {
+            activate: function (tab) {
+              this.updateTab();
+            },
+            added: function () {
+              this.updateBadge();
+            }
+          },
+
+          updateTab: function() {
+            var failedReqArray = sasAdapter.getFailedRequests();
+            for (var i = 0; i < failedReqArray.length; i++) {
+              this.add({
+                xtype: 'container',
+                items: [
+                  {
+                    xtype: 'label',
+                    text: failedReqArray[i].time.toString()
+                  },
+                  {
+                    layout: 'fit',
+                    xtype: 'panel',
+                    title: failedReqArray[i].sasProgram,
+                    html: failedReqArray[i].responseHtml,
+                    collapsible: true,
+                    collapsed: true,
+                    autoScroll: true,
+                    style: {
+                      'word-wrap': 'break-word !important'
+                    }
+                  },
+                  {
+                    xtype: 'component',
+                    autoEl: {
+                      tag: 'hr'
+                    },
+                    style: {
+                      marginTop: '20px',
+                      marginBottom: '15px'
+                    }
+                  }
+                ]
+
+              });
+            }
+            this.doLayout();
+          },
+
+          updateBadge: function() {
+            var failedReqArray = sasAdapter.getFailedRequests();
+            var badgeHtml = this.up().getBadge(failedReqArray.length);
+            this.setTitle('Failed Requests' + badgeHtml);
           }
         }
       ],

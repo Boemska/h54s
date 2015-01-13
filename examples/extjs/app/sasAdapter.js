@@ -70,13 +70,24 @@ Ext.define('h54sExample.sasAdapter', {
   getApplicationLogs: function() {
     return this._adapter.getApplicationLogs();
   },
+
+  getFailedRequests: function() {
+    return this._adapter.getFailedRequests();
+  },
+
   clearApplicationLogs: function() {
     this._adapter.clearApplicationLogs();
   },
+
   clearDebugData: function() {
     this._adapter.clearDebugData();
   },
+
   clearSasErrors: function() {
     this._adapter.clearSasErrors();
+  },
+
+  clearFailedRequests: function() {
+    this._adapter.clearFailedRequests();
   }
 });
