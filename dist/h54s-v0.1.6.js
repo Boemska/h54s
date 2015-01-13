@@ -658,8 +658,8 @@ h54s.prototype._utils.addFailedResponse = function(responseText, sasProgram) {
   debugText = this.decodeHTMLEntities(debugText);
 
   this._failedRequests.push({
-    debugHtml: responseText,
-    debugText: debugText,
+    responseHtml: responseText,
+    responseText: debugText,
     sasProgram: sasProgram,
     time: new Date()
   });
