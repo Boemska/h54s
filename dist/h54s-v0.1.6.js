@@ -654,6 +654,10 @@ h54s.prototype._utils.parseDebugRes = function(responseText, sasProgram, params)
 *
 */
 h54s.prototype._utils.addFailedResponse = function(responseText, sasProgram) {
+  var patt = /<script([\s\S]*)\/form>/;
+  var patt2 = /display\s?:\s?none;?\s?/;
+  //remove script with form for toggling the logs and "display:none" from style
+  responseText = responseText.replace(patt, '').replace(patt2, '');
   var debugText = responseText.replace(/<[^>]*>/g, '');
   debugText = this.decodeHTMLEntities(debugText);
 
