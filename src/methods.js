@@ -65,6 +65,7 @@ h54s.prototype.call = function(sasProgram, callback) {
             self._utils.addApplicationLogs("Retrying #" + retryCount);
           } else {
             self._utils.parseErrorResponse(res.responseText, sasProgram);
+            self._utils.addFailedResponse(res.responseText, sasProgram);
             callback(new h54s.Error('parseError', 'Unable to parse response json'));
           }
         } finally {
@@ -218,6 +219,14 @@ h54s.prototype.getApplicationLogs = function() {
 */
 h54s.prototype.getDebugData = function() {
   return this._utils._debugData;
+};
+
+/*
+* Get failed requests
+*
+*/
+h54s.prototype.getFailedRequests = function() {
+  return this._utils._failedRequests;
 };
 
 /*

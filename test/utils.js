@@ -73,9 +73,14 @@ describe('h54s', function() {
         assert.isObject(err, 'We should get error object');
         assert.equal(err.type, 'parseError', 'We should get parseError');
         var sasErrors = sasAdapter.getSasErrors();
+        var failedRequests = sasAdapter.getFailedRequests();
         assert.isArray(sasErrors, 'sasErrors should be array');
+        assert.isArray(failedRequests, 'failedRequests should be array');
         if(sasErrors.length === 0) {
           assert.notOk(sasErrors, 'sasErrors array should not be empty');
+        }
+        if(failedRequests.length === 0) {
+          assert.notOk(failedRequests, 'failedRequests array should not be empty');
         }
         done();
       });

@@ -2,6 +2,7 @@ h54s.prototype._utils = {};
 h54s.prototype._utils._applicationLogs = [];
 h54s.prototype._utils._debugData = [];
 h54s.prototype._utils._sasErrors = [];
+h54s.prototype._utils._failedRequests = [];
 
 h54s.prototype._utils.ajax = (function () {
   var xhr = function(type, url, data) {
@@ -200,6 +201,8 @@ h54s.prototype._utils.convertTableObject = function(inObject) {
 * Parse response from server in debug mode
 *
 * @param {object} responseText - response html from the server
+* @param {string} sasProgram - sas program path
+* @param {object} params - params sent to sas program with addTable
 *
 */
 h54s.prototype._utils.parseDebugRes = function(responseText, sasProgram, params) {
@@ -236,6 +239,30 @@ h54s.prototype._utils.parseDebugRes = function(responseText, sasProgram, params)
   }
 
   return jsonObj;
+};
+
+/*
+* Add failed response to logs - used only if debug=false
+*
+* @param {object} responseText - response html from the server
+* @param {string} sasProgram - sas program path
+*
+*/
+h54s.prototype._utils.addFailedResponse = function(responseText, sasProgram) {
+  var debugText = responseText.replace(/<[^>]*>/g, '');
+  debugText = this.decodeHTMLEntities(debugText);
+
+  this._failedRequests.push({
+    debugHtml: responseText,
+    debugText: debugText,
+    sasProgram: sasProgram,
+    time: new Date()
+  });
+
+  //max 20 failed requests
+  if(this._failedRequests.length > 20) {
+    this._failedRequests.shift();
+  }
 };
 
 /*

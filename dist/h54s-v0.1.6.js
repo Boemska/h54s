@@ -1,4 +1,4 @@
-/*! h54s v0.1.5 - 2015-01-09 
+/*! h54s v0.1.6 - 2015-01-13 
  *  License: GPL 
  *  Author: Boemska 
 */
@@ -180,6 +180,7 @@ h54s.prototype.call = function(sasProgram, callback) {
             self._utils.addApplicationLogs("Retrying #" + retryCount);
           } else {
             self._utils.parseErrorResponse(res.responseText, sasProgram);
+            self._utils.addFailedResponse(res.responseText, sasProgram);
             callback(new h54s.Error('parseError', 'Unable to parse response json'));
           }
         } finally {
@@ -336,6 +337,14 @@ h54s.prototype.getDebugData = function() {
 };
 
 /*
+* Get failed requests
+*
+*/
+h54s.prototype.getFailedRequests = function() {
+  return this._utils._failedRequests;
+};
+
+/*
 * Enter debug mode
 *
 */
@@ -389,6 +398,7 @@ h54s.prototype._utils = {};
 h54s.prototype._utils._applicationLogs = [];
 h54s.prototype._utils._debugData = [];
 h54s.prototype._utils._sasErrors = [];
+h54s.prototype._utils._failedRequests = [];
 
 h54s.prototype._utils.ajax = (function () {
   var xhr = function(type, url, data) {
@@ -587,6 +597,8 @@ h54s.prototype._utils.convertTableObject = function(inObject) {
 * Parse response from server in debug mode
 *
 * @param {object} responseText - response html from the server
+* @param {string} sasProgram - sas program path
+* @param {object} params - params sent to sas program with addTable
 *
 */
 h54s.prototype._utils.parseDebugRes = function(responseText, sasProgram, params) {
@@ -623,6 +635,30 @@ h54s.prototype._utils.parseDebugRes = function(responseText, sasProgram, params)
   }
 
   return jsonObj;
+};
+
+/*
+* Add failed response to logs - used only if debug=false
+*
+* @param {object} responseText - response html from the server
+* @param {string} sasProgram - sas program path
+*
+*/
+h54s.prototype._utils.addFailedResponse = function(responseText, sasProgram) {
+  var debugText = responseText.replace(/<[^>]*>/g, '');
+  debugText = this.decodeHTMLEntities(debugText);
+
+  this._failedRequests.push({
+    debugHtml: responseText,
+    debugText: debugText,
+    sasProgram: sasProgram,
+    time: new Date()
+  });
+
+  //max 20 failed requests
+  if(this._failedRequests.length > 20) {
+    this._failedRequests.shift();
+  }
 };
 
 /*
