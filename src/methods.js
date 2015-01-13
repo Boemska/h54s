@@ -270,6 +270,14 @@ h54s.prototype.clearSasErrors = function() {
 };
 
 /*
+* Clear failed requests
+*
+*/
+h54s.prototype.clearFailedRequests = function() {
+  this._utils._failedRequests = [];
+};
+
+/*
 * Clear all logs
 *
 */
@@ -277,4 +285,5 @@ h54s.prototype.clearAllLogs = function() {
   this.clearApplicationLogs();
   this.clearDebugData();
   this.clearSasErrors();
+  this.clearFailedRequests();
 };
