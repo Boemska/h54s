@@ -192,7 +192,13 @@ Ext.define('h54sExample.view.MainViewport', {
                       xtype: 'gridcolumn',
                       dataIndex: 'shortName',
                       text: 'Report Name',
-                      flex: 1
+                      flex: 1,
+                      renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
+                        var newTooltip = record.get('programname');
+
+                        metaData.tdAttr = 'data-qtip="' + newTooltip + '"';
+                        return value;
+                      }
                     }, {
                       xtype: 'numbercolumn',
                       width: 60,
@@ -201,9 +207,9 @@ Ext.define('h54sExample.view.MainViewport', {
                       flex: 0
                     }, {
                       xtype: 'gridcolumn',
-                      width: 60,
+                      width: 50,
                       dataIndex: 'pType',
-                      text: '',
+                      text: 'Type',
                       flex: 0
                     }
                   ]

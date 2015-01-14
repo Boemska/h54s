@@ -13,7 +13,7 @@ Ext.define('h54sExample.view.WindowDrillHour', {
   height: 500,
   width: 700,
   layout: 'fit',
-  title: 'My Window',
+  title: '',
 
   items: [
     {
@@ -76,7 +76,7 @@ Ext.define('h54sExample.view.WindowDrillHour', {
         xtype: 'gridcolumn',
         dataIndex: 'pType',
         width: 60,
-        text: '',
+        text: 'Type',
         flex: 0
     }];
 
