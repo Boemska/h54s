@@ -1,16 +1,6 @@
 Ext.define('h54sExample.controller.MainController', {
   extend : 'Ext.app.Controller',
 
-  refs: [
-    {
-      ref: 'mainView',
-      selector: '#mainView'
-    }, {
-      ref: 'timeReport',
-      selector: '#highchartsContainer'
-    }
-  ],
-
   onLaunch: function() {
     this.startup();
   },
