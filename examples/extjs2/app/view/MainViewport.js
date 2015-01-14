@@ -1,12 +1,7 @@
 Ext.define('h54sExample.view.MainViewport', {
   extend: 'Ext.container.Viewport',
   alias: 'widget.mainviewport',
-
-  requires: [
-    'Ext.grid.Panel',
-    'Ext.grid.column.Number',
-    'Ext.grid.View'
-  ],
+  itemId: 'mainView',
 
   layout: 'fit',
   defaultListenerScope: true,
@@ -31,13 +26,50 @@ Ext.define('h54sExample.view.MainViewport', {
               xtype: 'panel',
               flex: 385,
               frame: true,
-              html: '<div style="width: 100%; height: 100% ; margin: 0 auto;" id="pieByUser"></div>',
               margin: '20 20 0 20',
               padding: '20 20 0 20',
               title: 'Total Reports Opened',
-              listeners: {
-                resize: 'onPanelResize'
-              }
+              items: [
+                {
+                  xtype: 'highcharts',
+                  store: 'ByUserStore',
+                  series: [{
+                    dataKey: 'data',
+                    type: 'bar',
+                    name: 'Usage by User'
+                  }],
+                  xAxisField: 'categories',
+                  chartConfig: {
+                    title: {
+                      text: null
+                    },
+                    exporting: {
+                      enabled: false
+                    },
+                    tooltip: {
+                      formatter: function() {
+                        return '<b>' + this.point.name +':</b> '+ this.y;
+                      }
+                    },
+                    xAxis: {
+                      title: {
+                        text: null
+                      }
+                    },
+                    yAxis: {
+                      title: {
+                        text: null
+                      }
+                    },
+                    legend: {
+                      enabled: false
+                    },
+                    credits: {
+                      enabled: false
+                    }
+                  }
+                }
+              ]
             }, {
               xtype: 'panel',
               flex: 615,
@@ -60,8 +92,93 @@ Ext.define('h54sExample.view.MainViewport', {
               },
               items: [
                 {
-                  xtype: 'highchartscontainer',
-                  id: 'pieSubdirectory',
+                  id: 'pieChart',
+                  xtype: 'highcharts',
+                  store: 'ByLocationStore',
+                  series: [{
+                    dataKey: 'lev0Data',
+                    name: 'Level 0',
+                    size: '30%',
+                    dataLabels: {
+                      formatter: function () {
+                        return this.point.name;
+                      },
+                      color: 'white',
+                      distance: -20
+                    },
+                    seriesLevel: 0
+                  }, {
+                    dataKey: 'lev1Data',
+                    name: 'Level 1',
+                    size: '55%',
+                    innerSize: '30%',
+                    dataLabels: {
+                      formatter: function () {
+                        return this.point.name;
+                      },
+                      color: 'white',
+                      distance: -20
+                    },
+                    seriesLevel: 1
+                  }, {
+                    dataKey: 'lev2Data',
+                    name: 'Level 2',
+                    size: '80%',
+                    innerSize: '55%',
+                    seriesLevel: 2
+                  }],
+                  chartConfig: {
+                    chart: {
+                      type: 'pie'
+                    },
+                    exporting: {
+                      enabled: false
+                    },
+                    title: {
+                      text: null
+                    },
+                    tooltip: {
+                      formatter: function() {
+
+                        if(this.point.name === '' || this.point.name === ' ' ){
+                          return false ;
+                        } else {
+                          return this.point.name +': '+ this.y;
+                        }
+                      }
+                    },
+                    credits: {
+                      enabled: false
+                    },
+                    plotOptions: {
+                      pie: {
+                        allowPointSelect: true,
+                        slicedOffset: 0,
+                        cursor: 'pointer',
+                        dataLabels: {
+                          enabled: true,
+                          style: {
+                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                          }
+                        }
+                      },
+                      series: {
+                        cursor: 'pointer',
+                        point: {
+                          events: {
+                            click: function(e) {
+                              if (this.name !== '' && this.name !== ' '){
+                                var controller = h54sExample.app.getController('MainController');
+                                controller.onSubdirectoryClick(this);
+                                controller.lastClicked = this.name;
+                              }
+
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
                   flex: 55
                 }, {
                   xtype: 'gridpanel',
@@ -69,6 +186,7 @@ Ext.define('h54sExample.view.MainViewport', {
                   frame: true,
                   id: 'toplevelProcess',
                   margin: '5 5 5 5',
+                  store: 'GridStore',
                   columns: [
                     {
                       xtype: 'gridcolumn',
@@ -105,7 +223,7 @@ Ext.define('h54sExample.view.MainViewport', {
                 xtype: 'button',
                 text: 'Select Date Range',
                 handler: function () {
-                  var chart = $('#' + 'highchartsContainer').highcharts();
+                  var chart = $('#timeReportsChart').highcharts();
                   var minDate = new Date(chart.xAxis[0].getExtremes().min);
                   var maxDate = new Date(chart.xAxis[0].getExtremes().max);
 
@@ -125,31 +243,129 @@ Ext.define('h54sExample.view.MainViewport', {
           },
           items: [
             {
-              xtype: 'container',
-              flex: 1,
-              html: '<div style="width: 100%; height: 100% ; margin: 0 auto;" id="highchartsContainer"></div>',
-              layout: 'fit',
-              listeners: {
-                resize: 'onContainerResize'
+              id: 'timeReportsChart',
+              xtype: 'highcharts',
+              stockChart: true,
+              store: 'ByTimeStore',
+              series: [
+                {
+                  name: 'WRS Reports',
+                  dataKey: 'wrsReports'
+                }, {
+                  name: 'STP Reports',
+                  dataKey: 'stpReports'
+                }
+              ],
+              chartConfig: {
+                chart: {
+                  type: 'column',
+                  zoomType: 'x'
+                },
+                rangeSelector: {
+                  buttons: [{
+                    type: 'day',
+                    count: 1,
+                    text: '1d'
+                  }, {
+                    type: 'week',
+                    count: 1,
+                    text: '1w'
+                  }, {
+                    type: 'all',
+                    text: 'All'
+                  }]
+                },
+                exporting: {
+                  enabled: false
+                },
+                xAxis: {
+                  ordinal: false,
+                  events: {
+                    afterSetExtremes: function (e) {
+                      var controller = h54sExample.app.getController('MainController');
+                      controller.updateTimespan(e.min, e.max, new Date(e.min), new Date(e.max));
+                      controller.lastClicked = undefined;
+                    }
+                  }
+                },
+                legend: {
+                  enabled: true,
+                  verticalAlign: 'top'
+                },
+                navigator: {
+                  enabled: false,
+                  height: 0,
+                  margin: 0
+                },
+                scrollbar: {
+                  enabled: false
+                },
+
+                credits: {
+                  enabled: false
+                },
+
+                plotOptions: {
+                  column: {
+                    stacking: 'normal',
+                    dataGrouping: {
+                      forced: false,
+                      units: [[
+                        'hour',
+                        [6]
+                      ]]
+                    }
+                  },
+                  series: {
+                    cursor: 'pointer',
+                    point: {
+                      events: {
+                        click: function (e) {
+                          var timeMs = this.x;
+                          if (!timeMs) {
+                            Ext.MessageBox.alert('Warn: No x timestamp found.');
+                            return;
+                          }
+
+                          var timeMsEnd = timeMs + 60 * 60 * 1000;
+
+                          var sasStart = new Date(timeMs);
+                          var sasEnd = new Date(timeMsEnd);
+
+                          var me = this;
+
+                          sasAdapter.addTable([{
+                            javastart: timeMs,
+                            javaend: timeMsEnd,
+                            sasstart: sasStart,
+                            sasend: sasEnd
+                          }], 'timespan');
+
+
+                          sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/drillHour', function(err, res) {
+                            if (err) {
+                              Ext.MessageBox.alert('Warning', 'Could not call drillHour.');
+                            } else {
+                              var win = Ext.create('h54sExample.view.WindowDrillHour');
+                              var fromString = Ext.util.Format.date(new Date(timeMs), 'Y-m-d H:i:s');
+                              var endString = Ext.util.Format.date(new Date(timeMsEnd), 'Y-m-d H:i:s');
+
+                              win.setTitle('From ' + fromString + ' to ' + endString);
+                              win.setData(res);
+
+                              win.show();
+                            }
+                          });
+                        }
+                      }
+                    }
+                  }
+                }
               }
             }
           ]
         }
       ]
     }
-  ],
-
-  onPanelResize: function (component, width, height, oldWidth, oldHeight, eOpts) {
-    var chart = $('#pieByUser').highcharts();
-    if (chart) {
-      chart.setSize(width, height, false);
-    }
-  },
-
-  onContainerResize: function (component, width, height, oldWidth, oldHeight, eOpts) {
-    var chart = $('#highchartsContainer').highcharts();
-    if (chart) {
-      chart.setSize(width, height, false);
-    }
-  },
+  ]
 });
