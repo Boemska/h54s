@@ -85,7 +85,6 @@ Ext.define('h54sExample.view.charts.LocationChart', {
                   controller.onSubdirectoryClick(this);
                   controller.lastClicked = this.name;
                 }
-
               }
             }
           }
