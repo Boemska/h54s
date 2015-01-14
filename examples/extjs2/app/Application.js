@@ -15,7 +15,11 @@ Ext.define('h54sExample.Application', {
     'h54sExample.view.DateWindow',
     'h54sExample.view.WindowDrillHour',
     'h54sExample.view.DebugWindow',
-    'h54sExample.view.LoginWindow'
+    'h54sExample.view.LoginWindow',
+
+    'h54sExample.view.charts.LocationChart',
+    'h54sExample.view.charts.TimeChart',
+    'h54sExample.view.charts.UserChart'
   ],
 
   launch: function () {
