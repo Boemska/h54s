@@ -5,6 +5,16 @@ Ext.define('h54sExample.view.MainViewport', {
 
   layout: 'fit',
   defaultListenerScope: true,
+  autoScroll: true,
+
+  responsiveConfig: {
+    'width < 800': {
+      layout: {
+        type: 'vbox',
+        align: 'stretch'
+      },
+    }
+  },
 
   items: [
     {
@@ -13,6 +23,12 @@ Ext.define('h54sExample.view.MainViewport', {
         type: 'vbox',
         align: 'stretch'
       },
+      plugins: 'responsive',
+      responsiveConfig: {
+        'width < 800': {
+          autoScroll: true
+        }
+      },
       items: [
         {
           xtype: 'container',
@@ -20,6 +36,16 @@ Ext.define('h54sExample.view.MainViewport', {
           layout: {
             type: 'hbox',
             align: 'stretch'
+          },
+          plugins: 'responsive',
+          responsiveConfig: {
+            'width < 800': {
+              layout: {
+                type: 'vbox',
+                align: 'stretch'
+              },
+              height: 1000
+            }
           },
           items: [
             {
@@ -33,7 +59,14 @@ Ext.define('h54sExample.view.MainViewport', {
                 {
                   xtype: 'userchart'
                 }
-              ]
+              ],
+
+              plugins: 'responsive',
+              responsiveConfig: {
+                'width < 800': {
+                  height: 1000,
+                }
+              }
             }, {
               xtype: 'panel',
               flex: 615,
@@ -49,6 +82,13 @@ Ext.define('h54sExample.view.MainViewport', {
                     layout: 'hbox'
                   }
                 ]
+              },
+              plugins: 'responsive',
+              responsiveConfig: {
+                'width < 800': {
+                  height: 1000,
+                  margin: '20'
+                }
               },
               layout: {
                 type: 'hbox',
@@ -100,6 +140,12 @@ Ext.define('h54sExample.view.MainViewport', {
           flex: 1,
           frame: true,
           margin: '20 20 2 20',
+          plugins: 'responsive',
+          responsiveConfig: {
+            'width < 800': {
+              height: 400,
+            }
+          },
           header: {
             titlePosition: 0,
             items: [
