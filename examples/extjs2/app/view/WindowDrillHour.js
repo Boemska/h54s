@@ -14,6 +14,7 @@ Ext.define('h54sExample.view.WindowDrillHour', {
   width: 700,
   layout: 'fit',
   title: '',
+  frame: true,
 
   items: [
     {

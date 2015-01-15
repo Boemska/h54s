@@ -10,6 +10,7 @@ Ext.define('h54sExample.view.DebugWindow', {
   collapsible: true,
   focusOnToFront: false,
   constrainHeader: true,
+  frame: true,
 
   layout: 'fit',
   buttons : [
