@@ -53,16 +53,16 @@ Ext.define('h54sExample.view.HighchartsContainer', {
   },
 
   onLoad: function() {
-    var me = this;
     var data = this.store.getProxy().getData();
 
     this.chartConfig.series = [];
-    this.series.forEach(function(s, ind) {
-      s.data = data[s.dataKey];
-      var sClone = Ext.clone(s);
+    for(var i = 0; i < this.series.length; i++) {
+      var key = this.series[i].dataKey;
+      this.series[i].data = data[key];
+      var sClone = Ext.clone(this.series[i]);
       delete sClone.dataKey;
-      me.chartConfig.series.push(sClone)
-    });
+      this.chartConfig.series.push(sClone)
+    }
 
     if(this.xAxisField) {
       if(!this.chartConfig.xAxis) {
@@ -79,11 +79,11 @@ Ext.define('h54sExample.view.HighchartsContainer', {
     }
 
     if(this.chart) {
-      me.chart.destroy();
-      if(me.stockChart) {
-        me.chart = new Highcharts.StockChart(me.chartConfig);
+      this.chart.destroy();
+      if(this.stockChart) {
+        this.chart = new Highcharts.StockChart(this.chartConfig);
       } else {
-        me.chart = new Highcharts.Chart(me.chartConfig);
+        this.chart = new Highcharts.Chart(this.chartConfig);
       }
     }
 

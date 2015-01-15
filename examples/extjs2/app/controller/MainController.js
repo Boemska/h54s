@@ -326,7 +326,7 @@ Ext.define('h54sExample.controller.MainController', {
 
       sasAdapter.addTable([{
         count: point.y || point.breadcrumbY,
-        path: path.trim(),
+        path: $.trim(path), //ie8 doesn't have String.prototype.trim() implemented
         dir: dir
       }],'clicked');
 
