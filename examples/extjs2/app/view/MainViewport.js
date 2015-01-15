@@ -23,12 +23,6 @@ Ext.define('h54sExample.view.MainViewport', {
         type: 'vbox',
         align: 'stretch'
       },
-      plugins: 'responsive',
-      responsiveConfig: {
-        'width < 800': {
-          autoScroll: true
-        }
-      },
       items: [
         {
           xtype: 'container',
@@ -86,7 +80,7 @@ Ext.define('h54sExample.view.MainViewport', {
               plugins: 'responsive',
               responsiveConfig: {
                 'width < 800': {
-                  height: 1000,
+                  height: 600,
                   margin: '20'
                 }
               },
