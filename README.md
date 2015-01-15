@@ -206,6 +206,53 @@ adapter.unsetDebugMode();
 
 ---
 
+###clearApplicationLogs()
+Clears application logs array
+```
+adapter.clearApplicationLogs();
+```
+
+---
+
+###clearDebugData()
+Clears debug data array
+```
+adapter.clearDebugData()
+```
+
+---
+
+###clearSasErrors()
+Clears sas errors array
+```
+adapter.clearSasErrors()
+```
+
+---
+
+###clearFailedRequests()
+Clears failed requests array
+```
+adapter.clearFailedRequests()
+```
+
+---
+
+###clearAllLogs()
+Clears all log array
+```
+adapter.clearAllLogs()
+```
+
+It's the same as:
+```
+adapter.clearApplicationLogs();
+adapter.clearDebugData();
+adapter.clearSasErrors();
+adapter.clearFailedRequests();
+```
+---
+
 ---
 
 ##Development
