@@ -175,6 +175,22 @@ var debugData = adapter.getDebugData();
 
 ---
 
+###getFailedRequests()
+
+```
+var failedRequests = adapter.getFailedRequests();
+```
+
+>failedRequests[i].responseHtml - SAS html output
+
+>failedRequests[i].responseText - SAS text output (stripped html)
+
+>failedRequests[i].sasProgram - SAS program called
+
+>failedRequests[i].time - the time of the response (javascript Date object)
+
+---
+
 ###setDebugMode()
 Set debugging mode - `debug:true`:
 ```
