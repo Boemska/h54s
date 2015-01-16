@@ -162,6 +162,10 @@ Ext.define('h54sExample.view.DebugWindow', {
     restore: function () {
       //just remove focus from window by focusing anything else
       Ext.getCmp('toplevelProcess').focus();
+    },
+    beforerender: function() {
+      Ext.getBody().parent().setStyle('overflow', 'hidden'); //html tag
+      Ext.getCmp('mainView').setAutoScroll(false);
     }
   },
 

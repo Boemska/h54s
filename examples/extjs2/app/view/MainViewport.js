@@ -2,6 +2,7 @@ Ext.define('h54sExample.view.MainViewport', {
   extend: 'Ext.container.Viewport',
   alias: 'widget.mainviewport',
   itemId: 'mainView',
+  id: 'mainView',
 
   layout: 'fit',
   defaultListenerScope: true,
@@ -12,7 +13,7 @@ Ext.define('h54sExample.view.MainViewport', {
       layout: {
         type: 'vbox',
         align: 'stretch'
-      },
+      }
     }
   },
 
