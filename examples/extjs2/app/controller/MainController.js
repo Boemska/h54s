@@ -350,7 +350,7 @@ Ext.define('h54sExample.controller.MainController', {
       return;
     }
 
-    var timeMsEnd = timeMs + 60 * 60 * 1000;
+    var timeMsEnd = timeMs + 6 * 60 * 60 * 1000 - 1;
 
     var sasStart = new Date(timeMs);
     var sasEnd = new Date(timeMsEnd);

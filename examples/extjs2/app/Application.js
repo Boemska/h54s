@@ -39,5 +39,11 @@ Ext.define('h54sExample.Application', {
       scope: this,
       defaultEventAction: "stopEvent"
     });
+
+    Highcharts.setOptions({
+      global: {
+        useUTC: false
+      }
+    });
   }
 });
