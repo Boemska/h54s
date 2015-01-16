@@ -175,6 +175,22 @@ var debugData = adapter.getDebugData();
 
 ---
 
+###getFailedRequests()
+
+```
+var failedRequests = adapter.getFailedRequests();
+```
+
+>failedRequests[i].responseHtml - SAS html output
+
+>failedRequests[i].responseText - SAS text output (stripped html)
+
+>failedRequests[i].sasProgram - SAS program called
+
+>failedRequests[i].time - the time of the response (javascript Date object)
+
+---
+
 ###setDebugMode()
 Set debugging mode - `debug:true`:
 ```
@@ -188,6 +204,53 @@ Unset  debugging mode - `debug:false`:
 adapter.unsetDebugMode();
 ```
 
+---
+
+###clearApplicationLogs()
+Clears application logs array
+```
+adapter.clearApplicationLogs();
+```
+
+---
+
+###clearDebugData()
+Clears debug data array
+```
+adapter.clearDebugData()
+```
+
+---
+
+###clearSasErrors()
+Clears sas errors array
+```
+adapter.clearSasErrors()
+```
+
+---
+
+###clearFailedRequests()
+Clears failed requests array
+```
+adapter.clearFailedRequests()
+```
+
+---
+
+###clearAllLogs()
+Clears all log array
+```
+adapter.clearAllLogs()
+```
+
+It's the same as:
+```
+adapter.clearApplicationLogs();
+adapter.clearDebugData();
+adapter.clearSasErrors();
+adapter.clearFailedRequests();
+```
 ---
 
 ---
