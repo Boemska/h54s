@@ -15,19 +15,43 @@ Ext.define('h54sExample.view.WindowDrillHour', {
   layout: 'fit',
   title: '',
   frame: true,
+  closeAction: 'destroy',
 
   items: [
     {
       xtype: 'gridpanel',
+      store: 'DrillHourStore',
       columns: [
         {
           xtype: 'gridcolumn',
-          dataIndex: 'string',
-          text: 'String'
+          dataIndex: 'shortname',
+          text: 'Report Name',
+          flex: 1,
+          renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
+            var newTooltip = record.get('programname');
+
+            metaData.tdAttr = 'data-qtip="' + newTooltip + '"';
+            return value;
+          }
         }, {
-          xtype: 'numbercolumn',
-          dataIndex: 'number',
-          text: 'Number'
+          xtype: 'gridcolumn',
+          dataIndex: 'username',
+          text: 'Username',
+          flex: 0,
+          width: 120
+        }, {
+          xtype: 'gridcolumn',
+          dataIndex: 'datetime',
+          text: 'Date',
+          flex: 0,
+          width: 150,
+          format: 'Y-m-d H:i:s'
+        }, {
+          xtype: 'gridcolumn',
+          dataIndex: 'pType',
+          width: 60,
+          text: 'Type',
+          flex: 0
         }
       ],
       features: [
@@ -40,113 +64,72 @@ Ext.define('h54sExample.view.WindowDrillHour', {
         }
       ]
     }
-  ],
+  ]
+});
 
-  setData: function (data) {
-    var me = this;
+//Grouping feature - startCollapsed override fix
+Ext.override(Ext.grid.feature.GroupStore, {
+  processStore: function (store) {
+    var me = this,
+      groups = store.getGroups(),
+      groupCount = groups ? groups.length : 0,
+      i,
+      group,
+      groupPlaceholder,
+      data = me.data,
+      oldGroupCache = me.groupingFeature.groupCache,
+      groupCache = me.groupingFeature.clearGroupCache(),
+      collapseAll = me.groupingFeature.startCollapsed,
+      groupField = store.getGroupField(),
+      key, modelData, Model;
 
-    var grid = me.down('gridpanel');
-
-    // reconfigure grid columns, store, data...
-
-    var res = data;
-
-    var newFields = [];
-    var newColumns = [];
-
-
-    var fields = [{
-        xtype: 'gridcolumn',
-        dataIndex: 'shortname',
-        text: 'Report Name',
-        flex: 1
-      }, {
-        xtype: 'gridcolumn',
-        dataIndex: 'username',
-        text: 'Username',
-        flex: 0,
-        width: 120
-      }, {
-        xtype: 'gridcolumn',
-        dataIndex: 'datetime',
-        text: 'Date',
-        flex: 0,
-        width: 150,
-        format: 'Y-m-d H:i:s'
-      }, {
-        xtype: 'gridcolumn',
-        dataIndex: 'pType',
-        width: 60,
-        text: 'Type',
-        flex: 0
-    }];
-
-    var renderFn = function (value, metaData, record, rowIndex, colIndex, store, view) {
-      var newTooltip = record.get('programname');
-
-      metaData.tdAttr = 'data-qtip="' + newTooltip + '"';
-      return value;
-    };
-
-    for (var i = 0; i < fields.length; i++) {
-      var descField = fields[i];
-
-      var fieldType = 'string';
-
-      newFields.push({
-        name: descField.dataIndex
-      });
-
-
-      var column = {
-        xtype: descField.xtype,
-        format: descField.format || '0', // for numbercolumn , format it to whole number
-        dataIndex: descField.dataIndex,
-        text: descField.text,
-        flex: descField.flex,
-        width: descField.width,
-        renderer: renderFn
-      };
-
-      newColumns.push(column);
-    }
-
-    if (!res.byProgram) {
-      Ext.MessageBox.alert('Warning', 'No byProgram object found.');
-      return;
-    }
-    var ds = res.byProgram;
-
-    var newData = [];
-    for (i = 0; i < ds.length; i++) {
-      var row = ds[i];
-
-      if (row.pType === 'STP' && row.datetime) {
-        row.datetime = Ext.util.Format.date(sasAdapter.fromSasDateTime(row.datetime), 'Y-m-d H:i:s');
-      } else {
-        row.datetime = Ext.util.Format.date(new Date(row.datetime), 'Y-m-d H:i:s');
-      }
-
-      newData.push(row);
-    }
-
-
-    var newStore = Ext.create('Ext.data.Store', {
-      autoLoad: true,
-      storeId: 'GridStore',
-      fields: newFields,
-      groupField: 'username',
-      proxy: {
-        type: 'memory',
-        data: newData,
-        reader: {
-          type: 'json'
+    if (data) {
+      data.clear();
+    } else {
+      data = me.data = new Ext.util.Collection({
+        rootProperty: 'data',
+        extraKeys: {
+          byInternalId: {
+            property: 'internalId',
+            rootProperty: ''
+          }
         }
+      });
+    }
+
+    if (store.getCount()) {
+
+      //THE FIX
+      //commented out 104 line
+//      me.groupingFeature.startCollapsed = false;
+
+      if (groupCount > 0) {
+        for (i = 0; i < groupCount; i++) {
+          group = groups.getAt(i);
+
+
+          key = group.getGroupKey();
+          groupCache[key] = group;
+          group.isCollapsed = collapseAll || (oldGroupCache[key] && oldGroupCache[key].isCollapsed);
+
+
+
+          if (group.isCollapsed) {
+            Model = store.getModel();
+            modelData = {};
+            modelData[Model.idProperty] = 'group-' + key + '-placeholder';
+            modelData[groupField] = key;
+            group.placeholder = groupPlaceholder = new Model(modelData);
+            groupPlaceholder.isNonData = groupPlaceholder.isCollapsedPlaceholder = true;
+            groupPlaceholder.group = group;
+            data.add(groupPlaceholder);
+          } else {
+            data.insert(me.data.length, group.items);
+          }
+        }
+      } else {
+        data.add(store.getRange());
       }
-
-    });
-
-    grid.reconfigure(newStore, newColumns);
+    }
   }
-
 });

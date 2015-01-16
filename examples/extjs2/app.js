@@ -6,13 +6,15 @@ Ext.application({
     'ByTimeModel',
     'ByLocationModel',
     'ByUserModel',
-    'GridModel'
+    'GridModel',
+    'DrillHourModel'
   ],
   stores: [
     'ByTimeStore',
     'ByLocationStore',
     'ByUserStore',
-    'GridStore'
+    'GridStore',
+    'DrillHourStore'
   ],
 
   controllers: [

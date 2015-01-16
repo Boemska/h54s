@@ -373,8 +373,31 @@ Ext.define('h54sExample.controller.MainController', {
         var fromString = Ext.util.Format.date(new Date(timeMs), 'Y-m-d H:i:s');
         var endString = Ext.util.Format.date(new Date(timeMsEnd), 'Y-m-d H:i:s');
 
+        if (!res.byProgram) {
+          Ext.MessageBox.alert('Warning', 'No byProgram object found.');
+          return;
+        }
+
         win.setTitle('From ' + fromString + ' to ' + endString);
-        win.setData(res);
+
+        var ds = res.byProgram;
+
+        var data = [];
+        for (var i = 0; i < ds.length; i++) {
+          var row = ds[i];
+
+          if (row.pType === 'STP' && row.datetime) {
+            row.datetime = Ext.util.Format.date(sasAdapter.fromSasDateTime(row.datetime), 'Y-m-d H:i:s');
+          } else {
+            row.datetime = Ext.util.Format.date(new Date(row.datetime), 'Y-m-d H:i:s');
+          }
+
+          data.push(row);
+        }
+
+        var store = Ext.getStore('DrillHourStore');
+        store.getProxy().setData(data);
+        store.load();
 
         win.show();
       }
