@@ -20,7 +20,7 @@ Ext.define('h54sExample.view.HighchartsContainer', {
     if(!this.chartConfig) {
       this.chartConfig = {
         chart: {}
-      }
+      };
     } else if(!this.chartConfig.chart) {
       this.chartConfig.chart = {};
     }
@@ -61,21 +61,21 @@ Ext.define('h54sExample.view.HighchartsContainer', {
       this.series[i].data = data[key];
       var sClone = Ext.clone(this.series[i]);
       delete sClone.dataKey;
-      this.chartConfig.series.push(sClone)
+      this.chartConfig.series.push(sClone);
     }
 
     if(this.xAxisField) {
       if(!this.chartConfig.xAxis) {
         this.chartConfig.xAxis = {};
       }
-      this.chartConfig.xAxis.categories = data[this.xAxisField]
+      this.chartConfig.xAxis.categories = data[this.xAxisField];
     }
 
     if(this.yAxisField) {
       if(!this.chartConfig.yAxis) {
         this.chartConfig.yAxis = {};
       }
-      this.chartConfig.yAxis.categories = data[this.yAxisField]
+      this.chartConfig.yAxis.categories = data[this.yAxisField];
     }
 
     if(this.chart) {
