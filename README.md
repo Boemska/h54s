@@ -176,6 +176,7 @@ var debugData = adapter.getDebugData();
 ---
 
 ###getFailedRequests()
+Note that failed requests array is populated only if debug mode is turned off (debug: false)
 
 ```
 var failedRequests = adapter.getFailedRequests();
