@@ -48,6 +48,7 @@ Ext.define('h54sExample.view.MainViewport', {
               xtype: 'panel',
               flex: 385,
               frame: true,
+              layout: 'fit',
               margin: '20 20 0 20',
               padding: '20 20 0 20',
               title: 'Total Reports Opened',
