@@ -1,3 +1,4 @@
+/* global Ext, sasAdapter, Highcharts, $ */
 Ext.define('h54sExample.controller.MainController', {
   extend : 'Ext.app.Controller',
 
@@ -47,8 +48,6 @@ Ext.define('h54sExample.controller.MainController', {
       return;
     }
 
-    var me = this;
-
     if (!data.last30daysrpt || !data.last30daysstp) {
       Ext.MessageBox.alert('Error', 'No data for last 30 days found.');
       return;
@@ -67,7 +66,6 @@ Ext.define('h54sExample.controller.MainController', {
     for (i = 0; i < data.last30daysstp.length; i++) {
       rec = data.last30daysstp[i];
 
-      var sasHour = rec.nearestHour;
       //TODO: rename nearestHour to dt_nearestHour in SAS
       var jsHour = sasAdapter.fromSasDateTime(rec.nearestHour);
 
@@ -249,7 +247,7 @@ Ext.define('h54sExample.controller.MainController', {
         ];
       }
 
-      var handlerFn = function(e){
+      var handlerFn = function(){
         var breadcrumbPoint = {
           breadcrumbLevel: 0,
           breadcrumbCentre: this.currentPath,
@@ -354,8 +352,6 @@ Ext.define('h54sExample.controller.MainController', {
 
     var sasStart = new Date(timeMs);
     var sasEnd = new Date(timeMsEnd);
-
-    var me = this;
 
     sasAdapter.addTable([{
       javastart: timeMs,

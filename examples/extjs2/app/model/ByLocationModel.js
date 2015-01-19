@@ -1,3 +1,4 @@
+/* global Ext */
 Ext.define('h54sExample.model.ByLocationModel', {
   extend: 'Ext.data.Model',
 

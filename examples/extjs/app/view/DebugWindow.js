@@ -1,3 +1,4 @@
+/* global Ext, sasAdapter */
 Ext.define('h54sExample.view.DebugWindow', {
   extend: 'Ext.window.Window',
 
@@ -48,7 +49,7 @@ Ext.define('h54sExample.view.DebugWindow', {
           bodyPadding: 10,
 
           listeners: {
-            activate: function (tab) {
+            activate: function () {
               this.updateTab();
             },
             added: function () {
@@ -80,7 +81,7 @@ Ext.define('h54sExample.view.DebugWindow', {
           overflowY: 'scroll',
 
           listeners: {
-            activate: function (tab) {
+            activate: function () {
               this.updateTab();
             },
             added: function () {
@@ -140,7 +141,7 @@ Ext.define('h54sExample.view.DebugWindow', {
           bodyPadding: 10,
 
           listeners: {
-            activate: function (tab) {
+            activate: function () {
               this.updateTab();
             },
             added: function () {
@@ -174,7 +175,7 @@ Ext.define('h54sExample.view.DebugWindow', {
           overflowY: 'scroll',
 
           listeners: {
-            activate: function (tab) {
+            activate: function () {
               this.updateTab();
             },
             added: function () {

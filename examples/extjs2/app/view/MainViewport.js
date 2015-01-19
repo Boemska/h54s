@@ -1,3 +1,4 @@
+/* global Ext, h54sExample, $ */
 Ext.define('h54sExample.view.MainViewport', {
   extend: 'Ext.container.Viewport',
   alias: 'widget.mainviewport',
@@ -106,7 +107,7 @@ Ext.define('h54sExample.view.MainViewport', {
                       dataIndex: 'shortName',
                       text: 'Report Name',
                       flex: 1,
-                      renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
+                      renderer: function (value, metaData, record) {
                         var newTooltip = record.get('programname');
 
                         metaData.tdAttr = 'data-qtip="' + newTooltip + '"';

@@ -1,3 +1,4 @@
+/* global Ext, sasAdapter, alert */
 Ext.define('h54sExample.view.TableWindow', {
   extend: 'Ext.window.Window',
 
@@ -26,7 +27,7 @@ Ext.define('h54sExample.view.TableWindow', {
         }
       }],
       listeners: {
-        afterrender: function(e) {
+        afterrender: function() {
           var me = this;
           var detailWindow = Ext.getCmp('detailWindow');
           detailWindow.setLoading();
@@ -37,7 +38,6 @@ Ext.define('h54sExample.view.TableWindow', {
             } else {
               var outputRow = res.outputdata[0];
               var store = Ext.getStore('DetailTableStore');
-              var fields = Object.keys(outputRow);
               var grid = Ext.getCmp('detailTableGrid');
 
 

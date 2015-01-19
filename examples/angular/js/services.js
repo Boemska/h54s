@@ -1,3 +1,4 @@
+/* global app, h54s, serverData */
 app.factory('sasAdapter', function($q, $rootScope) {
   var sasAdapter = new h54s({
     hostUrl: serverData.url

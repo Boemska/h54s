@@ -1,3 +1,4 @@
+/* global Ext, h54s, serverData */
 Ext.define('h54sExample.sasAdapter', {
   alternateClassName: 'sasAdapter',
   singleton: true,

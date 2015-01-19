@@ -1,3 +1,4 @@
+/* global Ext, h54sExample */
 Ext.define('h54sExample.view.charts.TimeChart', {
   extend: 'Ext.container.Container',
   alias: 'widget.timechart',
@@ -83,7 +84,7 @@ Ext.define('h54sExample.view.charts.TimeChart', {
           cursor: 'pointer',
           point: {
             events: {
-              click: function (e) {
+              click: function () {
                 var controller = h54sExample.app.getController('MainController');
                 controller.showDrillHour(this.x);
               }

@@ -1,3 +1,4 @@
+/* global Ext, setInterval, clearInterval, Highcharts */
 Ext.define('h54sExample.view.HighchartsContainer', {
   extend: 'Ext.container.Container',
   alias: 'widget.highcharts',
@@ -27,7 +28,7 @@ Ext.define('h54sExample.view.HighchartsContainer', {
   },
 
 
-  onContainerResize: function (component, width, height, oldWidth, oldHeight, eOpts) {
+  onContainerResize: function (component, width, height) {
     if (this.chart) {
       this.chart.setSize(width, height, false);
     }

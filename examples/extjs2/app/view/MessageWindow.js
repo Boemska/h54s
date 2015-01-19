@@ -1,3 +1,4 @@
+/* global Ext, setTimeout */
 Ext.define('h54sExample.view.MessageWindow', {
   extend: 'Ext.window.Toast',
 

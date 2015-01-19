@@ -1,3 +1,4 @@
+/* global Ext */
 Ext.define('h54sExample.view.DateWindow', {
   extend: 'Ext.window.Window',
   alias: 'widget.comboprompt',
@@ -81,11 +82,11 @@ Ext.define('h54sExample.view.DateWindow', {
     }
   ],
 
-  onCancelClick: function (button, e, eOpts) {
+  onCancelClick: function (button) {
     button.up('window').close();
   },
 
-  onOkClick: function (button, e, eOpts) {
+  onOkClick: function (button) {
     var me = this;
     if (this.promptCallback) {
       var fromDate = me.down('datefield[fieldLabel="From"]').getValue();

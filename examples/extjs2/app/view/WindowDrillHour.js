@@ -1,3 +1,4 @@
+/* global Ext */
 Ext.define('h54sExample.view.WindowDrillHour', {
   extend: 'Ext.window.Window',
   alias: 'widget.windowdrillhour',
@@ -27,7 +28,7 @@ Ext.define('h54sExample.view.WindowDrillHour', {
           dataIndex: 'shortname',
           text: 'Report Name',
           flex: 1,
-          renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
+          renderer: function (value, metaData, record) {
             var newTooltip = record.get('programname');
 
             metaData.tdAttr = 'data-qtip="' + newTooltip + '"';

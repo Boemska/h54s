@@ -1,3 +1,4 @@
+/* global Ext */
 Ext.define('h54sExample.store.LibraryListStore', {
   extend: 'Ext.data.Store',
 

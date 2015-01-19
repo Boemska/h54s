@@ -1,3 +1,4 @@
+/* global Ext, sasAdapter, alert */
 Ext.define('h54sExample.view.Dashboard', {
   extend: 'Ext.panel.Panel',
 
@@ -65,7 +66,7 @@ Ext.define('h54sExample.view.Dashboard', {
             listeners: {
               change: function (e) {
                 var store = Ext.getStore('TableStore');
-                store.filterBy(function (record, id) {
+                store.filterBy(function (record) {
                   var recValue = record.get('memname').toLowerCase();
                   var value = e.getValue().toLowerCase();
                   if (!e.getValue() || recValue.indexOf(value) !== -1)
@@ -85,7 +86,6 @@ Ext.define('h54sExample.view.Dashboard', {
             queryMode: 'local',
             listeners: {
               select: function (e) {
-                var me = this;
                 sasAdapter.addTable([
                   {
                     libraryName: e.getValue()

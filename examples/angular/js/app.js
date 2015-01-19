@@ -1,3 +1,4 @@
+/* global angular */
 var app = angular.module('h54s_example', [
   'ngRoute',
   'smart-table'

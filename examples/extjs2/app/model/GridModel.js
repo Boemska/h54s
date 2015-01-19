@@ -1,3 +1,4 @@
+/* global Ext */
 Ext.define('h54sExample.model.GridModel', {
   extend: 'Ext.data.Model',
 

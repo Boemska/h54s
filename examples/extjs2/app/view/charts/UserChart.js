@@ -1,3 +1,4 @@
+/* global Ext */
 Ext.define('h54sExample.view.charts.UserChart', {
   extend: 'Ext.container.Container',
   alias: 'widget.userchart',

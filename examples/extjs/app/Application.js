@@ -1,3 +1,4 @@
+/* global Ext, sasAdapter, alert */
 Ext.define('h54sExample.Application', {
   extend: 'Ext.app.Application',
   name: 'h54s Example',
@@ -20,7 +21,7 @@ Ext.define('h54sExample.Application', {
       }
     });
 
-    var map = new Ext.util.KeyMap(Ext.getBody(), {
+    new Ext.util.KeyMap(Ext.getBody(), {
       key: 68,
       ctrl: true,
       alt: true,

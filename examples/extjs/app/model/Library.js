@@ -1,3 +1,4 @@
+/* global Ext */
 Ext.define('h54sExample.model.Library', {
   extend: 'Ext.data.Model',
 

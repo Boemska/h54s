@@ -1,3 +1,4 @@
+/* global Ext, h54sExample, Highcharts */
 Ext.define('h54sExample.view.charts.LocationChart', {
   extend: 'Ext.container.Container',
   alias: 'widget.locationchart',
@@ -79,7 +80,7 @@ Ext.define('h54sExample.view.charts.LocationChart', {
           cursor: 'pointer',
           point: {
             events: {
-              click: function(e) {
+              click: function() {
                 if (this.name !== '' && this.name !== ' '){
                   var controller = h54sExample.app.getController('MainController');
                   controller.onSubdirectoryClick(this);

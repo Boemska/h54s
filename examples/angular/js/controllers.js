@@ -1,3 +1,4 @@
+/* global app, alert, $, window */
 app.controller('dashboardCtrl', ['$scope', '$location', 'sasAdapter', '$rootScope', 'stateData', function($scope, $location, sasAdapter, $rootScope, stateData) {
   $scope.loaded = false;
   if(stateData.librarylist) {
@@ -59,7 +60,7 @@ app.controller('dashboardCtrl', ['$scope', '$location', 'sasAdapter', '$rootScop
 
 
 app.controller('loginCtrl', ['$scope', '$location', 'sasAdapter', function($scope, $location, sasAdapter) {
-  $scope.login = function(e) {
+  $scope.login = function() {
     if(!$scope.user)
       return;
 

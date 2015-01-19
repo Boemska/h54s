@@ -1,3 +1,4 @@
+/* global Ext, sasAdapter */
 Ext.define('h54sExample.view.LoginWindow', {
   extend: 'Ext.window.Window',
 
@@ -25,7 +26,7 @@ Ext.define('h54sExample.view.LoginWindow', {
             this.up('window').down('textfield[name="px"]').focus(true, 10);
           }
         },
-        change: function(f, e) {
+        change: function() {
           this.up('window').down('label').hide();
         }
       }
@@ -45,7 +46,7 @@ Ext.define('h54sExample.view.LoginWindow', {
             Ext.getCmp('loginSubmit').focus(false, 10);
           }
         },
-        change: function(f, e) {
+        change: function() {
           this.up('window').down('label').hide();
         }
       }
@@ -79,7 +80,7 @@ Ext.define('h54sExample.view.LoginWindow', {
     }
   ],
 
-  onOkClick: function (button, e, eOpts) {
+  onOkClick: function () {
     var win = this;
 
     var invalidLogonLabel = win.down('label');
