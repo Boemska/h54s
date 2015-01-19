@@ -1,3 +1,4 @@
+/* global h54s, XMLHttpRequest, ActiveXObject, escape, unescape, document */
 h54s.prototype._utils = {};
 h54s.prototype._utils._applicationLogs = [];
 h54s.prototype._utils._debugData = [];
@@ -118,7 +119,6 @@ h54s.prototype._utils.convertTableObject = function(inObject) {
   var targetArray             = []; // this is the array of target arrays
   var currentTarget           = 0;
   targetArray[currentTarget]  = [];
-  var totalChars              = 0;
   var j                       = 0;
   for (var i = 0; i < inObject.length; i++) {
     targetArray[currentTarget][j] = {};

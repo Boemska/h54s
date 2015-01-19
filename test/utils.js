@@ -1,3 +1,4 @@
+/* global describe, it, assert, serverData, h54s, unescape */
 describe('h54s', function() {
   describe('utils test:', function() {
 
@@ -69,7 +70,7 @@ describe('h54s', function() {
           memname: 'CHOSENLIB'
         }
       ], 'data');
-      sasAdapter.call('/AJAX/h54s_test/getData', function(err, res) {
+      sasAdapter.call('/AJAX/h54s_test/getData', function(err) {
         assert.isObject(err, 'We should get error object');
         assert.equal(err.type, 'parseError', 'We should get parseError');
         var sasErrors = sasAdapter.getSasErrors();
@@ -122,11 +123,11 @@ describe('h54s', function() {
       sasAdapter.setCredentials(serverData.user, serverData.pass);
       sasAdapter.addTable([
         {
-          dt_some_date: date
+          dt_some_date: date // jshint ignore:line
         }
       ], 'data');
       sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res) {
-        var resSeconds = Math.round(res.outputdata[0].dt_some_date.getTime() / 1000);
+        var resSeconds = Math.round(res.outputdata[0].dt_some_date.getTime() / 1000); // jshint ignore:line
         var dateSeconds = Math.round(date.getTime() / 1000);
         assert.isUndefined(err, 'We got error on sas program ajax call');
         assert.equal(resSeconds, dateSeconds, 'Date is not the same');
@@ -146,7 +147,7 @@ describe('h54s', function() {
           memname: 'CHOSENLIB'
         }
       ], 'data');
-      sasAdapter.call('/AJAX/h54s_test/getData', function(err, res) {
+      sasAdapter.call('/AJAX/h54s_test/getData', function(err) {
         assert.isObject(err, 'We should get error object');
         assert.equal(err.type, 'parseError', 'We should get parseError');
         var sasErrors = sasAdapter.getSasErrors();
@@ -162,7 +163,7 @@ describe('h54s', function() {
             memname: 'CHOSENLIB'
           }
         ], 'data');
-        sasAdapter.call('/AJAX/h54s_test/getData', function(err, res) {
+        sasAdapter.call('/AJAX/h54s_test/getData', function(err) {
           assert.isObject(err, 'We should get error object');
           assert.equal(err.type, 'sasError', 'We should get sasError');
           var debugData = sasAdapter.getDebugData();

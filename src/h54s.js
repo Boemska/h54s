@@ -1,3 +1,5 @@
+/* global h54s: true */
+
 /*
 * Represents html5 for sas adapter
 * @constructor

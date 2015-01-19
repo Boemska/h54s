@@ -1,3 +1,4 @@
+/* global describe, it, assert, serverData, h54s */
 describe('h54s', function() {
   describe('Ajax test:', function() {
 

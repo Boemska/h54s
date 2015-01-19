@@ -1,12 +1,13 @@
+/* global describe, it, assert, serverData, h54s, proclaim */
 describe('h54s', function() {
   describe('init:', function() {
 
     it('should throw error if config data is missing or empty', function(done) {
       proclaim.doesNotThrow(function() {
-        var sasAdapter = new h54s();
+        var sasAdapter = new h54s(); // jshint ignore:line
       });
       proclaim.doesNotThrow(function() {
-        var sasAdapter = new h54s({});
+        var sasAdapter = new h54s({}); // jshint ignore:line
       });
       done();
     });

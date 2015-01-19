@@ -1,3 +1,4 @@
+/* global describe, it, assert, serverData, h54s, proclaim */
 describe('h54s', function() {
   describe('methods test:', function() {
 
@@ -119,7 +120,7 @@ describe('h54s', function() {
         hostUrl: 'http://example.com',
         url: '/'
       });
-      sasAdapter.call('filePath', function(err, res) {
+      sasAdapter.call('filePath', function(err) {
         assert.equal(err.message, 'Unable to parse response json', 'We should get json parsing error');
         done();
       });
@@ -143,9 +144,9 @@ describe('h54s', function() {
         hostUrl: serverData.url
       });
 
-      sasAdapter.login(serverData.user, serverData.pass, function(status) {
+      sasAdapter.login(serverData.user, serverData.pass, function() {
         //logout and try to call sas program
-        sasAdapter._utils.ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
+        sasAdapter._utils.ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function() {
           sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/startupService', function(err, res) {
             assert.isUndefined(err, 'We got error on sas program ajax call');
             assert.isObject(res, 'We expected object to be returned by call method');
@@ -163,7 +164,7 @@ describe('h54s', function() {
         debug: true
       });
       sasAdapter.setCredentials(serverData.user, serverData.pass);
-      sasAdapter.call('/AJAX/h54s_test/startupService', function(err, res) {
+      sasAdapter.call('/AJAX/h54s_test/startupService', function(err) {
         assert.isUndefined(err, 'We got error on sas program ajax call');
         done();
       });

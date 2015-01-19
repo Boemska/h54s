@@ -1,3 +1,5 @@
+/* global h54s */
+
 /*
 * Call Sas program
 *
@@ -18,14 +20,6 @@ h54s.prototype.call = function(sasProgram, callback) {
   }
   if(typeof sasProgram !== 'string') {
     throw new h54s.Error('argumentError', 'First parameter should be string');
-  }
-
-  // initialize dynamically generated xhr options first
-  var myprogram;
-  if (this.systemtype == 'WPS') {
-    myprogram = this.metaProgram + '.sas';
-  } else if (this.systemtype == 'SAS') {
-    myprogram = this.metaProgram;
   }
 
   var params = {

@@ -14,10 +14,19 @@ module.exports = function (grunt) {
     pkg: grunt.file.readJSON('package.json'),
     jshint: {
       options: {
-        trailing: true
+        trailing: true,
+        unused: true,
+        undef: true,
+        camelcase: true
       },
       target: {
-        src: ['src/**/*.js', 'test/**/*.js', 'examples/**/*.js', '!examples/extjs2/lib/*']
+        src: [
+          'src/**/*.js',
+          'test/**/*.js',
+          'examples/**/*.js',
+          '!examples/extjs2/lib/*',
+          '!examples/angular/js/libs/*'
+        ]
       }
     },
     concat: {

@@ -1,4 +1,4 @@
-/*! h54s v0.1.6 - 2015-01-13 
+/*! h54s v0.1.6 - 2015-01-19 
  *  License: GPL 
  *  Author: Boemska 
 */
@@ -55,6 +55,8 @@ if (!Object.keys) {
     };
   }());
 }
+
+/* global h54s: true */
 
 /*
 * Represents html5 for sas adapter
@@ -113,6 +115,8 @@ h54s.Error = function(type, message) {
 
 h54s.Error.prototype = Object.create(Error.prototype);
 
+/* global h54s */
+
 /*
 * Call Sas program
 *
@@ -133,14 +137,6 @@ h54s.prototype.call = function(sasProgram, callback) {
   }
   if(typeof sasProgram !== 'string') {
     throw new h54s.Error('argumentError', 'First parameter should be string');
-  }
-
-  // initialize dynamically generated xhr options first
-  var myprogram;
-  if (this.systemtype == 'WPS') {
-    myprogram = this.metaProgram + '.sas';
-  } else if (this.systemtype == 'SAS') {
-    myprogram = this.metaProgram;
   }
 
   var params = {
@@ -403,6 +399,7 @@ h54s.prototype.clearAllLogs = function() {
   this.clearFailedRequests();
 };
 
+/* global h54s, XMLHttpRequest, ActiveXObject, escape, unescape, document */
 h54s.prototype._utils = {};
 h54s.prototype._utils._applicationLogs = [];
 h54s.prototype._utils._debugData = [];
@@ -523,7 +520,6 @@ h54s.prototype._utils.convertTableObject = function(inObject) {
   var targetArray             = []; // this is the array of target arrays
   var currentTarget           = 0;
   targetArray[currentTarget]  = [];
-  var totalChars              = 0;
   var j                       = 0;
   for (var i = 0; i < inObject.length; i++) {
     targetArray[currentTarget][j] = {};
