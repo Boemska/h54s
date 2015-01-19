@@ -2,7 +2,6 @@
 describe('h54s', function() {
   describe('utils test:', function() {
 
-    //TODO: Implement and test date escape
     it('All strings in returned object should be escaped', function(done) {
       this.timeout(4000);
       var sasAdapter = new h54s({
