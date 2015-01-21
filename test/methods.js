@@ -45,7 +45,7 @@ describe('h54s', function() {
     });
 
     it('Try to log in with credentials and callback', function(done) {
-      this.timeout(4000);
+      this.timeout(10000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url,
         loginUrl: '/invalidUrl'
@@ -57,7 +57,7 @@ describe('h54s', function() {
     });
 
     it('Try to log in with credentials and callback', function(done) {
-      this.timeout(4000);
+      this.timeout(10000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
@@ -68,7 +68,7 @@ describe('h54s', function() {
     });
 
     it('Try to log in with only callback', function(done) {
-      this.timeout(4000);
+      this.timeout(10000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
@@ -80,7 +80,7 @@ describe('h54s', function() {
     });
 
     it('Call sas program without logging in', function(done) {
-      this.timeout(6000);
+      this.timeout(10000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });

@@ -3,7 +3,7 @@ describe('h54s', function() {
   describe('Ajax test:', function() {
 
     it('Test post method', function(done) {
-      this.timeout(4000);
+      this.timeout(10000);
       var sasAdapter = new h54s();
       assert.isDefined(sasAdapter._utils.ajax, 'Ajax is not defined');
       assert.isFunction(sasAdapter._utils.ajax.post, 'Ajax post method is not defined');
@@ -23,7 +23,7 @@ describe('h54s', function() {
     });
 
     it('Test get method', function(done) {
-      this.timeout(4000);
+      this.timeout(10000);
       var sasAdapter = new h54s();
       assert.isDefined(sasAdapter._utils.ajax, 'Ajax is not defined');
       assert.isFunction(sasAdapter._utils.ajax.get, 'Ajax get method is not defined');
