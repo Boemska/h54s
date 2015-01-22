@@ -3,7 +3,7 @@ describe('h54s', function() {
   describe('utils test:', function() {
 
     it('All strings in returned object should be escaped', function(done) {
-      this.timeout(4000);
+      this.timeout(6000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
@@ -113,7 +113,7 @@ describe('h54s', function() {
     });
 
     it('Test date send and receive', function(done) {
-      this.timeout(6000);
+      this.timeout(10000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url,
         debug: true

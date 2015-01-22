@@ -127,7 +127,7 @@ describe('h54s', function() {
     });
 
     it('Log in with wrong credentials', function(done) {
-      this.timeout(4000);
+      this.timeout(6000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
