@@ -55,7 +55,7 @@ h54s.prototype.call = function(sasProgram, callback) {
           resObj = self._utils.convertDates(resObj);
           unescapedResObj = self._utils.unescapeValues(resObj);
         } catch(e) {
-          if(retryCount < self.counters.maxXhrRetries) {
+          if(retryCount < self.maxXhrRetries) {
             self._utils.ajax.post(self.url, params).success(this.success).error(this.error);
             retryCount++;
             self._utils.addApplicationLogs("Retrying #" + retryCount);

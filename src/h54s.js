@@ -10,11 +10,7 @@
 h54s = function(config) {
 
   this.systemtype = "SAS";
-  this.counters   =  {
-    maxXhrRetries: 5, // this is the number of times that xhrs retry before failing
-    finishedXhrCount: 0, // leave as 0
-    totalXhrCount: 0 // leave as 0
-  };
+  this.maxXhrRetries = 5;
   this.sasService = 'default';
   this.url        = "/SASStoredProcess/do";
   this.debug      = false;
