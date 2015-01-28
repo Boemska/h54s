@@ -21,7 +21,7 @@ Default configuration looks like this:
   url: '/SASStoredProcess/do',
   debug: false,
   loginUrl: '/SASLogon/Logon.do',
-  sasParams: [],
+  maxXhrRetries: 5
   autoLogin: false
 }
 ```
@@ -101,7 +101,7 @@ adapter.login('username', 'password', function(status) {
 or:
 ```
 adapter.setCredentials('username', 'password');
-  adapter.login(function(status) {
+adapter.login(function(status) {
   if(status === -1) {
     //Wrong username or password
   } else if(status === 200) {
@@ -262,9 +262,9 @@ adapter.clearFailedRequests();
 2. Run `npm install`
 3. Install grunt-cli if it's not installed already - `npm install -g grunt-cli`.
 4. Edit host url, user and pass in /test/_server_data.js.
-5. Run `grunt`. It will run jshint, concatenate the files in /src, and run karma tests. There are more grunt tasks.
+5. Run `grunt`. It will run jshint and karma tests. There are more grunt tasks.
   1. `grunt compress` - Create minified h54s file.
-  2. `grunt test` - Runs jshint and karma tests.
+  2. `grunt build` - Runs jshint, karma tests and creates build file - concatenate files in /src (debug release, not minified).
   3. `grunt watch` - Runs tests on file change.
   4. `grunt serveAngular` - Creates web server and serves angular.js example (default port is 1337)
   5. `grunt serveExtjs` - Creates web server and serves ext.js example (default port is 1337)
