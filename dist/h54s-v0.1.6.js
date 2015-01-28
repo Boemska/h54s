@@ -400,7 +400,7 @@ h54s.prototype.clearAllLogs = function() {
   this.clearFailedRequests();
 };
 
-/* global h54s, XMLHttpRequest, ActiveXObject, escape, unescape, document */
+/* global h54s, XMLHttpRequest, ActiveXObject, document */
 h54s.prototype._utils = {};
 h54s.prototype._utils._applicationLogs = [];
 h54s.prototype._utils._debugData = [];
@@ -545,7 +545,7 @@ h54s.prototype._utils.convertTableObject = function(inObject) {
         if (thisValue === "") {
           targetArray[currentTarget][j][key] = " ";
         } else {
-          targetArray[currentTarget][j][key] = escape(thisValue);
+          targetArray[currentTarget][j][key] = encodeURIComponent(thisValue).replace(/'/g, '%27');
         }
         thisSpec.encodedLength = targetArray[currentTarget][j][key].length;
       } else if(isDate) {
@@ -558,7 +558,7 @@ h54s.prototype._utils.convertTableObject = function(inObject) {
         thisSpec.colName                    = key;
         thisSpec.colType                    = 'json';
         thisSpec.colLength                  = JSON.stringify(thisValue).length;
-        targetArray[currentTarget][j][key]  = escape(JSON.stringify(thisValue));
+        targetArray[currentTarget][j][key]  = encodeURIComponent(JSON.stringify(thisValue)).replace(/'/g, '%27');
         thisSpec.encodedLength              = targetArray[currentTarget][j][key].length;
       }
       chunkRowCount = chunkRowCount +
@@ -681,7 +681,7 @@ h54s.prototype._utils.addFailedResponse = function(responseText, sasProgram) {
 h54s.prototype._utils.unescapeValues = function(obj) {
   for (var key in obj) {
     if (typeof obj[key] === 'string') {
-      obj[key] = unescape(obj[key]);
+      obj[key] = decodeURIComponent(obj[key]);
     } else if(typeof obj === 'object') {
       this.unescapeValues(obj[key]);
     }
