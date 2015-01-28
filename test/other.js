@@ -71,6 +71,11 @@ describe('h54s', function() {
         assert.equal(res.outputdata[0].data, data, 'string is not the same in response');
 
         sasAdapter.setDebugMode();
+        sasAdapter.addTable([
+          {
+            data: data
+          }
+        ], 'data');
         sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res2) {
           assert.isUndefined(err, 'We got error on sas program ajax call');
           assert.isDefined(res2, 'Response is undefined');
