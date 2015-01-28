@@ -233,7 +233,8 @@ h54s.prototype._utils.parseDebugRes = function(responseText, sasProgram, params)
 
   this.parseErrorResponse(responseText, sasProgram);
 
-  var jsonObj = JSON.parse(matches[2]);
+  //remove new lines in json response
+  var jsonObj = JSON.parse(matches[2].replace(/(\r\n|\r|\n)/g, ''));
   if(debugText.indexOf('ERROR:') !== -1) {
     jsonObj.hasErrors = true;
   }

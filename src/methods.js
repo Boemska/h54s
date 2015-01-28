@@ -49,7 +49,8 @@ h54s.prototype.call = function(sasProgram, callback) {
         try {
           //clear sas params
           this.sasParams = [];
-          resObj = JSON.parse(res.responseText);
+          //remove new lines in json response
+          resObj = JSON.parse(res.responseText.replace(/(\r\n|\r|\n)/g, ''));
           resObj = self._utils.convertDates(resObj);
           unescapedResObj = self._utils.unescapeValues(resObj);
         } catch(e) {

@@ -1,4 +1,4 @@
-/*! h54s v0.1.6 - 2015-01-19 
+/*! h54s v0.1.6 - 2015-01-28 
  *  License: GPL 
  *  Author: Boemska 
 */
@@ -166,7 +166,8 @@ h54s.prototype.call = function(sasProgram, callback) {
         try {
           //clear sas params
           this.sasParams = [];
-          resObj = JSON.parse(res.responseText);
+          //remove new lines in json response
+          resObj = JSON.parse(res.responseText.replace(/(\r\n|\r|\n)/g, ''));
           resObj = self._utils.convertDates(resObj);
           unescapedResObj = self._utils.unescapeValues(resObj);
         } catch(e) {
@@ -634,7 +635,8 @@ h54s.prototype._utils.parseDebugRes = function(responseText, sasProgram, params)
 
   this.parseErrorResponse(responseText, sasProgram);
 
-  var jsonObj = JSON.parse(matches[2]);
+  //remove new lines in json response
+  var jsonObj = JSON.parse(matches[2].replace(/(\r\n|\r|\n)/g, ''));
   if(debugText.indexOf('ERROR:') !== -1) {
     jsonObj.hasErrors = true;
   }
