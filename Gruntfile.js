@@ -88,9 +88,9 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-connect');
 
-  grunt.registerTask('default', ['jshint', 'concat', 'karma:run']);
+  grunt.registerTask('default', ['jshint', 'karma:run']);
   grunt.registerTask('compress', 'uglify');
-  grunt.registerTask('test', ['jshint', 'karma:run']);
+  grunt.registerTask('build', ['jshint', 'karma:run', 'concat']);
   grunt.registerTask('watch', 'karma:dev');
 
   grunt.registerTask('serveAngular', 'connect:angular');
