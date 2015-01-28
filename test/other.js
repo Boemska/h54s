@@ -69,20 +69,16 @@ describe('h54s', function() {
         assert.isUndefined(err, 'We got error on sas program ajax call');
         assert.isDefined(res, 'Response is undefined');
         assert.equal(res.outputdata[0].data, data, 'string is not the same in response');
-        done();
+
+        sasAdapter.setDebugMode();
+        sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res2) {
+          assert.isUndefined(err, 'We got error on sas program ajax call');
+          assert.isDefined(res2, 'Response is undefined');
+          assert.equal(res2.outputdata[0].data, data, 'string is not the same in response');
+          done();
+        });
       });
     });
 
   });
 });
-
-function getRandomAsciiChars(count) {
-  var str = '';
-
-  for(var i = 0; i < count; i++) {
-    var charCode = Math.floor((Math.random() * 95) + 32);
-    var char = String.fromCharCode(charCode);
-    str += char;
-  }
-  return str;
-}
