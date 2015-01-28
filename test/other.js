@@ -1,4 +1,4 @@
-/* global describe, it, assert, serverData, h54s */
+/* global describe, it, assert, serverData, h54s, getRandomAsciiChars */
 describe('h54s', function() {
   describe('Character tests:', function() {
 

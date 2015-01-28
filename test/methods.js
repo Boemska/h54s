@@ -1,4 +1,4 @@
-/* global describe, it, assert, serverData, h54s, proclaim */
+/* global describe, it, assert, serverData, h54s, proclaim, getRandomAsciiChars */
 describe('h54s', function() {
   describe('methods test:', function() {
 
@@ -168,6 +168,54 @@ describe('h54s', function() {
         assert.isUndefined(err, 'We got error on sas program ajax call');
         done();
       });
+    });
+
+    it('Test concurent calls', function(done) {
+      this.timeout(20000);
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url
+      });
+
+      var finishedRequests = 0;
+
+      var data1 = getRandomAsciiChars(20000);
+      var data2 = getRandomAsciiChars(10);
+
+      sasAdapter.addTable([
+        {
+          data: data1
+        }
+      ], 'data');
+
+      sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res) {
+        assert.isUndefined(err, 'We got error on sas program ajax call');
+        assert.isDefined(res, 'Response is undefined');
+        assert.equal(res.outputdata[0].data, data1, 'data1 is not the same in response');
+        finishedRequests++;
+        if(finishedRequests === 2) {
+          done();
+        }
+      });
+
+      //sasParams should be cleared on first call
+      assert.isUndefined(sasAdapter.sasParams.data, 'sasParams is not empty');
+
+      sasAdapter.addTable([
+        {
+          data: data2
+        }
+      ], 'data');
+
+      sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res) {
+        assert.isUndefined(err, 'We got error on sas program ajax call');
+        assert.isDefined(res, 'Response is undefined');
+        assert.equal(res.outputdata[0].data, data2, 'data2 is not the same in response');
+        finishedRequests++;
+        if(finishedRequests === 2) {
+          done();
+        }
+      });
+
     });
 
   });

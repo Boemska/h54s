@@ -32,6 +32,9 @@ h54s.prototype.call = function(sasProgram, callback) {
     params[key] = this.sasParams[key];
   }
 
+  //clear sas params
+  this.sasParams = {};
+
   this._utils.ajax.post(this.url, params).success(function(res) {
     if(/<form.+action="Logon.do".+/.test(res.responseText) && self.autoLogin) {
       self.login(function(status) {
@@ -47,8 +50,6 @@ h54s.prototype.call = function(sasProgram, callback) {
       var resObj, unescapedResObj;
       if(!dbg) {
         try {
-          //clear sas params
-          this.sasParams = [];
           //remove new lines in json response
           resObj = JSON.parse(res.responseText.replace(/(\r\n|\r|\n)/g, ''));
           resObj = self._utils.convertDates(resObj);
@@ -71,8 +72,6 @@ h54s.prototype.call = function(sasProgram, callback) {
         }
       } else {
         try {
-          //clear sas params
-          this.sasParams = [];
           resObj = self._utils.parseDebugRes(res.responseText, sasProgram, params);
           resObj = self._utils.convertDates(resObj);
           unescapedResObj = self._utils.unescapeValues(resObj);

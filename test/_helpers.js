@@ -1,3 +1,4 @@
+/* exported getRandomAsciiChars */
 function getRandomAsciiChars(count) {
   var str = '';
 

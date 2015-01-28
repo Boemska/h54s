@@ -19,7 +19,7 @@ h54s = function(config) {
   this.url        = "/SASStoredProcess/do";
   this.debug      = false;
   this.loginUrl   = '/SASLogon/Logon.do';
-  this.sasParams  = [];
+  this.sasParams  = {};
   this.autoLogin  = false;
 
 
