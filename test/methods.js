@@ -139,7 +139,8 @@ describe('h54s', function() {
     it('Test login on call after first login and logout', function(done) {
       this.timeout(10000);
       var sasAdapter = new h54s({
-        hostUrl: serverData.url
+        hostUrl: serverData.url,
+        autoLogin: true
       });
 
       sasAdapter.login(serverData.user, serverData.pass, function() {

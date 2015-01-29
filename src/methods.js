@@ -192,9 +192,6 @@ h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
       self._utils.addApplicationLogs('Wrong username or password');
       callCallback(-1);
     } else {
-      //sas can ask for login again in 10 minutes if inactive
-      //with autoLogin = true it should login in call method
-      self.autoLogin = true;
       callCallback(res.status);
 
       self._disableCalls = false;
