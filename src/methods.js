@@ -9,7 +9,7 @@
 */
 h54s.prototype.call = function(sasProgram, callback, params) {
   var self = this;
-  var callArgs = arguments;
+  var callArgs = Array.prototype.slice.call(arguments);
   var retryCount = 0;
   var dbg = this.debug;
   if (!callback || typeof callback !== 'function'){
@@ -62,7 +62,7 @@ h54s.prototype.call = function(sasProgram, callback, params) {
         self.login(function(status) {
           if(status === 200) {
             //add params to arguments if call function is called without it
-            if(callArgs[2]) {
+            if(!callArgs[2]) {
               callArgs[2] = params;
             }
             self.call.apply(self, callArgs);

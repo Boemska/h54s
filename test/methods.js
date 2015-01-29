@@ -103,26 +103,24 @@ describe('h54s', function() {
         user: serverData.user,
         pass: serverData.pass
       });
+
+      var data = 'test';
+
+      sasAdapter.addTable([
+        {
+          data: data
+        }
+      ], 'data');
+
       //logout because we are already logged in in previeous tests
       sasAdapter._utils.ajax.get(serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
         assert.equal(res.status, 200, 'Log out is not successful');
-        sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/startupService', function(err, res) {
+        sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res) {
           assert.isUndefined(err, 'We got error on sas program ajax call');
           assert.isObject(res, 'We expected object to be returned by call method');
+          assert.isDefined(res.outputdata[0].data, 'data is lost after auto login');
           done();
         });
-      });
-    });
-
-    it('Test retry', function(done) {
-      this.timeout(10000);
-      var sasAdapter = new h54s({
-        hostUrl: 'http://example.com',
-        url: '/'
-      });
-      sasAdapter.call('filePath', function(err) {
-        assert.equal(err.message, 'Unable to parse response json', 'We should get json parsing error');
-        done();
       });
     });
 
