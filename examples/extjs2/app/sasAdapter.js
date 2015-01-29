@@ -26,10 +26,6 @@ Ext.define('h54sExample.sasAdapter', {
 
   call: function(sasProgram, callback) {
     var me = this;
-    //remember program and callback for retry
-    this.sasProgram = sasProgram;
-    this.callback = callback;
-
     var msg = this.msgWindow.addLoadingMessage(sasProgram);
 
     try {
@@ -40,7 +36,6 @@ Ext.define('h54sExample.sasAdapter', {
           if (loading){
             loading.remove();
           }
-          msg.remove();
           loginWindow.show();
         } else {
           if(err) {
@@ -69,10 +64,6 @@ Ext.define('h54sExample.sasAdapter', {
 
   addTable: function(table, macro) {
     this._adapter.addTable(table, macro);
-  },
-
-  retry: function() {
-    this.call(this.sasProgram, this.callback);
   },
 
   setDebugMode: function() {

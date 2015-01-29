@@ -94,7 +94,6 @@ Ext.define('h54sExample.view.LoginWindow', {
         return;
       }
       win.close();
-      sasAdapter.retry();
     });
   }
 

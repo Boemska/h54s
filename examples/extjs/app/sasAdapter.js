@@ -24,8 +24,6 @@ Ext.define('h54sExample.sasAdapter', {
   },
 
   call: function(sasProgram, callback) {
-    this.sasProgram = sasProgram;
-    this.callback = callback;
     try {
       this._adapter.call(sasProgram, function(err, res) {
         if(err && (err.type === 'notLoggedinError' || err.type === 'loginError')) {
@@ -42,10 +40,6 @@ Ext.define('h54sExample.sasAdapter', {
 
   addTable: function(table, macro) {
     this._adapter.addTable(table, macro);
-  },
-
-  retry: function() {
-    this.call(this.sasProgram, this.callback);
   },
 
   setDebugMode: function() {
