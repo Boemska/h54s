@@ -7,7 +7,7 @@
 * @param {function} callback - Callback function called when ajax call is finished
 *
 */
-h54s.prototype.call = function(sasProgram, callback) {
+h54s.prototype.call = function(sasProgram, callback, params) {
   var self = this;
   var callArgs = arguments;
   var retryCount = 0;
@@ -22,11 +22,13 @@ h54s.prototype.call = function(sasProgram, callback) {
     throw new h54s.Error('argumentError', 'First parameter should be string');
   }
 
-  var params = {
-    _program: sasProgram,
-    _debug: this.debug ? 131 : 0,
-    _service: this.sasService,
-  };
+  if(!params) {
+    params = {
+      _program: sasProgram,
+      _debug: this.debug ? 131 : 0,
+      _service: this.sasService,
+    };
+  }
 
   for(var key in this.sasParams) {
     params[key] = this.sasParams[key];
@@ -35,17 +37,54 @@ h54s.prototype.call = function(sasProgram, callback) {
   //clear sas params
   this.sasParams = {};
 
+  if(this._disableCalls) {
+    this._pendingCalls.push({
+      sasProgram: sasProgram,
+      callback: callback,
+      params: params
+    });
+    return;
+  }
+
   this._utils.ajax.post(this.url, params).success(function(res) {
-    if(/<form.+action="Logon.do".+/.test(res.responseText) && self.autoLogin) {
-      self.login(function(status) {
-        if(status === 200) {
-          self.call.apply(self, callArgs);
-        } else {
-          callback(new h54s.Error('loginError', 'Unable to login'));
-        }
+    //maybe we already got past previous check
+    if(self._disableCalls) {
+      self._pendingCalls.push({
+        sasProgram: sasProgram,
+        callback: callback,
+        params: params
       });
-    } else if(/<form.+action="Logon.do".+/.test(res.responseText) && !self.autoLogin) {
-      callback(new h54s.Error('notLoggedinError', 'You are not logged in'));
+      return;
+    }
+
+    if(/<form.+action="Logon.do".+/.test(res.responseText)) {
+      if(self.autoLogin) {
+        self.login(function(status) {
+          if(status === 200) {
+            //add params to arguments if call function is called without it
+            if(callArgs[2]) {
+              callArgs[2] = params;
+            }
+            self.call.apply(self, callArgs);
+          } else {
+            self._disableCalls = true;
+            self._pendingCalls.push({
+              sasProgram: sasProgram,
+              callback: callback,
+              params: params
+            });
+            callback(new h54s.Error('loginError', 'Unable to login'));
+          }
+        });
+      } else {
+        self._disableCalls = true;
+        self._pendingCalls.push({
+          sasProgram: sasProgram,
+          callback: callback,
+          params: params
+        });
+        callback(new h54s.Error('notLoggedinError', 'You are not logged in'));
+      }
     } else {
       var resObj, unescapedResObj;
       if(!dbg) {
@@ -157,6 +196,16 @@ h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
       //with autoLogin = true it should login in call method
       self.autoLogin = true;
       callCallback(res.status);
+
+      self._disableCalls = false;
+
+      while(self._pendingCalls.length > 0) {
+        var pendingCall = self._pendingCalls.shift();
+        var sasProgram = pendingCall.sasProgram;
+        var callback = pendingCall.callback;
+        var params = pendingCall.params;
+        self.call(sasProgram, callback, params);
+      }
     }
   }).error(function(res) {
     self._utils.addApplicationLogs('Login failed with status code: ' + res.status);

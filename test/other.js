@@ -57,6 +57,7 @@ describe('h54s', function() {
         hostUrl: serverData.url
       });
 
+      //we should test with bigger string, but there's infinite loop in _utils.convertTableObject
       var data = getRandomAsciiChars(2000);
 
       sasAdapter.addTable([

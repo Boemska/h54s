@@ -171,14 +171,14 @@ describe('h54s', function() {
     });
 
     it('Test concurent calls', function(done) {
-      this.timeout(20000);
+      this.timeout(10000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
 
       var finishedRequests = 0;
 
-      var data1 = getRandomAsciiChars(20000);
+      var data1 = getRandomAsciiChars(1000);
       var data2 = getRandomAsciiChars(10);
 
       sasAdapter.addTable([
@@ -215,7 +215,38 @@ describe('h54s', function() {
           done();
         }
       });
+    });
 
+    it('Test pending calls after login', function(done) {
+      this.timeout(10000);
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url
+      });
+
+      var counter = 0;
+
+      sasAdapter._utils.ajax.get(serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function() {
+        sasAdapter.call('/AJAX/h54s_test/startupService', function(err) {
+          if(!err) {
+            counter++;
+          }
+        });
+        sasAdapter.call('/AJAX/h54s_test/startupService', function(err) {
+          if(!err) {
+            counter++;
+          }
+        });
+        sasAdapter.call('/AJAX/h54s_test/startupService', function(err) {
+          if(!err) {
+            counter++;
+          }
+        });
+        sasAdapter.login(serverData.user, serverData.pass, function(status) {
+          assert.equal(status, 200, 'We got wrong status code');
+          assert.equal(counter, 0, 'Some calls are already executed - should\'ve waited for login');
+          done();
+        });
+      });
     });
 
   });

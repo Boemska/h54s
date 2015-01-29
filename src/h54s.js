@@ -18,6 +18,8 @@ h54s = function(config) {
   this.sasParams  = {};
   this.autoLogin  = false;
 
+  this._pendingCalls = [];
+
 
   if(!config) {
     return;
