@@ -224,7 +224,7 @@ h54s.prototype.call = function(sasProgram, callback, params) {
     }
   }).error(function(res) {
     self._utils.addApplicationLogs('Request failed with status: ' + res.status);
-    callback(new h54s.Error(res.statusText));
+    callback(new h54s.Error('httpError', res.statusText));
   });
 };
 
@@ -243,7 +243,10 @@ h54s.prototype.call = function(sasProgram, callback, params) {
 h54s.prototype.login = function(user, pass, callback) {
   var self = this;
   if(!user || !pass) {
-    throw new h54s.Error('credentialsError', 'Credentials not set');
+    throw new h54s.Error('argumentError', 'Credentials not set');
+  }
+  if(typeof user !== 'string' || typeof pass !== 'string') {
+    throw new h54s.Error('argumentError', 'User and pass parameters must be strings');
   }
   //NOTE: callback optional?
   if(!callback || typeof callback !== 'function') {
