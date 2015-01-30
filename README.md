@@ -61,14 +61,13 @@ adapter.call('/sas_programs/test', function(err, res){
 
 `err.type` meaning:
 
->"loginError" is returned if autoLogin is set but log in credentials are wrong or not set at all.
-
->"notLoggedinError" is returned if autoLogin is not set.
+>"notLoggedinError" is returned if user is not logged in or SAS session expired.
 
 >"parseError" is returned if the adapter can't parse json response from server.
 
->"parseError" is returned only if debug mode is set (`debug: true` in config object). It indicates that SAS program has some errors.
+>"sasError" is returned only if debug mode is set (`debug: true` in config object). It indicates that SAS program has some errors.
 
+>"httpError" if http request failed returning status code other than 200
 ---
 
 
