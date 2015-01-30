@@ -28,7 +28,12 @@ describe('h54s', function() {
       });
       proclaim.throws(function() {
         sasAdapter.login();
+      });
+      proclaim.throws(function() {
         sasAdapter.login('username');
+      });
+      proclaim.throws(function() {
+        sasAdapter.login('username', {}, function() {});
       });
       done();
     });
