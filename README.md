@@ -22,7 +22,6 @@ Default configuration looks like this:
   debug: false,
   loginUrl: '/SASLogon/Logon.do',
   maxXhrRetries: 5
-  autoLogin: false
 }
 ```
 
@@ -33,15 +32,13 @@ var adapter = new h54s({
 });
 ```
 
-Or login credentials:
+Or with some other config parameters:
 ```
 var adapter = new h54s({
-  user: 'username',
-  pass: 'password',
-  autoLogin: true
+  debug: true,
+  maxXhrRetries: 0 //don't retry if we get error or no data
 });
 ```
-Note that autoLogin: true will automatically try to log in on first SAS program call.
 
 ##API
 
@@ -74,34 +71,12 @@ adapter.call('/sas_programs/test', function(err, res){
 
 ---
 
-###setCredentials(user, pass)
-Sets log in credentials.
-Example:
-```
-adapter.setCredentials('username', 'password');
-```
-
----
 
 ###login(user, pass, callback)
 Log in.
 Example:
 ```
 adapter.login('username', 'password', function(status) {
-  if(status === -1) {
-    //Wrong username or password
-  } else if(status === 200) {
-    //Success - user is logged in
-  } else {
-    //ajax call failed
-    //status is value of http request status code
-  }
-});
-```
-or:
-```
-adapter.setCredentials('username', 'password');
-adapter.login(function(status) {
   if(status === -1) {
     //Wrong username or password
   } else if(status === 200) {
