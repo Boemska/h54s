@@ -9,7 +9,6 @@
 */
 h54s.prototype.call = function(sasProgram, callback, params) {
   var self = this;
-  var callArgs = Array.prototype.slice.call(arguments);
   var retryCount = 0;
   var dbg = this.debug;
   if (!callback || typeof callback !== 'function'){
@@ -58,33 +57,13 @@ h54s.prototype.call = function(sasProgram, callback, params) {
     }
 
     if(/<form.+action="Logon.do".+/.test(res.responseText)) {
-      if(self.autoLogin) {
-        self.login(function(status) {
-          if(status === 200) {
-            //add params to arguments if call function is called without it
-            if(!callArgs[2]) {
-              callArgs[2] = params;
-            }
-            self.call.apply(self, callArgs);
-          } else {
-            self._disableCalls = true;
-            self._pendingCalls.push({
-              sasProgram: sasProgram,
-              callback: callback,
-              params: params
-            });
-            callback(new h54s.Error('loginError', 'Unable to login'));
-          }
-        });
-      } else {
-        self._disableCalls = true;
-        self._pendingCalls.push({
-          sasProgram: sasProgram,
-          callback: callback,
-          params: params
-        });
-        callback(new h54s.Error('notLoggedinError', 'You are not logged in'));
-      }
+      self._disableCalls = true;
+      self._pendingCalls.push({
+        sasProgram: sasProgram,
+        callback: callback,
+        params: params
+      });
+      callback(new h54s.Error('notLoggedinError', 'You are not logged in'));
     } else {
       var resObj, unescapedResObj;
       if(!dbg) {
@@ -135,22 +114,6 @@ h54s.prototype.call = function(sasProgram, callback, params) {
   });
 };
 
-
-/*
-* Set credentials
-*
-* @param {string} user - Login username
-* @param {string} pass - Login password
-*
-*/
-h54s.prototype.setCredentials = function(user, pass) {
-  if(!user || !pass) {
-    throw new h54s.Error('credentialsError', 'Missing credentials');
-  }
-  this.user = user;
-  this.pass = pass;
-};
-
 /*
 * Login method
 *
@@ -163,17 +126,14 @@ h54s.prototype.setCredentials = function(user, pass) {
 * @param {function} callback - Callback function called when ajax call is finished
 *
 */
-h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
-  var callback;
+h54s.prototype.login = function(user, pass, callback) {
   var self = this;
-  if((!this.user && !arguments[0]) || (!this.pass && !arguments[1])) {
+  if(!user || !pass) {
     throw new h54s.Error('credentialsError', 'Credentials not set');
   }
-  if(typeof arguments[0] === 'string' && typeof arguments[1] === 'string') {
-    this.setCredentials(arguments[0], arguments[1]);
-    callback = arguments[2];
-  } else {
-    callback = arguments[0];
+  //NOTE: callback optional?
+  if(!callback || typeof callback !== 'function') {
+    throw new h54s.Error('argumentError', 'You must provide callback');
   }
 
   var callCallback = function(status) {
@@ -185,8 +145,8 @@ h54s.prototype.login = function(/* (user, pass, callback) | callback */) {
   this._utils.ajax.post(this.loginUrl, {
     _sasapp: "Stored Process Web App 9.3",
     _service: this.sasService,
-    ux: this.user,
-    px: this.pass,
+    ux: user,
+    px: pass,
   }).success(function(res) {
     if(/<form.+action="Logon.do".+/.test(res.responseText)) {
       self._utils.addApplicationLogs('Wrong username or password');

@@ -27,10 +27,9 @@ describe('h54s', function() {
         hostUrl: serverData.url
       });
       proclaim.throws(function() {
-        sasAdapter.setCredentials();
-        sasAdapter.setCredentials('username');
+        sasAdapter.login();
+        sasAdapter.login('username');
       });
-      sasAdapter.setCredentials('username', 'pass');
       done();
     });
 
@@ -72,8 +71,7 @@ describe('h54s', function() {
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
-      sasAdapter.setCredentials(serverData.user, serverData.pass);
-      sasAdapter.login(function(status) {
+      sasAdapter.login(serverData.user, serverData.pass, function(status) {
         assert.equal(status, 200, "We got wrong status code");
         done();
       });
@@ -95,65 +93,15 @@ describe('h54s', function() {
       });
     });
 
-    it('Test auto login', function(done) {
-      this.timeout(10000);
-      var sasAdapter = new h54s({
-        hostUrl: serverData.url,
-        autoLogin: true,
-        user: serverData.user,
-        pass: serverData.pass
-      });
-
-      var data = 'test';
-
-      sasAdapter.addTable([
-        {
-          data: data
-        }
-      ], 'data');
-
-      //logout because we are already logged in in previeous tests
-      sasAdapter._utils.ajax.get(serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
-        assert.equal(res.status, 200, 'Log out is not successful');
-        sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res) {
-          assert.isUndefined(err, 'We got error on sas program ajax call');
-          assert.isObject(res, 'We expected object to be returned by call method');
-          assert.isDefined(res.outputdata[0].data, 'data is lost after auto login');
-          done();
-        });
-      });
-    });
-
     it('Log in with wrong credentials', function(done) {
       this.timeout(6000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
-      sasAdapter.setCredentials('username', 'pass');
-      sasAdapter.login(function(status) {
+      sasAdapter.login('username', 'pass', function(status) {
         assert.equal(status, -1, 'We got wrong status code');
         done();
       });
-    });
-
-    it('Test login on call after first login and logout', function(done) {
-      this.timeout(10000);
-      var sasAdapter = new h54s({
-        hostUrl: serverData.url,
-        autoLogin: true
-      });
-
-      sasAdapter.login(serverData.user, serverData.pass, function() {
-        //logout and try to call sas program
-        sasAdapter._utils.ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function() {
-          sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/startupService', function(err, res) {
-            assert.isUndefined(err, 'We got error on sas program ajax call');
-            assert.isObject(res, 'We expected object to be returned by call method');
-            done();
-          });
-        });
-      });
-
     });
 
     it('Debug mode test', function(done) {
@@ -162,10 +110,13 @@ describe('h54s', function() {
         hostUrl: serverData.url,
         debug: true
       });
-      sasAdapter.setCredentials(serverData.user, serverData.pass);
-      sasAdapter.call('/AJAX/h54s_test/startupService', function(err) {
-        assert.isUndefined(err, 'We got error on sas program ajax call');
-        done();
+      sasAdapter.login(serverData.user, serverData.pass, function(status) {
+        if(status === 200) {
+          sasAdapter.call('/AJAX/h54s_test/startupService', function(err) {
+            assert.isUndefined(err, 'We got error on sas program ajax call');
+            done();
+          });
+        }
       });
     });
 
