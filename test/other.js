@@ -1,4 +1,4 @@
-/* global describe, it, assert, serverData, h54s, getRandomAsciiChars */
+/* global describe, it, assert, serverData, h54s, getRandomAsciiChars, proclaim */
 describe('h54s', function() {
   describe('Character tests:', function() {
 
@@ -52,38 +52,64 @@ describe('h54s', function() {
     });
 
     it('Test big ascii string', function(done) {
-      this.timeout(20000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
 
-      //we should test with bigger string, but there's infinite loop in _utils.convertTableObject
-      var data = getRandomAsciiChars(2000);
+      var data = getRandomAsciiChars(10000);
 
-      sasAdapter.addTable([
-        {
-          data: data
-        }
-      ], 'data');
+      proclaim.throws(function() {
+        sasAdapter.addTable([
+          {
+            data1: data,
+            data2: data,
+            data3: data,
+            data4: data
+          }
+        ], 'data');
+      }, 'Row 0 exceeds size limit of 32kb');
 
-      sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res) {
-        assert.isUndefined(err, 'We got error on sas program ajax call');
-        assert.isDefined(res, 'Response is undefined');
-        assert.equal(res.outputdata[0].data, data, 'string is not the same in response');
+      proclaim.throws(function() {
+        sasAdapter.addTable([
+          {}, {
+            data1: data,
+            data2: data,
+            data3: data,
+            data4: data
+          }
+        ], 'data');
+      }, 'Row 1 exceeds size limit of 32kb');
 
-        sasAdapter.setDebugMode();
+      proclaim.doesNotThrow(function() {
         sasAdapter.addTable([
           {
             data: data
+          }, {
+            data: data
+          }, {
+            data: data
+          }, {
+            data: data
+          }, {
+            data: data
+          }, {
+            data: data
+          }, {
+            data: data
+          }, {
+            data: data
+          }, {
+            data: data
+          }, {
+            data: data
+          }, {
+            data: data
+          }, {
+            data: data
           }
         ], 'data');
-        sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res2) {
-          assert.isUndefined(err, 'We got error on sas program ajax call');
-          assert.isDefined(res2, 'Response is undefined');
-          assert.equal(res2.outputdata[0].data, data, 'string is not the same in response');
-          done();
-        });
       });
+      done();
     });
 
   });

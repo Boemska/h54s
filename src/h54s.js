@@ -24,7 +24,7 @@ h54s = function(config) {
     return;
   }
 
-  //merge config argument config
+  //merge config object from parameter with this
   for(var key in config) {
     if((key === 'url' || key === 'loginUrl') && config[key].charAt(0) !== '/') {
       config[key] = '/' + config[key];
