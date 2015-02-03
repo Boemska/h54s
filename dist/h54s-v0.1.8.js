@@ -1,4 +1,4 @@
-/*! h54s v0.1.8 - 2015-01-30 
+/*! h54s v0.1.8 - 2015-02-03 
  *  License: GPL 
  *  Author: Boemska 
 */
@@ -82,7 +82,7 @@ h54s = function(config) {
     return;
   }
 
-  //merge config argument config
+  //merge config object from parameter with this
   for(var key in config) {
     if((key === 'url' || key === 'loginUrl') && config[key].charAt(0) !== '/') {
       config[key] = '/' + config[key];
@@ -575,20 +575,15 @@ h54s.prototype._utils.convertTableObject = function(inObject) {
         throw new h54s.Error('typeError', 'There is a type mismatch in the array between elements (columns) of the same name.');
       }
     }
-    j++;
     // TODO: this needs to go into its own method so that it can be called from the ifs above
     //       rather than doing the postmortem. Needs to abort and start on new array if 32k is
     //       reached.
-    if (chunkArrayCount + chunkRowCount > chunkThreshold) {
-      targetArray[currentTarget].splice(j - 1, 1); // get rid of that last row
-      currentTarget++; // move onto the next array
-      targetArray[currentTarget] = []; // make it an array
-      i--; // go back to the last row in the source
-      j = 0; // initialise new row counter for new array
-      chunkArrayCount = 0; // this is the new chunk max size
+    if (chunkRowCount > chunkThreshold) {
+      throw new h54s.Error('argumentError', 'Row ' + j + ' exceeds size limit of 32kb');
     } else {
       chunkArrayCount = chunkArrayCount + chunkRowCount;
     }
+    j++;
   }
 
   // reformat existingCols into an array so sas can parse it;
