@@ -9,6 +9,8 @@ Ext.define('h54sExample.view.LoginWindow', {
   defaultListenerScope: true,
   closable: false,
 
+  defaultFocus: 'userId',
+
   layout: {
     type: 'vbox',
     align: 'stretch'
@@ -18,6 +20,7 @@ Ext.define('h54sExample.view.LoginWindow', {
       xtype: 'textfield',
       flex: 1,
       name: 'ux',
+      itemId: 'userId',
       fieldLabel: 'User ID',
       listeners: {
         specialkey: function (f, e) {
