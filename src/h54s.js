@@ -16,6 +16,7 @@ h54s = function(config) {
   this.debug      = false;
   this.loginUrl   = '/SASLogon/Logon.do';
   this.sasParams  = {};
+  this.retryAfterLogin = true;
 
   this._pendingCalls = [];
 

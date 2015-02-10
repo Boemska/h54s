@@ -164,7 +164,9 @@ h54s.prototype.login = function(user, pass, callback) {
         var sasProgram = pendingCall.sasProgram;
         var callback = pendingCall.callback;
         var params = pendingCall.params;
-        self.call(sasProgram, callback, params);
+        if(self.retryAfterLogin) {
+          self.call(sasProgram, callback, params);
+        }
       }
     }
   }).error(function(res) {
