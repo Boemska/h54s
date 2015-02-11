@@ -21,9 +21,16 @@ Default configuration looks like this:
   url: '/SASStoredProcess/do',
   debug: false,
   loginUrl: '/SASLogon/Logon.do',
-  maxXhrRetries: 5
+  maxXhrRetries: 5,
+  retryAfterLogin: true
 }
 ```
+> `maxXhrRetries` is number of retries if request failed with sas error or no data.
+
+
+> Note that if one request fails with `err.type = 'notLoggedinError'`, other calls will be disabled.
+> Disabled calls will be executed automatically after login if `retryAfterLogin` is set to true.
+
 
 You can also provide hostUrl if your SAS instance is on another domain:
 ```
