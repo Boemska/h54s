@@ -16,7 +16,6 @@ Default configuration looks like this:
 
 ```
 {
-  systemtype: 'SAS',
   sasService: 'default',
   url: '/SASStoredProcess/do',
   debug: false,

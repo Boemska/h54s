@@ -9,7 +9,6 @@
 */
 h54s = function(config) {
 
-  this.systemtype = "SAS";
   this.maxXhrRetries = 5;
   this.sasService = 'default';
   this.url        = "/SASStoredProcess/do";
