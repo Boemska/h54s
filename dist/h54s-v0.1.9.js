@@ -1,4 +1,4 @@
-/*! h54s v0.1.9 - 2015-02-10 
+/*! h54s v0.1.9 - 2015-02-11 
  *  License: GPL 
  *  Author: Boemska 
 */
@@ -67,7 +67,6 @@ if (!Object.keys) {
 */
 h54s = function(config) {
 
-  this.systemtype = "SAS";
   this.maxXhrRetries = 5;
   this.sasService = 'default';
   this.url        = "/SASStoredProcess/do";
