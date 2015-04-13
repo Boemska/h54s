@@ -18,7 +18,7 @@ describe('h54s', function() {
         }
       ], 'data');
 
-      sasAdapter.login(serverData.user, serverData.pass, function(status) {
+      sasAdapter.login(serverData.user, serverData.pass, function() {
         sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res) {
           assert.isUndefined(err, 'We got error on sas program ajax call');
           assert.isDefined(res, 'Response is undefined');
