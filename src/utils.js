@@ -26,6 +26,8 @@ h54s.prototype._utils.ajax = (function () {
       }
     };
 
+    request.timeout = 30000;
+
     request.send(data);
 
     return {
