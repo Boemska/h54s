@@ -18,12 +18,14 @@ describe('h54s', function() {
         }
       ], 'data');
 
-      sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res) {
-        assert.isUndefined(err, 'We got error on sas program ajax call');
-        assert.isDefined(res, 'Response is undefined');
-        assert.equal(res.outputdata[0].data0, data0, 'Bounce data is different - data0');
-        assert.equal(res.outputdata[0].data1, data1, 'Bounce data is different - data1');
-        done();
+      sasAdapter.login(serverData.user, serverData.pass, function(status) {
+        sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res) {
+          assert.isUndefined(err, 'We got error on sas program ajax call');
+          assert.isDefined(res, 'Response is undefined');
+          assert.equal(res.outputdata[0].data0, data0, 'Bounce data is different - data0');
+          assert.equal(res.outputdata[0].data1, data1, 'Bounce data is different - data1');
+          done();
+        });
       });
     });
 
