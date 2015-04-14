@@ -48,11 +48,11 @@ var adapter = new h54s({
 
 ##API
 
-###call(sasProgram, callback)
+###call(sasProgram, tablesObj, callback)
 Calls SAS program and returns data in callback function.
 Example:
 ```
-adapter.call('/sas_programs/test', function(err, res){
+adapter.call('/sas_programs/test', tablesObj, function(err, res){
   if(err) {
     //Houston we have a problem
   } else {
@@ -61,6 +61,8 @@ adapter.call('/sas_programs/test', function(err, res){
   }
 });
 ```
+>`tablesObj` is instance of h54s.Tables. Should be `null` if you are not sending anything.
+
 >`err` is a custom javascript Error object with one extra field - type.
 
 >`err.type` could be "loginError", "notLoggedinError", "parseError", "sasError", or http response text if ajax request failed.
@@ -95,11 +97,11 @@ adapter.login('username', 'password', function(status) {
 
 ---
 
-###addTable(tableArray, macroName)
-Adds an array of objects which are then sent to the server with first `call`.
+###h54s.Tables(tableArray, macroName)
+Creates object with tables which are then sent to the server in `call` method.
 
 ```
-adapter.addTable([
+var tables = new h54s.Tables([
   {
     libname: 'WORK',
     memname: 'CHOSENLIB'
@@ -107,7 +109,26 @@ adapter.addTable([
 ], 'data');
 ```
 
->Note that tableArray is deleted after first SAS call.
+---
+
+###h54s.Tables.prototype.add(tableArray, macroName)
+Add new table to tables object
+
+```
+var tables = new h54s.Tables([
+  {
+    libname: 'WORK',
+    memname: 'CHOSENLIB'
+  }
+], 'data');
+
+tables.add([
+  {
+    libname: 'HELP',
+    memname: 'CHOSENLIB'
+  }
+], 'data2')
+```
 
 ---
 
