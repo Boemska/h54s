@@ -31,7 +31,7 @@ Ext.define('h54sExample.view.TableWindow', {
           var me = this;
           var detailWindow = Ext.getCmp('detailWindow');
           detailWindow.setLoading();
-          sasAdapter.call('/AJAX/h54s_test/getData', function (err, res) {
+          sasAdapter.call('/AJAX/h54s_test/getData', me.up('#detailWindow').table, function (err, res) {
             if (err) {
               me.up('#detailWindow').close();
               alert(err.message);
@@ -72,5 +72,9 @@ Ext.define('h54sExample.view.TableWindow', {
         }
       }
     }
-  ]
+  ],
+
+  setTable: function(table) {
+    this.table = table;
+  }
 });

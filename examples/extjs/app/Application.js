@@ -12,7 +12,7 @@ Ext.define('h54sExample.Application', {
   ],
 
   launch: function () {
-    sasAdapter.call('/AJAX/h54s_test/libraryList', function (err, res) {
+    sasAdapter.call('/AJAX/h54s_test/libraryList', null, function (err, res) {
       if (err) {
         alert(err.message);
       } else {

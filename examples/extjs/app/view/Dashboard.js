@@ -86,12 +86,12 @@ Ext.define('h54sExample.view.Dashboard', {
             queryMode: 'local',
             listeners: {
               select: function (e) {
-                sasAdapter.addTable([
+                var table = sasAdapter.createTable([
                   {
                     libraryName: e.getValue()
                   }
                 ], 'lib');
-                sasAdapter.call('/AJAX/h54s_test/datasetList', function (err, res) {
+                sasAdapter.call('/AJAX/h54s_test/datasetList', table, function (err, res) {
                   if (err) {
                     alert(err.message);
                   } else {
@@ -133,12 +133,13 @@ Ext.define('h54sExample.view.Dashboard', {
             e.clearSelections();
             e.view.refresh();
             var detailWindow = Ext.create('h54sExample.view.TableWindow');
-            sasAdapter.addTable([
+            var table = sasAdapter.createTable([
               {
                 libname: row.data.libname,
                 memname: row.data.memname
               }
             ], 'data');
+            detailWindow.setTable(table)
             detailWindow.show();
           }
         },
