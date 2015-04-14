@@ -21,9 +21,9 @@ app.factory('sasAdapter', function($q, $rootScope) {
     },
     //NOTE: h54s pending methods will not execute after login
     //that feature is not supported in angular
-    call: function(sasProgram) {
+    call: function(sasProgram, table) {
       var deferred = $q.defer();
-      sasAdapter.call(sasProgram, function(err, res) {
+      sasAdapter.call(sasProgram, table, function(err, res) {
         if(err) {
           deferred.reject(err);
         } else {
@@ -32,8 +32,8 @@ app.factory('sasAdapter', function($q, $rootScope) {
       });
       return deferred.promise;
     },
-    addTable: function(table, macro) {
-      sasAdapter.addTable(table, macro);
+    createTable: function(table, macro) {
+      return new h54s.Tables(table, macro);
     },
     setDebugMode: function() {
       if(!sasAdapter.debug) {

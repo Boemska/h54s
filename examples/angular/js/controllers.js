@@ -24,14 +24,14 @@ app.controller('dashboardCtrl', ['$scope', '$location', 'sasAdapter', '$rootScop
 
   $scope.loadLib = function(lib) {
     $scope.libname = lib.libname;
-    sasAdapter.addTable([
+    var table = sasAdapter.createTable([
       {
         libraryName: lib.libname
       }
     ], 'lib');
     stateData.current.name = lib.libname;
 
-    sasAdapter.call('/AJAX/h54s_test/datasetList').then(function(res) {
+    sasAdapter.call('/AJAX/h54s_test/datasetList', table).then(function(res) {
       $scope.rowCollection = res.tablelist;
       stateData.current.rows = res.tablelist;
     }, function(err) {
@@ -74,7 +74,7 @@ app.controller('loginCtrl', ['$scope', '$location', 'sasAdapter', function($scop
 
 app.controller('dataCtrl', ['$scope', '$location', '$routeParams', 'sasAdapter', function($scope, $location, $routeParams, sasAdapter) {
   $scope.loaded = false;
-  sasAdapter.addTable([
+  var table = sasAdapter.createTable([
     {
       libname: $routeParams.libname,
       memname: $routeParams.memname
@@ -85,7 +85,7 @@ app.controller('dataCtrl', ['$scope', '$location', '$routeParams', 'sasAdapter',
   $scope.displayedCollection = [].concat($scope.rowCollection);
   $scope.keys = [];
 
-  sasAdapter.call('/AJAX/h54s_test/getData').then(function(res) {
+  sasAdapter.call('/AJAX/h54s_test/getData', table).then(function(res) {
     $scope.rowCollection = res.outputdata;
     $scope.keys = Object.keys(res.outputdata[0]);
     $scope.loaded = true;
