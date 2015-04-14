@@ -31,5 +31,27 @@ describe('h54s', function() {
       done();
     });
 
+    it('Test tables object', function(done) {
+      var data = new h54s.Tables([
+        {
+          libname: 'WORK',
+          memname: 'CHOSENLIB'
+        }
+      ], 'data1');
+
+      assert.isDefined(data._tables.data1, 'data1 macro not inserted');
+
+      data.add([
+        {
+          libname: 'Test',
+          memname: 'chl'
+        }
+      ], 'data2');
+
+      assert.isDefined(data._tables.data2, 'data2 macro not inserted');
+
+      done();
+    });
+
   });
 });

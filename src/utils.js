@@ -1,5 +1,6 @@
 /* global h54s, XMLHttpRequest, ActiveXObject, document */
 h54s.prototype._utils = {};
+h54s.Tables.prototype._utils = {};
 h54s.prototype._utils._applicationLogs = [];
 h54s.prototype._utils._debugData = [];
 h54s.prototype._utils._sasErrors = [];
@@ -82,7 +83,7 @@ h54s.prototype._utils.ajax = (function () {
 * @param {object} inObject - Object to convert
 *
 */
-h54s.prototype._utils.convertTableObject = function(inObject) {
+h54s.Tables.prototype._utils.convertTableObject = function(inObject) {
   var self = this;
   var chunkThreshold = 32000; // this goes to 32k for SAS
   // first check that the object is an array
@@ -361,7 +362,7 @@ h54s.prototype._utils.addApplicationLogs = function(message) {
 * @param {object} jsDate - javascript Date object
 *
 */
-h54s.prototype._utils.toSasDateTime = function (jsDate) {
+h54s.Tables.prototype._utils.toSasDateTime = function (jsDate) {
   var basedate = new Date("January 1, 1960 00:00:00");
   var currdate = jsDate;
 

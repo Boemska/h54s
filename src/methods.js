@@ -7,7 +7,7 @@
 * @param {function} callback - Callback function called when ajax call is finished
 *
 */
-h54s.prototype.call = function(sasProgram, callback, params) {
+h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
   var self = this;
   var retryCount = 0;
   var dbg = this.debug;
@@ -29,12 +29,15 @@ h54s.prototype.call = function(sasProgram, callback, params) {
     };
   }
 
-  for(var key in this.sasParams) {
-    params[key] = this.sasParams[key];
+  if(tablesObj) {
+    if(tablesObj instanceof h54s.Tables) {
+      for(var key in tablesObj._tables) {
+        params[key] = tablesObj._tables[key];
+      }
+    } else {
+      throw new h54s.Error('argumentError', 'Wrong type of tables object');
+    }
   }
-
-  //clear sas params
-  this.sasParams = {};
 
   if(this._disableCalls) {
     this._pendingCalls.push({
@@ -165,7 +168,7 @@ h54s.prototype.login = function(user, pass, callback) {
         var callback = pendingCall.callback;
         var params = pendingCall.params;
         if(self.retryAfterLogin) {
-          self.call(sasProgram, callback, params);
+          self.call(sasProgram, null, callback, params);
         }
       }
     }
@@ -173,33 +176,6 @@ h54s.prototype.login = function(user, pass, callback) {
     self._utils.addApplicationLogs('Login failed with status code: ' + res.status);
     callCallback(res.status);
   });
-};
-
-/*
-* Add table
-*
-* @param {object} inTable - Table object
-* @param {string} macroName - Sas macro name
-*
-*/
-h54s.prototype.addTable = function (inTable, macroName) {
-  if (typeof (macroName) !== 'string') {
-    throw new h54s.Error('argumentError', 'Second parameter must be a valid string');
-  }
-
-  var result;
-  try {
-    result = this._utils.convertTableObject(inTable);
-  } catch(e) {
-    throw e;
-  }
-  var tableArray = [];
-  tableArray.push(JSON.stringify(result.spec));
-  for (var numberOfTables = 0; numberOfTables < result.data.length; numberOfTables++) {
-    var outString = JSON.stringify(result.data[numberOfTables]);
-    tableArray.push(outString);
-  }
-  this.sasParams[macroName] = tableArray;
 };
 
 /*
@@ -291,4 +267,35 @@ h54s.prototype.clearAllLogs = function() {
   this.clearDebugData();
   this.clearSasErrors();
   this.clearFailedRequests();
+};
+
+/*
+* Add table to tables object
+* @param {array} table - Array of table objects
+* @param {string} macroName - Sas macro name
+*
+*/
+h54s.Tables.prototype.add = function(table, macroName) {
+  if(table && macroName) {
+    if(!(table instanceof Array)) {
+      throw new h54s.Error('argumentError', 'First argument must be array');
+    }
+    if(typeof macroName !== 'string') {
+      throw new h54s.Error('argumentError', 'Second argument must be string');
+    }
+  }
+
+  var result;
+  try {
+    result = this._utils.convertTableObject(table);
+  } catch(e) {
+    throw e;
+  }
+  var tableArray = [];
+  tableArray.push(JSON.stringify(result.spec));
+  for (var numberOfTables = 0; numberOfTables < result.data.length; numberOfTables++) {
+    var outString = JSON.stringify(result.data[numberOfTables]);
+    tableArray.push(outString);
+  }
+  this._tables[macroName] = tableArray;
 };

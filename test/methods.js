@@ -18,7 +18,7 @@ describe('h54s', function() {
       proclaim.throws(function() {
         sasAdapter.call('test');
       });
-      sasAdapter.call('test', function() {});
+      sasAdapter.call('test', null, function() {});
       done();
     });
 
@@ -90,7 +90,7 @@ describe('h54s', function() {
       //logout because we are already logged in in previeous tests
       sasAdapter._utils.ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
         assert.equal(res.status, 200, 'Log out is not successful');
-        sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/startupService', function(err, res) {
+        sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/startupService', null, function(err, res) {
           assert.equal(err.message, 'You are not logged in', 'Should throw error because user is not logged in');
           assert.isUndefined(res, 'We got error, res should be undefined');
           done();
@@ -117,7 +117,7 @@ describe('h54s', function() {
       });
       sasAdapter.login(serverData.user, serverData.pass, function(status) {
         if(status === 200) {
-          sasAdapter.call('/AJAX/h54s_test/startupService', function(err) {
+          sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err) {
             assert.isUndefined(err, 'We got error on sas program ajax call');
             done();
           });
@@ -136,13 +136,13 @@ describe('h54s', function() {
       var data1 = getRandomAsciiChars(1000);
       var data2 = getRandomAsciiChars(10);
 
-      sasAdapter.addTable([
+      var table = new h54s.Tables([
         {
           data: data1
         }
       ], 'data');
 
-      sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res) {
+      sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
         assert.isUndefined(err, 'We got error on sas program ajax call');
         assert.isDefined(res, 'Response is undefined');
         assert.equal(res.outputdata[0].data, data1, 'data1 is not the same in response');
@@ -152,16 +152,13 @@ describe('h54s', function() {
         }
       });
 
-      //sasParams should be cleared on first call
-      assert.isUndefined(sasAdapter.sasParams.data, 'sasParams is not empty');
-
-      sasAdapter.addTable([
+      table.add([ //overwrite data key
         {
           data: data2
         }
       ], 'data');
 
-      sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res) {
+      sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
         assert.isUndefined(err, 'We got error on sas program ajax call');
         assert.isDefined(res, 'Response is undefined');
         assert.equal(res.outputdata[0].data, data2, 'data2 is not the same in response');
@@ -181,17 +178,17 @@ describe('h54s', function() {
       var counter = 0;
 
       sasAdapter._utils.ajax.get(serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function() {
-        sasAdapter.call('/AJAX/h54s_test/startupService', function(err) {
+        sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err) {
           if(!err) {
             counter++;
           }
         });
-        sasAdapter.call('/AJAX/h54s_test/startupService', function(err) {
+        sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err) {
           if(!err) {
             counter++;
           }
         });
-        sasAdapter.call('/AJAX/h54s_test/startupService', function(err) {
+        sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err) {
           if(!err) {
             counter++;
           }

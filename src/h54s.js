@@ -14,7 +14,6 @@ h54s = function(config) {
   this.url        = "/SASStoredProcess/do";
   this.debug      = false;
   this.loginUrl   = '/SASLogon/Logon.do';
-  this.sasParams  = {};
   this.retryAfterLogin = true;
 
   this._pendingCalls = [];
@@ -44,6 +43,14 @@ h54s = function(config) {
   }
 };
 
+/*
+* h54s error constructor
+* @constructor
+*
+*@param {string} type - Error type
+*@param {string} message - Error message
+*
+*/
 h54s.Error = function(type, message) {
   if(Error.captureStackTrace) {
     Error.captureStackTrace(this);
@@ -53,3 +60,17 @@ h54s.Error = function(type, message) {
 };
 
 h54s.Error.prototype = Object.create(Error.prototype);
+
+/*
+* h54s tables object constructor
+* @constructor
+*
+*@param {array} table - Table added when object is created
+*@param {string} message - macro name
+*
+*/
+h54s.Tables = function(table, macroName) {
+  this._tables = {};
+
+  this.add(table, macroName);
+};

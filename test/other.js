@@ -11,7 +11,7 @@ describe('h54s', function() {
       var data0 = "\\\"/\/\?''";
       var data1 = "asd\nasd\tasd\r\nasdasd" + String.fromCharCode(10) + "asd";
 
-      sasAdapter.addTable([
+      var table = new h54s.Tables([
         {
           data0: data0,
           data1: data1
@@ -19,7 +19,7 @@ describe('h54s', function() {
       ], 'data');
 
       sasAdapter.login(serverData.user, serverData.pass, function() {
-        sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res) {
+        sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
           assert.isUndefined(err, 'We got error on sas program ajax call');
           assert.isDefined(res, 'Response is undefined');
           assert.equal(res.outputdata[0].data0, data0, 'Bounce data is different - data0');
@@ -41,9 +41,9 @@ describe('h54s', function() {
         chars['data' + i] = String.fromCharCode(i);
       }
 
-      sasAdapter.addTable([chars], 'data');
+      var table = new h54s.Tables([chars], 'data');
 
-      sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res) {
+      sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
         assert.isUndefined(err, 'We got error on sas program ajax call');
         assert.isDefined(res, 'Response is undefined');
         for(var i = 32; i < 128; i++) {
@@ -54,14 +54,10 @@ describe('h54s', function() {
     });
 
     it('Test big ascii string', function(done) {
-      var sasAdapter = new h54s({
-        hostUrl: serverData.url
-      });
-
       var data = getRandomAsciiChars(10000);
 
       proclaim.throws(function() {
-        sasAdapter.addTable([
+        new h54s.Tables([
           {
             data1: data,
             data2: data,
@@ -72,7 +68,7 @@ describe('h54s', function() {
       }, 'Row 0 exceeds size limit of 32kb');
 
       proclaim.throws(function() {
-        sasAdapter.addTable([
+        new h54s.Tables([
           {}, {
             data1: data,
             data2: data,
@@ -83,7 +79,7 @@ describe('h54s', function() {
       }, 'Row 1 exceeds size limit of 32kb');
 
       proclaim.doesNotThrow(function() {
-        sasAdapter.addTable([
+        new h54s.Tables([
           {
             data: data
           }, {

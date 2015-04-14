@@ -9,7 +9,7 @@ describe('h54s', function() {
       });
       sasAdapter.login(serverData.user, serverData.pass, function(status) {
         if(status === 200) {
-          sasAdapter.call('/AJAX/h54s_test/startupService', function(err, res) {
+          sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err, res) {
             assert.isUndefined(err, 'We got error on sas program ajax call');
             var topLevelProcess = res.toplevelProcess;
             var donutLev1 = res.donutLev1;
@@ -40,7 +40,7 @@ describe('h54s', function() {
       });
       sasAdapter.login(serverData.user, serverData.pass, function(status) {
         if(status === 200) {
-          sasAdapter.call('/AJAX/h54s_test/startupService', function(err, res) {
+          sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err, res) {
             assert.isUndefined(err, 'We got error on sas program ajax call');
             var topLevelProcess = res.toplevelProcess;
             var donutLev1 = res.donutLev1;
@@ -70,13 +70,13 @@ describe('h54s', function() {
       });
       sasAdapter.login(serverData.user, serverData.pass, function(status) {
         if(status === 200) {
-          sasAdapter.addTable([
+          var table = new h54s.Tables([
             {
               libname: 'WORK',
               memname: 'CHOSENLIB'
             }
           ], 'data');
-          sasAdapter.call('/AJAX/h54s_test/getData', function(err) {
+          sasAdapter.call('/AJAX/h54s_test/getData', table, function(err) {
             assert.isObject(err, 'We should get error object');
             assert.equal(err.type, 'parseError', 'We should get parseError');
             var sasErrors = sasAdapter.getSasErrors();
@@ -102,12 +102,12 @@ describe('h54s', function() {
       });
       sasAdapter.login(serverData.user, serverData.pass, function(status) {
         if(status === 200) {
-          sasAdapter.addTable([
+          var table = new h54s.Tables([
             {
               data: 'test'
             }
           ], 'data');
-          sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res) {
+          sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
             assert.isUndefined(err, 'We got error on sas program ajax call');
             var logs = sasAdapter.getApplicationLogs();
             assert.isArray(logs, 'getApplicationLogs() should return array');
@@ -133,12 +133,12 @@ describe('h54s', function() {
       var date = new Date();
       sasAdapter.login(serverData.user, serverData.pass, function(status) {
         if(status === 200) {
-          sasAdapter.addTable([
+          var table = new h54s.Tables([
             {
               dt_some_date: date // jshint ignore:line
             }
           ], 'data');
-          sasAdapter.call('/AJAX/h54s_test/BounceData', function(err, res) {
+          sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
             var resSeconds = Math.round(res.outputdata[0].dt_some_date.getTime() / 1000); // jshint ignore:line
             var dateSeconds = Math.round(date.getTime() / 1000);
             assert.isUndefined(err, 'We got error on sas program ajax call');
@@ -156,13 +156,13 @@ describe('h54s', function() {
       });
       sasAdapter.login(serverData.user, serverData.pass, function(status) {
         if(status === 200) {
-          sasAdapter.addTable([
+          var table = new h54s.Tables([
             {
               libname: 'WORK',
               memname: 'CHOSENLIB'
             }
           ], 'data');
-          sasAdapter.call('/AJAX/h54s_test/getData', function(err) {
+          sasAdapter.call('/AJAX/h54s_test/getData', table, function(err) {
             assert.isObject(err, 'We should get error object');
             assert.equal(err.type, 'parseError', 'We should get parseError');
             var sasErrors = sasAdapter.getSasErrors();
@@ -172,13 +172,13 @@ describe('h54s', function() {
             }
 
             sasAdapter.setDebugMode();
-            sasAdapter.addTable([
+            table.add([
               {
                 libname: 'WORK',
                 memname: 'CHOSENLIB'
               }
             ], 'data');
-            sasAdapter.call('/AJAX/h54s_test/getData', function(err) {
+            sasAdapter.call('/AJAX/h54s_test/getData', table, function(err) {
               assert.isObject(err, 'We should get error object');
               assert.equal(err.type, 'sasError', 'We should get sasError');
               var debugData = sasAdapter.getDebugData();
