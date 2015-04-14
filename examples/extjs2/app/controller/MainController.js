@@ -8,7 +8,7 @@ Ext.define('h54sExample.controller.MainController', {
 
   startup: function() {
     var me = this;
-    sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/startupService', function (err, res) {
+    sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/startupService', null, function (err, res) {
       var loading = Ext.get('loadingWrapper');
       if (err) {
         if (loading) {
@@ -213,14 +213,14 @@ Ext.define('h54sExample.controller.MainController', {
   updateTimespan: function(javastart, javaend, sasstart, sasend) {
     var me = this;
 
-    sasAdapter.addTable([{
+    var table = sasAdapter.createTable([{
       javastart: javastart,
       javaend: javaend,
       sasstart: sasstart,
       sasend: sasend
     }],'timespan');
 
-    sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/updateTimespan', function(err, res){
+    sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/updateTimespan', table, function(err, res){
       if (err){
         Ext.MessageBox.alert('Error', 'Could not call updateTimespan.');
       } else {
@@ -315,21 +315,21 @@ Ext.define('h54sExample.controller.MainController', {
       var jsMin = Math.round(extremes.min);
       var jsMax = Math.round(extremes.max);
 
-      sasAdapter.addTable([{
+      var table = sasAdapter.createTable([{
         javastart: jsMin,
         javaend: jsMax,
         sasstart: new Date(jsMin),
         sasend: new Date(jsMax)
       }],'timespan');
 
-      sasAdapter.addTable([{
+      table.add([{
         count: point.y || point.breadcrumbY,
         path: $.trim(path), //ie8 doesn't have String.prototype.trim() implemented
         dir: dir
       }],'clicked');
 
 
-      sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/drillPie', function(err, res){
+      sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/drillPie', table, function(err, res){
         if (err){
           Ext.MessageBox.alert('Error', 'Could not call drillPie.');
           return;
@@ -353,7 +353,7 @@ Ext.define('h54sExample.controller.MainController', {
     var sasStart = new Date(timeMs);
     var sasEnd = new Date(timeMsEnd);
 
-    sasAdapter.addTable([{
+    var table = sasAdapter.createTable([{
       javastart: timeMs,
       javaend: timeMsEnd,
       sasstart: sasStart,
@@ -361,7 +361,7 @@ Ext.define('h54sExample.controller.MainController', {
     }], 'timespan');
 
 
-    sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/drillHour', function(err, res) {
+    sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/drillHour', table, function(err, res) {
       if (err) {
         Ext.MessageBox.alert('Warning', 'Could not call drillHour.');
       } else {

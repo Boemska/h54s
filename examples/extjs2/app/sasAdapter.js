@@ -24,12 +24,12 @@ Ext.define('h54sExample.sasAdapter', {
     }
   },
 
-  call: function(sasProgram, callback) {
+  call: function(sasProgram, tables, callback) {
     var me = this;
     var msg = this.msgWindow.addLoadingMessage(sasProgram);
 
     try {
-      this._adapter.call(sasProgram, function(err, res) {
+      this._adapter.call(sasProgram, tables, function(err, res) {
         if(err && (err.type === 'notLoggedinError' || err.type === 'loginError')) {
           var loginWindow = Ext.create('h54sExample.view.LoginWindow');
           var loading = Ext.get('loadingWrapper');
@@ -62,8 +62,8 @@ Ext.define('h54sExample.sasAdapter', {
     }
   },
 
-  addTable: function(table, macro) {
-    this._adapter.addTable(table, macro);
+  createTable: function(table, macro) {
+    return new h54s.Tables(table, macro);
   },
 
   setDebugMode: function() {
