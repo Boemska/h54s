@@ -75,7 +75,8 @@ adapter.call('/sas_programs/test', tablesObj, function(err, res){
 
 >"sasError" is returned only if debug mode is set (`debug: true` in config object). It indicates that SAS program has some errors.
 
->"httpError" if http request failed returning status code other than 200
+>"httpError" if http request failed returning status code other than 200.
+
 ---
 
 
@@ -264,8 +265,15 @@ adapter.clearFailedRequests();
 3. Install grunt-cli if it's not installed already - `npm install -g grunt-cli`.
 4. Edit host url, user and pass in /test/_server_data.js.
 5. Run `grunt`. It will run jshint and karma tests. There are more grunt tasks.
-  1. `grunt compress` - Create minified h54s file.
-  2. `grunt build` - Runs jshint, karma tests and creates build file - concatenate files in /src (debug release, not minified).
-  3. `grunt watch` - Runs tests on file change.
-  4. `grunt serveAngular` - Creates web server and serves angular.js example (default port is 1337)
-  5. `grunt serveExtjs` - Creates web server and serves ext.js example (default port is 1337)
+
+  * `grunt compress` - Create minified h54s file.
+
+  * `grunt build` - Runs jshint, karma tests and creates build file - concatenate files in /src (debug release, not minified).
+
+  * `grunt watch` - Runs tests on file change.
+ 
+  * `grunt serveAngular` - Creates web server and serves angular.js example (default port is 1337)
+
+  * `grunt serveExtjs` - Creates web server and serves ext.js example (default port is 1337)
+
+  * `grunt serveExtjs2` - Creates web server and serves ext.js example (default port is 1337)
