@@ -4,13 +4,12 @@
 * Represents html5 for sas adapter
 * @constructor
 *
-*@param {object} config - adapter config object, with keys like url, debug, sasService, etc.
+*@param {object} config - adapter config object, with keys like url, debug, etc.
 *
 */
 h54s = function(config) {
 
   this.maxXhrRetries = 5;
-  this.sasService = 'default';
   this.url        = "/SASStoredProcess/do";
   this.debug      = false;
   this.loginUrl   = '/SASLogon/Logon.do';

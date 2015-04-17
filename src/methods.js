@@ -25,7 +25,7 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
     params = {
       _program: sasProgram,
       _debug: this.debug ? 131 : 0,
-      _service: this.sasService,
+      _service: 'default',
     };
   }
 
@@ -150,7 +150,7 @@ h54s.prototype.login = function(user, pass, callback) {
 
   this._utils.ajax.post(this.loginUrl, {
     _sasapp: "Stored Process Web App 9.3",
-    _service: this.sasService,
+    _service: 'default',
     ux: user,
     px: pass,
   }).success(function(res) {

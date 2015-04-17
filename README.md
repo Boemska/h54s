@@ -16,7 +16,6 @@ Default configuration looks like this:
 
 ```
 {
-  sasService: 'default',
   url: '/SASStoredProcess/do',
   debug: false,
   loginUrl: '/SASLogon/Logon.do',
@@ -271,7 +270,7 @@ adapter.clearFailedRequests();
   * `grunt build` - Runs jshint, karma tests and creates build file - concatenate files in /src (debug release, not minified).
 
   * `grunt watch` - Runs tests on file change.
- 
+
   * `grunt serveAngular` - Creates web server and serves angular.js example (default port is 1337)
 
   * `grunt serveExtjs` - Creates web server and serves ext.js example (default port is 1337)
