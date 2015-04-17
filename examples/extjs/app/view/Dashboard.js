@@ -139,7 +139,7 @@ Ext.define('h54sExample.view.Dashboard', {
                 memname: row.data.memname
               }
             ], 'data');
-            detailWindow.setTable(table)
+            detailWindow.setTable(table);
             detailWindow.show();
           }
         },
