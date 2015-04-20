@@ -170,7 +170,7 @@ describe('h54s', function() {
     });
 
     it('Test pending calls after login', function(done) {
-      this.timeout(10000);
+      this.timeout(20000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
@@ -196,7 +196,10 @@ describe('h54s', function() {
         sasAdapter.login(serverData.user, serverData.pass, function(status) {
           assert.equal(status, 200, 'We got wrong status code');
           assert.equal(counter, 0, 'Some calls are already executed - should\'ve waited for login');
-          done();
+          setTimeout(function() {
+            assert.equal(counter, 3, 'Some pending calls are not executed');
+            done();
+          }, 2000);
         });
       });
     });
