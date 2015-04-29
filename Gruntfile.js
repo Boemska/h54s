@@ -25,7 +25,8 @@ module.exports = function (grunt) {
           'test/**/*.js',
           'examples/**/*.js',
           '!examples/extjs2/lib/*',
-          '!examples/angular/js/libs/*'
+          '!examples/angular/js/libs/*',
+          '!examples/w2ui/lib/*'
         ]
       }
     },
@@ -75,6 +76,10 @@ module.exports = function (grunt) {
       extjs2: {
         port: 1337,
         combine: ['examples/extjs2', 'dist', 'test']
+      },
+      w2ui: {
+        port: 1337,
+        combine: ['examples/w2ui', 'dist', 'test']
       }
     }
   });
@@ -96,4 +101,5 @@ module.exports = function (grunt) {
   grunt.registerTask('serveAngular', 'connect:angular');
   grunt.registerTask('serveExtjs', 'connect:extjs');
   grunt.registerTask('serveExtjs2', 'connect:extjs2');
+  grunt.registerTask('serveW2UI', 'connect:w2ui');
 };
