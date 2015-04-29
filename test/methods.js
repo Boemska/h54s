@@ -18,6 +18,9 @@ describe('h54s', function() {
       proclaim.throws(function() {
         sasAdapter.call('test');
       });
+      proclaim.throws(function() {
+        new h54s.Tables([]);
+      });
       sasAdapter.call('test', null, function() {});
       done();
     });

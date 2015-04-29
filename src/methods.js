@@ -283,6 +283,8 @@ h54s.Tables.prototype.add = function(table, macroName) {
     if(typeof macroName !== 'string') {
       throw new h54s.Error('argumentError', 'Second argument must be string');
     }
+  } else {
+    throw new h54s.Error('argumentError', 'Missing arguments');
   }
 
   var result;
