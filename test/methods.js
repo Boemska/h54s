@@ -1,4 +1,4 @@
-/* global describe, it, assert, serverData, h54s, proclaim, getRandomAsciiChars */
+/* global describe, it, assert, serverData, h54s, proclaim, getRandomAsciiChars, setTimeout */
 describe('h54s', function() {
   describe('methods test:', function() {
 
