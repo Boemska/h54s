@@ -67,7 +67,7 @@ sasAdapter.openLoginPopup = function() {
 
 sasAdapter.showDebugPopup = function() {
   var debugPopup = w2popup.open({
-    body: '<div id="debug-tabs"></div><div id="debug-tab-data"></div>',
+    body: '<div id="debug-tabs"></div><div id="debug-tab-data"></div><button id="debug-clear-btn" class="btn">Clear</button>',
     width: 10000,
     height: 10000,
     showClose: true,
@@ -116,9 +116,34 @@ sasAdapter.showDebugPopup = function() {
               $('#debug-popup-close').on('click', function() {
                 debugPopup.close();
               });
+
+              $('#debug-clear-btn').on('click', function() {
+                $('#debug-tab-data').empty();
+
+                switch(w2ui.debugTabs.active) {
+                  case 'appLogs':
+                    $('#tabs_debugTabs_tab_appLogs .badge').html(0);
+                    sasAdapter.clearApplicationLogs();
+                    break;
+                  case 'debugData':
+                    $('#tabs_debugTabs_tab_debugData .badge').html(0);
+                    sasAdapter.clearDebugData();
+                    break;
+                  case 'sasErrors':
+                    $('#tabs_debugTabs_tab_sasErrors .badge').html(0);
+                    sasAdapter.clearSasErrors();
+                    break;
+                  case 'failedReq':
+                    $('#tabs_debugTabs_tab_failedReq .badge').html(0);
+                    sasAdapter.clearFailedRequests();
+                    break;
+                }
+              });
             }, 0);
           }
         });
+        var tabDataHeight = $('#w2ui-popup').height() - $('#debug-tabs').outerHeight() - 17;
+        $('#debug-tab-data').height(tabDataHeight);
       }, 0);
     },
     onClose: function() {

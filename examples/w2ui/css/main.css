@@ -34,15 +34,7 @@
   position: absolute;
   right: 0;
   top: 50px;
-
-
-  padding: 6px 12px;
-  cursor: pointer;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  color: #fff;
-  background-color: #337ab7;
-  border-color: #2e6da4;
+  margin-right: 0;
 }
 
 #debug-popup-close {
@@ -66,6 +58,10 @@
   border-bottom: 1px solid #ddd;
   margin: 10px 0;
   padding: 10px;
+}
+
+#debug-tab-data {
+  overflow-y: auto;
 }
 
 #debug-tab-data pre {
@@ -92,4 +88,10 @@
 
 .collapse {
   display: none;
+}
+
+#debug-clear-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
 }
