@@ -22,8 +22,8 @@ describe('h54s', function() {
         sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
           assert.isUndefined(err, 'We got error on sas program ajax call');
           assert.isDefined(res, 'Response is undefined');
-          assert.equal(res.outputdata[0].data0, data0, 'Bounce data is different - data0');
-          assert.equal(res.outputdata[0].data1, data1, 'Bounce data is different - data1');
+          assert.equal(res.outputdata[0].DATA0, data0, 'Bounce data is different - data0');
+          assert.equal(res.outputdata[0].DATA1, data1, 'Bounce data is different - data1');
           done();
         });
       });
@@ -47,13 +47,17 @@ describe('h54s', function() {
         assert.isUndefined(err, 'We got error on sas program ajax call');
         assert.isDefined(res, 'Response is undefined');
         for(var i = 32; i < 128; i++) {
-          assert.equal(res.outputdata[0]['data' + i], chars['data' + i], chars['data' + i] + ' character is not the same in response');
+          assert.equal(res.outputdata[0]['DATA' + i], chars['data' + i], chars['data' + i] + ' character is not the same in response');
         }
         done();
       });
     });
 
     it('Test big ascii string', function(done) {
+      this.timeout(20000);
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url
+      });
       var data = getRandomAsciiChars(10000);
 
       proclaim.throws(function() {
@@ -77,37 +81,73 @@ describe('h54s', function() {
           }
         ], 'data');
       }, 'Row 1 exceeds size limit of 32kb');
-
       proclaim.doesNotThrow(function() {
-        new h54s.Tables([
+        var rows = [
           {
-            data: data
+            data: 0 + ' ' + data
           }, {
-            data: data
+            data: 1 + ' ' + data
           }, {
-            data: data
+            data: 2 + ' ' + data
           }, {
-            data: data
+            data: 3 + ' ' + data
           }, {
-            data: data
+            data: 4 + ' ' + data
           }, {
-            data: data
+            data: 5 + ' ' + data
           }, {
-            data: data
+            data: 6 + ' ' + data
           }, {
-            data: data
+            data: 7 + ' ' + data
           }, {
-            data: data
+            data: 8 + ' ' + data
           }, {
-            data: data
+            data: 9 + ' ' + data
           }, {
-            data: data
+            data: 10 + ' ' + data
           }, {
-            data: data
+            data: 11 + ' ' + data
           }
-        ], 'data');
+        ];
+
+        var table = new h54s.Tables(rows, 'data');
+
+        sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
+          assert.isUndefined(err, 'We got error on sas program ajax call');
+          assert.isDefined(res, 'Response is undefined');
+          assert.equal(res.outputdata.length, 12, 'Received less rows than sent');
+          for(var i = 0; i < res.outputdata.length; i++) {
+            assert.equal(res.outputdata[i].DATA, rows[i].data, 'Row ' + i + ' is not the same in response');
+          }
+          done();
+        });
       });
-      done();
+    });
+
+    it('Test big table', function(done) {
+      this.timeout(20000);
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url
+      });
+//      var str = "CC$bV0A0/?Mt[%#QPirc:Xb62?pO&1X;OaUV#5cd/OOjD.rq9hQ+zw1b)chA$tYF\~+gvz,5@HU,'lSS-(Q~oX9S%l(!oX8=)hM";
+      var str = getRandomAsciiChars(1000);
+      var rows = [];
+
+      //70kb
+      for(var i = 0; i < 700; i++) {
+        rows.push({
+          data: i + str
+        });
+      }
+
+      var table = new h54s.Tables(rows, 'data');
+
+      sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
+        assert.isUndefined(err, 'We got error on sas program ajax call');
+        assert.isDefined(res, 'Response is undefined');
+        assert.equal(res.outputdata.length, 700, 'Received less rows than sent');
+        done();
+      });
     });
 
   });

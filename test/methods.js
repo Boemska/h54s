@@ -148,14 +148,14 @@ describe('h54s', function() {
       sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
         assert.isUndefined(err, 'We got error on sas program ajax call');
         assert.isDefined(res, 'Response is undefined');
-        assert.equal(res.outputdata[0].data, data1, 'data1 is not the same in response');
+        assert.equal(res.outputdata[0].DATA, data1, 'data1 is not the same in response');
         finishedRequests++;
         if(finishedRequests === 2) {
           done();
         }
       });
 
-      table.add([ //overwrite data key
+      table = new h54s.Tables([
         {
           data: data2
         }
@@ -164,7 +164,7 @@ describe('h54s', function() {
       sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
         assert.isUndefined(err, 'We got error on sas program ajax call');
         assert.isDefined(res, 'Response is undefined');
-        assert.equal(res.outputdata[0].data, data2, 'data2 is not the same in response');
+        assert.equal(res.outputdata[0].DATA, data2, 'data2 is not the same in response');
         finishedRequests++;
         if(finishedRequests === 2) {
           done();

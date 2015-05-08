@@ -139,7 +139,7 @@ describe('h54s', function() {
             }
           ], 'data');
           sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
-            var resSeconds = Math.round(res.outputdata[0].dt_some_date.getTime() / 1000); // jshint ignore:line
+            var resSeconds = Math.round(res.outputdata[0].DT_SOME_DATE.getTime() / 1000); // jshint ignore:line
             var dateSeconds = Math.round(date.getTime() / 1000);
             assert.isUndefined(err, 'We got error on sas program ajax call');
             assert.equal(resSeconds, dateSeconds, 'Date is not the same');
