@@ -8,9 +8,10 @@
 *
 */
 h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
-  var self = this;
-  var retryCount = 0;
-  var dbg = this.debug;
+  var self        = this;
+  var retryCount  = 0;
+  var dbg         = this.debug;
+
   if (!callback || typeof callback !== 'function'){
     throw new h54s.Error('argumentError', 'You must provide callback');
   }
@@ -24,7 +25,7 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
   if(!params) {
     params = {
       _program: sasProgram,
-      _debug: this.debug ? 131 : 0,
+      _debug:   this.debug ? 131 : 0,
       _service: 'default',
     };
   }
@@ -32,7 +33,9 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
   if(tablesObj) {
     if(tablesObj instanceof h54s.Tables) {
       for(var key in tablesObj._tables) {
-        params[key] = tablesObj._tables[key];
+        if(tablesObj._tables.hasOwnProperty(key)) {
+          params[key] = tablesObj._tables[key];
+        }
       }
     } else {
       throw new h54s.Error('argumentError', 'Wrong type of tables object');
@@ -42,8 +45,8 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
   if(this._disableCalls) {
     this._pendingCalls.push({
       sasProgram: sasProgram,
-      callback: callback,
-      params: params
+      callback:   callback,
+      params:     params
     });
     return;
   }
@@ -53,8 +56,8 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
     if(self._disableCalls) {
       self._pendingCalls.push({
         sasProgram: sasProgram,
-        callback: callback,
-        params: params
+        callback:   callback,
+        params:     params
       });
       return;
     }
@@ -63,8 +66,8 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
       self._disableCalls = true;
       self._pendingCalls.push({
         sasProgram: sasProgram,
-        callback: callback,
-        params: params
+        callback:   callback,
+        params:     params
       });
       callback(new h54s.Error('notLoggedinError', 'You are not logged in'));
     } else {
@@ -72,8 +75,8 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
       if(!dbg) {
         try {
           //remove new lines in json response
-          resObj = JSON.parse(res.responseText.replace(/(\r\n|\r|\n)/g, ''));
-          resObj = self._utils.convertDates(resObj);
+          resObj          = JSON.parse(res.responseText.replace(/(\r\n|\r|\n)/g, ''));
+          resObj          = self._utils.convertDates(resObj);
           unescapedResObj = self._utils.unescapeValues(resObj);
         } catch(e) {
           if(retryCount < self.maxXhrRetries) {
@@ -93,8 +96,8 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
         }
       } else {
         try {
-          resObj = self._utils.parseDebugRes(res.responseText, sasProgram, params);
-          resObj = self._utils.convertDates(resObj);
+          resObj          = self._utils.parseDebugRes(res.responseText, sasProgram, params);
+          resObj          = self._utils.convertDates(resObj);
           unescapedResObj = self._utils.unescapeValues(resObj);
         } catch(e) {
           self._utils.parseErrorResponse(res.responseText, sasProgram);
@@ -131,6 +134,7 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
 */
 h54s.prototype.login = function(user, pass, callback) {
   var self = this;
+
   if(!user || !pass) {
     throw new h54s.Error('argumentError', 'Credentials not set');
   }
@@ -164,9 +168,9 @@ h54s.prototype.login = function(user, pass, callback) {
 
       while(self._pendingCalls.length > 0) {
         var pendingCall = self._pendingCalls.shift();
-        var sasProgram = pendingCall.sasProgram;
-        var callback = pendingCall.callback;
-        var params = pendingCall.params;
+        var sasProgram  = pendingCall.sasProgram;
+        var callback    = pendingCall.callback;
+        var params      = pendingCall.params;
         if(self.retryAfterLogin) {
           self.call(sasProgram, null, callback, params);
         }
@@ -287,12 +291,8 @@ h54s.Tables.prototype.add = function(table, macroName) {
     throw new h54s.Error('argumentError', 'Missing arguments');
   }
 
-  var result;
-  try {
-    result = this._utils.convertTableObject(table);
-  } catch(e) {
-    throw e;
-  }
+  var result = this._utils.convertTableObject(table);
+
   var tableArray = [];
   tableArray.push(JSON.stringify(result.spec));
   for (var numberOfTables = 0; numberOfTables < result.data.length; numberOfTables++) {

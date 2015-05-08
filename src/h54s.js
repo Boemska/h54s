@@ -7,27 +7,31 @@
 *@param {object} config - adapter config object, with keys like url, debug, etc.
 *
 */
-h54s = function(config) {
+var h54s = function(config) {
 
-  this.maxXhrRetries = 5;
-  this.url        = "/SASStoredProcess/do";
-  this.debug      = false;
-  this.loginUrl   = '/SASLogon/Logon.do';
-  this.retryAfterLogin = true;
+  this.maxXhrRetries    = 5;
+  this.url              = "/SASStoredProcess/do";
+  this.debug            = false;
+  this.loginUrl         = '/SASLogon/Logon.do';
+  this.retryAfterLogin  = true;
 
-  this._pendingCalls = [];
+  this._pendingCalls    = [];
 
 
   if(!config) {
     return;
+  } else if(typeof config !== 'object') {
+    throw new h54s.Error('argumentError', 'First parameter should be config object');
   }
 
   //merge config object from parameter with this
   for(var key in config) {
-    if((key === 'url' || key === 'loginUrl') && config[key].charAt(0) !== '/') {
-      config[key] = '/' + config[key];
+    if(config.hasOwnProperty(key)) {
+      if((key === 'url' || key === 'loginUrl') && config[key].charAt(0) !== '/') {
+        config[key] = '/' + config[key];
+      }
+      this[key] = config[key];
     }
-    this[key] = config[key];
   }
 
   //if server is remote use the full server url
@@ -54,8 +58,8 @@ h54s.Error = function(type, message) {
   if(Error.captureStackTrace) {
     Error.captureStackTrace(this);
   }
-  this.message = message;
-  this.type = type;
+  this.message  = message;
+  this.type     = type;
 };
 
 h54s.Error.prototype = Object.create(Error.prototype);
