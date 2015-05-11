@@ -30,7 +30,7 @@ Ext.define('h54sExample.view.LoginWindow', {
           }
         },
         change: function() {
-          this.up('window').down('label').hide();
+          this.up('window').down('label').setText('');
         }
       }
     }, {
@@ -50,16 +50,16 @@ Ext.define('h54sExample.view.LoginWindow', {
           }
         },
         change: function() {
-          this.up('window').down('label').hide();
+          this.up('window').down('label').setText('');
         }
       }
     }, {
       xtype: 'label',
       flex: 1,
-      hidden: true,
-      margin: '0 0 10 0',
+      height: 20,
       style: {
-        color: 'red'
+        textAlign: 'center',
+        lineHeight: '20px'
       }
     }, {
       xtype: 'container',
@@ -86,14 +86,21 @@ Ext.define('h54sExample.view.LoginWindow', {
   onOkClick: function () {
     var win = this;
 
-    var invalidLogonLabel = win.down('label');
+    var message = win.down('label');
+    var submitBtn = win.down('button');
     var user = win.down('textfield[name="ux"]').getValue();
     var pass = win.down('textfield[name="px"]').getValue();
 
+    submitBtn.disable();
+    message.setStyle('color', 'inherit');
+    message.setText('Authenticating...');
+    message.show();
+
     sasAdapter.login(user, pass, function (err) {
+      submitBtn.enable();
       if (err) {
-        invalidLogonLabel.setText(err);
-        invalidLogonLabel.show();
+        message.setStyle('color', 'red');
+        message.setText(err);
         return;
       }
       win.close();

@@ -89,15 +89,27 @@ Ext.define('h54sExample.sasAdapter', {
   getApplicationLogs: function() {
     return this._adapter.getApplicationLogs();
   },
+
   clearApplicationLogs: function() {
     this._adapter.clearApplicationLogs();
   },
+
+  getFailedRequests: function() {
+    return this._adapter.getFailedRequests();
+  },
+
+  clearFailedRequests: function() {
+    this._adapter.clearFailedRequests();
+  },
+
   clearDebugData: function() {
     this._adapter.clearDebugData();
   },
+
   clearSasErrors: function() {
     this._adapter.clearSasErrors();
   },
+
 
   //TODO: remove when date values are prefixed wit dt_ in SAS
   fromSasDateTime: function(time) {
