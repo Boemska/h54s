@@ -77,13 +77,12 @@ Ext.define('h54sExample.view.Dashboard', {
               }
             }
           }, {
-            xtype: 'tbfill'
-          }, {
             xtype: 'combobox',
             emptyText: 'Library',
             store: 'LibraryListStore',
             displayField: 'libname',
             queryMode: 'local',
+            labelWidth: 75,
             listeners: {
               select: function (e) {
                 var table = sasAdapter.createTable([
