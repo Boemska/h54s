@@ -35,8 +35,10 @@ sasAdapter.openLoginPopup = function() {
           actions: {
             save: function() {
               if(this.validate().length <= 0) {
+                this.lock();
                 var self = this;
                 sasAdapter.login(this.record.user, this.record.pass, function(status) {
+                  self.unlock();
                   if(status === -1) {
                     self.error('Wrong username or password');
                   } else if(status === 200) {
