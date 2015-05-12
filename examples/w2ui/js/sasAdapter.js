@@ -35,18 +35,24 @@ sasAdapter.openLoginPopup = function() {
           actions: {
             save: function() {
               if(this.validate().length <= 0) {
-                this.lock();
-                var self = this;
-                sasAdapter.login(this.record.user, this.record.pass, function(status) {
-                  self.unlock();
-                  if(status === -1) {
-                    self.error('Wrong username or password');
-                  } else if(status === 200) {
-                    looginPopup.close();
-                  } else {
-                    self.error('There was an error. Please try again.');
-                  }
-                });
+                if(!this.loggingIn) {
+                  this.loggingIn = true;
+                  this.lock();
+
+                  var self = this;
+                  sasAdapter.login(this.record.user, this.record.pass, function(status) {
+                    self.loggingIn = false;
+                    self.unlock();
+
+                    if(status === -1) {
+                      self.error('Wrong username or password');
+                    } else if(status === 200) {
+                      looginPopup.close();
+                    } else {
+                      self.error('There was an error. Please try again.');
+                    }
+                  });
+                }
               }
             }
           }
