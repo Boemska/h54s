@@ -64,11 +64,16 @@ app.controller('loginCtrl', ['$scope', '$location', 'sasAdapter', function($scop
     if(!$scope.user)
       return;
 
-    sasAdapter.login($scope.user.username, $scope.user.password).then(function() {
-      $location.path('/');
-    }, function(err) {
-      $scope.error = err.message;
-    });
+    if(!$scope.loggingIn) {
+      $scope.loggingIn = true;
+      sasAdapter.login($scope.user.username, $scope.user.password).then(function() {
+        $scope.loggingIn = false;
+        $location.path('/');
+      }, function(err) {
+        $scope.loggingIn = false;
+        $scope.error = err.message;
+      });
+    }
   };
 }]);
 
