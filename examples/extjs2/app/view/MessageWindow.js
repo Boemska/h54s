@@ -1,6 +1,7 @@
 /* global Ext, setTimeout */
 Ext.define('h54sExample.view.MessageWindow', {
   extend: 'Ext.window.Toast',
+  alias: 'widget.h54stoast',
 
   align: 'tr',
   paddingX: 10,

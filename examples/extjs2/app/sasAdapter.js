@@ -2,18 +2,18 @@
 Ext.define('h54sExample.sasAdapter', {
   alternateClassName: 'sasAdapter',
   singleton: true,
-  msgWindow: Ext.create('h54sExample.view.MessageWindow'),
 
-  constructor: function() {
+  constructor: function () {
+    //TODO: edit/remove url
     this._adapter = new h54s({
-      hostUrl: serverData.url
+      hostUrl: 'http://server57562.uk2net.com/'
     });
   },
 
-  login: function(user, pass, callback) {
+  login: function (user, pass, callback) {
     try {
-      this._adapter.login(user, pass, function(status) {
-        if(status === -1) {
+      this._adapter.login(user, pass, function (status) {
+        if (status === -1) {
           callback('Wrong username or password');
         } else {
           callback();
@@ -24,92 +24,92 @@ Ext.define('h54sExample.sasAdapter', {
     }
   },
 
-  call: function(sasProgram, tables, callback) {
+  call: function (sasProgram, tables, callback) {
+    if (!this.msgWindow) {
+      this.msgWindow = Ext.create('widget.h54stoast');
+    }
+
     var me = this;
     var msg = this.msgWindow.addLoadingMessage(sasProgram);
 
     try {
-      this._adapter.call(sasProgram, tables, function(err, res) {
-        if(err && (err.type === 'notLoggedinError' || err.type === 'loginError')) {
-          var loginWindow = Ext.create('h54sExample.view.LoginWindow');
-          var loading = Ext.get('loadingWrapper');
-          if (loading){
-            loading.remove();
-          }
+      this._adapter.call(sasProgram, tables, function (err, res) {
+        if (err && (err.type === 'notLoggedinError' || err.type === 'loginError')) {
+          //TODO: edit app name
+          var loginWindow = Ext.create('widget.LoginWindow');
           loginWindow.show();
         } else {
-          if(err) {
+          if (err) {
             msg.setError();
           } else {
             msg.setLoaded();
           }
-          if(res && res.usermessage) {
+          if (res && res.usermessage) {
             me.msgWindow.addUserMessage(res.usermessage);
           }
           callback(err, res);
         }
 
         //update debug data
-        setTimeout(function() {
+        setTimeout(function () {
           var debugWindow = Ext.getCmp('debugWindow');
-          if(debugWindow) {
+          if (debugWindow) {
             debugWindow.updateData();
           }
         }, 10);
       });
-    } catch(e) {
+    } catch (e) {
       callback(e.message);
+      setTimeout(function () {
+        msg.setError();
+      }, 200);
     }
   },
 
-  createTable: function(table, macro) {
+  createTable: function (table, macro) {
     return new h54s.Tables(table, macro);
   },
 
-  setDebugMode: function() {
+  setDebugMode: function () {
     this._adapter.setDebugMode();
   },
 
-  unsetDebugMode: function() {
+  unsetDebugMode: function () {
     this._adapter.unsetDebugMode();
   },
 
-  getDebugMode: function() {
+  getDebugMode: function () {
     return this._adapter.debug;
   },
 
-  getSasErrors: function() {
+  getSasErrors: function () {
     return this._adapter.getSasErrors();
   },
 
-  getDebugData: function() {
+  getDebugData: function () {
     return this._adapter.getDebugData();
   },
 
-  getApplicationLogs: function() {
+  getApplicationLogs: function () {
     return this._adapter.getApplicationLogs();
   },
 
-  clearApplicationLogs: function() {
-    this._adapter.clearApplicationLogs();
-  },
-
-  getFailedRequests: function() {
+  getFailedRequests: function () {
     return this._adapter.getFailedRequests();
   },
 
-  clearFailedRequests: function() {
-    this._adapter.clearFailedRequests();
+  clearApplicationLogs: function () {
+    this._adapter.clearApplicationLogs();
   },
-
-  clearDebugData: function() {
+  clearDebugData: function () {
     this._adapter.clearDebugData();
   },
-
-  clearSasErrors: function() {
+  clearSasErrors: function () {
     this._adapter.clearSasErrors();
   },
-
+  clearFailedRequests: function () {
+    this._adapter.clearFailedRequests();
+  },
 
   //TODO: remove when date values are prefixed wit dt_ in SAS
   fromSasDateTime: function(time) {

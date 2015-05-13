@@ -1,6 +1,7 @@
 /* global Ext, sasAdapter */
 Ext.define('h54sExample.view.LoginWindow', {
   extend: 'Ext.window.Window',
+  alias: 'widget.LoginWindow',
 
   width: 328,
   bodyPadding: 10,
