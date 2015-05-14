@@ -6,7 +6,7 @@ HTML5 Data Adapter for SAS (‘h54s’ for short) lets SAS BI customers engage w
 Copy /dist/h54s-[version].js to your project, include it in your html page and create instance of the h54s object.
 
 Creating the instance:
-```
+```js
 var adapter = new h54s(config);
 ```
 
@@ -14,7 +14,7 @@ Config parameter is configuration object. If you omit the config parameter, h54s
 
 Default configuration looks like this:
 
-```
+```js
 {
   url: '/SASStoredProcess/do',
   debug: false,
@@ -31,14 +31,14 @@ Default configuration looks like this:
 
 
 You can also provide hostUrl if your SAS instance is on another domain:
-```
+```js
 var adapter = new h54s({
   hostUrl: 'http://www.example.com/'
 });
 ```
 
 Or with some other config parameters:
-```
+```js
 var adapter = new h54s({
   debug: true,
   maxXhrRetries: 0 //don't retry if we get error or no data
@@ -50,7 +50,7 @@ var adapter = new h54s({
 ###call(sasProgram, tablesObj, callback)
 Calls SAS program and returns data in callback function.
 Example:
-```
+```js
 adapter.call('/sas_programs/test', tablesObj, function(err, res){
   if(err) {
     //Houston we have a problem
@@ -59,7 +59,7 @@ adapter.call('/sas_programs/test', tablesObj, function(err, res){
     console.log(res);
   }
 });
-```
+```js
 >`tablesObj` is instance of h54s.Tables. Should be `null` if you are not sending anything.
 
 >`err` is a custom javascript Error object with one extra field - type.
@@ -82,7 +82,7 @@ adapter.call('/sas_programs/test', tablesObj, function(err, res){
 ###login(user, pass, callback)
 Log in.
 Example:
-```
+```js
 adapter.login('username', 'password', function(status) {
   if(status === -1) {
     //Wrong username or password
@@ -100,7 +100,7 @@ adapter.login('username', 'password', function(status) {
 ###h54s.Tables(tableArray, macroName)
 Creates object with tables which are then sent to the server in `call` method.
 
-```
+```js
 var tables = new h54s.Tables([
   {
     libname: 'WORK',
@@ -114,7 +114,7 @@ var tables = new h54s.Tables([
 ###h54s.Tables.prototype.add(tableArray, macroName)
 Add new table to tables object
 
-```
+```js
 var tables = new h54s.Tables([
   {
     libname: 'WORK',
@@ -136,7 +136,7 @@ tables.add([
 Returns SAS program errors.
 Last 100 SAS errors are saved by adapter.
 It returns array of objects:
-```
+```js
 var errors = adapter.getSasErrors();
 ```
 
@@ -150,7 +150,7 @@ var errors = adapter.getSasErrors();
 
 ###getApplicationLogs()
 Array of log strings:
-```
+```js
 var appLogs = adapter.getApplicationLogs();
 ```
 
@@ -160,7 +160,7 @@ var appLogs = adapter.getApplicationLogs();
 
 ###getDebugData()
 When in debugging mode (`debug: true`), adapter will save every response from the server.
-```
+```js
 var debugData = adapter.getDebugData();
 ```
 
@@ -179,7 +179,7 @@ var debugData = adapter.getDebugData();
 ###getFailedRequests()
 Note that failed requests array is populated only if debug mode is turned off (debug: false)
 
-```
+```js
 var failedRequests = adapter.getFailedRequests();
 ```
 
@@ -195,14 +195,14 @@ var failedRequests = adapter.getFailedRequests();
 
 ###setDebugMode()
 Set debugging mode - `debug:true`:
-```
+```js
 adapter.setDebugMode();
 ```
 
 
 ###unsetDebugMode()
 Unset  debugging mode - `debug:false`:
-```
+```js
 adapter.unsetDebugMode();
 ```
 
@@ -210,7 +210,7 @@ adapter.unsetDebugMode();
 
 ###clearApplicationLogs()
 Clears application logs array
-```
+```js
 adapter.clearApplicationLogs();
 ```
 
@@ -218,7 +218,7 @@ adapter.clearApplicationLogs();
 
 ###clearDebugData()
 Clears debug data array
-```
+```js
 adapter.clearDebugData()
 ```
 
@@ -226,7 +226,7 @@ adapter.clearDebugData()
 
 ###clearSasErrors()
 Clears sas errors array
-```
+```js
 adapter.clearSasErrors()
 ```
 
@@ -234,7 +234,7 @@ adapter.clearSasErrors()
 
 ###clearFailedRequests()
 Clears failed requests array
-```
+```js
 adapter.clearFailedRequests()
 ```
 
@@ -242,12 +242,12 @@ adapter.clearFailedRequests()
 
 ###clearAllLogs()
 Clears all log array
-```
+```js
 adapter.clearAllLogs()
 ```
 
 It's the same as:
-```
+```js
 adapter.clearApplicationLogs();
 adapter.clearDebugData();
 adapter.clearSasErrors();
