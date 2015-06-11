@@ -59,7 +59,7 @@ adapter.call('/sas_programs/test', tablesObj, function(err, res){
     console.log(res);
   }
 });
-```js
+```
 >`tablesObj` is instance of h54s.Tables. Should be `null` if you are not sending anything.
 
 >`err` is a custom javascript Error object with one extra field - type.
