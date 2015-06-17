@@ -75,7 +75,7 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
         self._utils.addApplicationLogs('Cannot extract _sasapp parameter from login URL');
         console.warn('Cannot extract _sasapp parameter from login URL');
       } else {
-        self._sasApp = sasAppMatches[1];
+        self.sasApp = sasAppMatches[1];
       }
 
       callback(new h54s.Error('notLoggedinError', 'You are not logged in'));
@@ -162,7 +162,7 @@ h54s.prototype.login = function(user, pass, callback) {
   };
 
   this._utils.ajax.post(this.loginUrl, {
-    _sasapp: self._sasApp,
+    _sasapp: self.sasApp,
     _service: 'default',
     ux: user,
     px: pass,
@@ -186,7 +186,7 @@ h54s.prototype.login = function(user, pass, callback) {
       }
     }
   }).error(function(res) {
-    //NOTE: error 502 if _sasApp parameter is wrong
+    //NOTE: error 502 if sasApp parameter is wrong
     self._utils.addApplicationLogs('Login failed with status code: ' + res.status);
     callCallback(res.status);
   });
