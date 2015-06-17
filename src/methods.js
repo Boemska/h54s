@@ -75,7 +75,7 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
         self._utils.addApplicationLogs('Cannot extract _sasapp parameter from login URL');
         console.warn('Cannot extract _sasapp parameter from login URL');
       } else {
-        self.sasApp = sasAppMatches[1];
+        self.sasApp = sasAppMatches[1].replace(/\+/g, ' ');
       }
 
       callback(new h54s.Error('notLoggedinError', 'You are not logged in'));
