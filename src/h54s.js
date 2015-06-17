@@ -14,6 +14,7 @@ var h54s = function(config) {
   this.debug            = false;
   this.loginUrl         = '/SASLogon/Logon.do';
   this.retryAfterLogin  = true;
+  this._sasApp          = 'Stored Process Web App 9.3';
 
   this._pendingCalls    = [];
 
