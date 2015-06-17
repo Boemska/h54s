@@ -6,7 +6,7 @@ Ext.define('h54sExample.sasAdapter', {
   constructor: function () {
     //TODO: edit/remove url
     this._adapter = new h54s({
-      hostUrl: 'http://server57562.uk2net.com/'
+      hostUrl: serverData.url
     });
   },
 

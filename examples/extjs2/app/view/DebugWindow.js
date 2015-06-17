@@ -1,3 +1,4 @@
+/* global Ext, sasAdapter */
 Ext.define('h54sExample.view.DebugWindow', {
   extend: 'Ext.window.Window',
 

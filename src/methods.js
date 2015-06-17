@@ -1,4 +1,4 @@
-/* global h54s */
+/* global h54s, console */
 
 /*
 * Call Sas program

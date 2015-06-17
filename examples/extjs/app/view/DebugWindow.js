@@ -1,3 +1,4 @@
+/* global Ext, sasAdapter, setTimeout */
 Ext.define('h54sExample.view.DebugWindow', {
   extend: 'Ext.window.Window',
   alias: 'widget.debugwindow',
@@ -227,7 +228,7 @@ Ext.define('h54sExample.view.DebugWindow', {
                         },
             {
               xtype: 'button',
-              handler: function (button, e) {
+              handler: function () {
                 var win = this.up('window');
                 var tab = win.down('tabpanel').getActiveTab();
                 switch (tab.itemId) {
@@ -263,15 +264,15 @@ Ext.define('h54sExample.view.DebugWindow', {
     afterrender: 'onDebugWindowAfterRender'
   },
 
-  onDebugDataDestroy: function (component, eOpts) {
+  onDebugDataDestroy: function (component) {
     component.addedItems.length = 0;
   },
 
-  onFailedRequestsDestroy: function (component, eOpts) {
+  onFailedRequestsDestroy: function (component) {
     component.addedItems.length = 0;
   },
 
-  onTabpanelTabChange: function (tabPanel, newCard, oldCard, eOpts) {
+  onTabpanelTabChange: function (tabPanel, newCard) {
     newCard.mask('Loading');
     setTimeout(function () {
       newCard.updateTabData();
@@ -279,11 +280,11 @@ Ext.define('h54sExample.view.DebugWindow', {
     }, 0);
   },
 
-  onDebugWindowClose: function (panel, eOpts) {
+  onDebugWindowClose: function () {
     sasAdapter.unsetDebugMode();
   },
 
-  onDebugWindowAfterRender: function (component, eOpts) {
+  onDebugWindowAfterRender: function (component) {
     var width = Math.min(Ext.getBody().getViewSize().width, 800);
     this.setWidth(width);
     this.setHeight(Ext.getBody().getViewSize().height);
