@@ -25,6 +25,7 @@ Default configuration looks like this:
 }
 ```
 > `maxXhrRetries` is number of retries if request failed with sas error or no data.
+
 > `sasApp` is SAS version - _sasapp parameter on login redirect
 
 
