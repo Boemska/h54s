@@ -91,7 +91,7 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
           if(retryCount < self.maxXhrRetries) {
             self._utils.ajax.post(self.url, params).success(this.success).error(this.error);
             retryCount++;
-            self._utils.addApplicationLogs("Retrying #" + retryCount);
+            self._utils.addApplicationLogs("Retrying #" + retryCount, sasProgram);
           } else {
             self._utils.parseErrorResponse(res.responseText, sasProgram);
             self._utils.addFailedResponse(res.responseText, sasProgram);
@@ -99,7 +99,7 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
           }
         } finally {
           if(unescapedResObj) {
-            self._utils.addApplicationLogs(resObj.logmessage);
+            self._utils.addApplicationLogs(resObj.logmessage, sasProgram);
             callback(undefined, unescapedResObj);
           }
         }
@@ -124,7 +124,7 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
       }
     }
   }).error(function(res) {
-    self._utils.addApplicationLogs('Request failed with status: ' + res.status);
+    self._utils.addApplicationLogs('Request failed with status: ' + res.status, sasProgram);
     callback(new h54s.Error('httpError', res.statusText));
   });
 };

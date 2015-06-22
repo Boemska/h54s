@@ -345,13 +345,14 @@ h54s.prototype._utils.decodeHTMLEntities = function (html) {
 * @param {string} res - server response
 *
 */
-h54s.prototype._utils.addApplicationLogs = function(message) {
+h54s.prototype._utils.addApplicationLogs = function(message, sasProgram) {
   if(message === 'blank') {
     return;
   }
   var log = {
-    message: message,
-    time:    new Date()
+    message:    message,
+    time:       new Date(),
+    sasProgram: sasProgram
   };
   this._applicationLogs.push(log);
 
