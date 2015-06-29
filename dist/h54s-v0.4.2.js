@@ -1,4 +1,4 @@
-/*! h54s v0.4.2 - 2015-06-26 
+/*! h54s v0.4.2 - 2015-06-29 
  *  License: GPL 
  *  Author: Boemska 
 */
@@ -137,7 +137,7 @@ h54s.Tables = function(table, macroName) {
   this.add(table, macroName);
 };
 
-/* global h54s, console */
+/* global h54s */
 
 /*
 * Call Sas program
@@ -214,7 +214,6 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
         self.sasApp = sasAppMatches[1].replace(/\+/g, ' ');
       } catch(e) {
         self._utils.addApplicationLogs('Cannot extract _sasapp parameter from login URL');
-        console.warn('Cannot extract _sasapp parameter from login URL');
       }
 
       callback(new h54s.Error('notLoggedinError', 'You are not logged in'));
