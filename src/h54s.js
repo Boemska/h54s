@@ -15,6 +15,7 @@ var h54s = function(config) {
   this.loginUrl         = '/SASLogon/Logon.do';
   this.retryAfterLogin  = true;
   this.sasApp           = 'Stored Process Web App 9.3';
+  this.ajaxTimeout      = 30000;
 
   this._pendingCalls    = [];
 
@@ -45,6 +46,8 @@ var h54s = function(config) {
     this.url      = config.hostUrl + this.url;
     this.loginUrl = config.hostUrl + this.loginUrl;
   }
+
+  this._utils.ajax.setTimeout(this.ajaxTimeout);
 };
 
 /*

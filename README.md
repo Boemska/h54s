@@ -21,7 +21,8 @@ Default configuration looks like this:
   loginUrl: '/SASLogon/Logon.do',
   maxXhrRetries: 5,
   retryAfterLogin: true
-  sasApp: 'Stored Process Web App 9.3'
+  sasApp: 'Stored Process Web App 9.3',
+  ajaxTimeout: 30000
 }
 ```
 > `maxXhrRetries` is number of retries if request failed with sas error or no data.
@@ -44,7 +45,8 @@ Or with some other config parameters:
 ```js
 var adapter = new h54s({
   debug: true,
-  maxXhrRetries: 0 //don't retry if we get error or no data
+  maxXhrRetries: 0, //don't retry if we get error or no data
+  ajaxTimeout: 0 //no ajax timeout
 });
 ```
 
