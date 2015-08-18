@@ -40,6 +40,7 @@ var adapter = new h54s({
   hostUrl: 'http://www.example.com/'
 });
 ```
+> Note that this is not allowed by browsers Same-origin policy which can be disabled in modern browsers for testing.
 
 Or with some other config parameters:
 ```js
