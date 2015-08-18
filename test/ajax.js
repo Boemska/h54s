@@ -45,7 +45,7 @@ describe('h54s', function() {
     it('Test timeout', function(done) {
       this.timeout(10000);
       var sasAdapter = new h54s({
-        ajaxTimeout: 1 //30ms
+        ajaxTimeout: 1 //1ms
       });
       assert.isDefined(sasAdapter._utils.ajax, 'Ajax is not defined');
       assert.isFunction(sasAdapter._utils.ajax.setTimeout, 'Ajax get method is not defined');
