@@ -1,4 +1,4 @@
-/*! h54s v0.5.0 - 2015-08-18 
+/*! h54s v0.5.0 - 2015-08-19 
  *  License: GPL 
  *  Author: Boemska 
 */
@@ -453,7 +453,7 @@ h54s.Tables.prototype.add = function(table, macroName) {
   this._tables[macroName] = tableArray;
 };
 
-/* global h54s, XMLHttpRequest, ActiveXObject, document */
+/* global h54s, XMLHttpRequest, ActiveXObject, document, clearTimeout, setTimeout */
 h54s.prototype._utils                   = {};
 h54s.Tables.prototype._utils            = {};
 h54s.prototype._utils._applicationLogs  = [];
@@ -463,6 +463,8 @@ h54s.prototype._utils._failedRequests   = [];
 
 h54s.prototype._utils.ajax = (function () {
   var timeout = 30000;
+  var timeoutHandle;
+
   var xhr = function(type, url, data) {
     var methods = {
       success: function() {},
@@ -475,6 +477,7 @@ h54s.prototype._utils.ajax = (function () {
     request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     request.onreadystatechange = function () {
       if (request.readyState === 4) {
+        clearTimeout(timeoutHandle);
         if (request.status >= 200 && request.status < 300) {
           methods.success.call(methods, request);
         } else {
@@ -483,7 +486,9 @@ h54s.prototype._utils.ajax = (function () {
       }
     };
 
-    request.timeout = timeout;
+    timeoutHandle = setTimeout(function() {
+      request.abort();
+    }, timeout);
 
     request.send(data);
 

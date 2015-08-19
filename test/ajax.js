@@ -59,8 +59,8 @@ describe('h54s', function() {
       }).success(function(res) {
         assert.notOk(res, 'Ajax response is undefined');
         done();
-      }).error(function(res) {
-        assert.equal(res.status, 0, 'Ajax request should have been aborted');
+      }).error(function() {
+        //it's supposed to throw an error
         done();
       });
     });
