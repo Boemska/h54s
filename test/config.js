@@ -53,7 +53,6 @@ describe('h54s', function() {
       done();
     });
 
-    //TODO: this test should run when we figure how to serve static json file with config using grunt and karma
     it('Test remote config', function(done) {
       var sasAdapter = new h54s({
         isRemoteConfig: true,
