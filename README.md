@@ -30,8 +30,9 @@ Default configuration looks like this:
 
 > `sasApp` is SAS version - _sasapp parameter on login redirect
 
-> Set `isRemoteConfig` to true if you want the adapter to use config from the file called `h54sConfig.json` at the root of you web app.
+> Set `isRemoteConfig` to true if you want the adapter to use config from the file called `h54sConfig.json` at the root of your web application.
 > Config properties in the constructor will override the remote properties.
+> You can register functions which are automatically executed when remote config is loaded using `adapter.onRemoteConfigUpdate(callbackFn)`
 
 
 > Disabled calls will be executed automatically after login if `retryAfterLogin` is set to true.
