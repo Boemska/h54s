@@ -22,16 +22,20 @@ Default configuration looks like this:
   maxXhrRetries: 5,
   retryAfterLogin: true
   sasApp: 'Stored Process Web App 9.3',
-  ajaxTimeout: 30000
+  ajaxTimeout: 30000,
+  isRemoteConfig: false
 }
 ```
 > `maxXhrRetries` is number of retries if request failed with sas error or no data.
 
 > `sasApp` is SAS version - _sasapp parameter on login redirect
 
+> Set `isRemoteConfig` to true if you want the adapter to use config from the file called `h54sConfig.json` at the root of you web app.
+> Config properties in the constructor will override the remote properties.
 
-> Note that if one request fails with `err.type = 'notLoggedinError'`, other calls will be disabled.
+
 > Disabled calls will be executed automatically after login if `retryAfterLogin` is set to true.
+> If one request fails with `err.type = 'notLoggedinError'`, other calls will be disabled, and executed or not based on the `retryAfterLogin` property.
 
 
 You can also provide hostUrl if your SAS instance is on another domain:

@@ -32,7 +32,10 @@ module.exports = function (grunt) {
     },
     concat: {
       options: {
-        banner: bannerContent
+        banner: bannerContent,
+        process: function(src, filepath) {
+          return src.replace("('/base/test/h54sConfig.json')", "('h54sConfig.json')");
+        }
       },
       target: {
         src: srcFiles,

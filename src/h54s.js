@@ -87,6 +87,12 @@ h54s.Tables = function(table, macroName) {
   this.add(table, macroName);
 };
 
+/*
+* private function to set h54s instance properties
+*
+*@param {object} config - adapter config object, with keys like url, debug, etc.
+*
+*/
 function _setConfig(config) {
   if(!config) {
     return;
