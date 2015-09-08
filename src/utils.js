@@ -70,7 +70,7 @@ h54s.prototype._utils.ajax = (function () {
       if(typeof data === 'object') {
         dataStr = serialize(data);
       }
-      var urlWithParams = dataStr ? (url + '?' + dataStr) : '';
+      var urlWithParams = dataStr ? (url + '?' + dataStr) : url;
       return xhr('GET', urlWithParams);
     },
     post: function(url, data) {

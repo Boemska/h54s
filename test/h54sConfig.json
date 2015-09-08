@@ -1,0 +1,10 @@
+{
+  "url": "/SASStoredProcess/do",
+  "debug": true,
+  "loginUrl": "/SASLogon/Logon.do",
+  "maxXhrRetries": 2,
+  "retryAfterLogin": true,
+  "sasApp": "Stored Process Web App 9.3",
+  "ajaxTimeout": 20000,
+  "metadataRoot": "/AJAX/"
+}

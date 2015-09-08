@@ -53,7 +53,11 @@ module.exports = function (grunt) {
     },
     karma: {
       options: {
-        files: srcFiles.concat(['test/**/*.js'])
+        files: [
+          'src/**/*.js',
+          'test/**/*.js',
+          {pattern: 'test/**/*.json', served: true, included: false}
+        ],
       },
       dev: {
         configFile: 'karma.conf.js',

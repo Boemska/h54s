@@ -19,35 +19,31 @@ var h54s = function(config) {
 
   this._pendingCalls    = [];
 
+  if(config && config.isRemoteConfig) {
+    var self = this;
 
-  if(!config) {
-    return;
-  } else if(typeof config !== 'object') {
-    throw new h54s.Error('argumentError', 'First parameter should be config object');
-  }
+    this._disableCalls = true;
+    ///'base/test/h54sConfig.json' is for the testing with karma
+    this._utils.ajax.get('h54sConfig.json').success(function(res) {
+      config = JSON.parse(res.responseText);
 
-  //merge config object from parameter with this
-  for(var key in config) {
-    if(config.hasOwnProperty(key)) {
-      if((key === 'url' || key === 'loginUrl') && config[key].charAt(0) !== '/') {
-        config[key] = '/' + config[key];
+      _setConfig.call(self, config);
+
+      //execute calls disabled while waiting for the config
+      self._disableCalls = false;
+      while(self._pendingCalls.length > 0) {
+        var pendingCall = self._pendingCalls.shift();
+        var sasProgram  = pendingCall.sasProgram;
+        var callback    = pendingCall.callback;
+        var params      = pendingCall.params;
+        self.call(sasProgram, null, callback, params);
       }
-      this[key] = config[key];
-    }
+    }).error(function (err) {
+      throw new h54s.Error('ajaxError', 'Remote config cannot be loaded');
+    });
+  } else {
+    _setConfig.call(this, config);
   }
-
-  //if server is remote use the full server url
-  //NOTE: this is not permited by the same-origin policy
-  if(config.hostUrl) {
-    if(config.hostUrl.charAt(config.hostUrl.length - 1) === '/') {
-      config.hostUrl = config.hostUrl.slice(0, -1);
-    }
-    this.hostUrl  = config.hostUrl;
-    this.url      = config.hostUrl + this.url;
-    this.loginUrl = config.hostUrl + this.loginUrl;
-  }
-
-  this._utils.ajax.setTimeout(this.ajaxTimeout);
 };
 
 /*
@@ -81,3 +77,34 @@ h54s.Tables = function(table, macroName) {
 
   this.add(table, macroName);
 };
+
+function _setConfig(config) {
+  if(!config) {
+    return;
+  } else if(typeof config !== 'object') {
+    throw new h54s.Error('argumentError', 'First parameter should be config object');
+  }
+
+  //merge config object from parameter with this
+  for(var key in config) {
+    if(config.hasOwnProperty(key)) {
+      if((key === 'url' || key === 'loginUrl') && config[key].charAt(0) !== '/') {
+        config[key] = '/' + config[key];
+      }
+      this[key] = config[key];
+    }
+  }
+
+  //if server is remote use the full server url
+  //NOTE: this is not permited by the same-origin policy
+  if(config.hostUrl) {
+    if(config.hostUrl.charAt(config.hostUrl.length - 1) === '/') {
+      config.hostUrl = config.hostUrl.slice(0, -1);
+    }
+    this.hostUrl  = config.hostUrl;
+    this.url      = config.hostUrl + this.url;
+    this.loginUrl = config.hostUrl + this.loginUrl;
+  }
+
+  this._utils.ajax.setTimeout(this.ajaxTimeout);
+}
