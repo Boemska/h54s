@@ -70,5 +70,17 @@ describe('h54s', function() {
       }, 100);
     });
 
+    it('Test config override with call', function(done) {
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url,
+        isRemoteConfig: true
+      });
+
+      sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err) {
+        assert.isUndefined(err, 'We got error on sas program ajax call');
+        done();
+      });
+    });
+
   });
 });

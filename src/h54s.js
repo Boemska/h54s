@@ -45,6 +45,10 @@ var h54s = function(config) {
         var sasProgram  = pendingCall.sasProgram;
         var callback    = pendingCall.callback;
         var params      = pendingCall.params;
+
+        //update debug because it may change in the meantime
+        params._debug = self.debug ? 131 : 0;
+
         self.call(sasProgram, null, callback, params);
       }
     }).error(function (err) {
