@@ -9,6 +9,7 @@
 */
 var h54s = function(config) {
 
+  //default config values
   this.maxXhrRetries    = 5;
   this.url              = "/SASStoredProcess/do";
   this.debug            = false;
@@ -23,9 +24,17 @@ var h54s = function(config) {
     var self = this;
 
     this._disableCalls = true;
-    ///'base/test/h54sConfig.json' is for the testing with karma
-    this._utils.ajax.get('h54sConfig.json').success(function(res) {
-      config = JSON.parse(res.responseText);
+
+    // '/base/test/h54sConfig.json' is for the testing with karma
+    //replaced with grunt concat in build
+    this._utils.ajax.get('/base/test/h54sConfig.json').success(function(res) {
+      var remoteConfig = JSON.parse(res.responseText);
+
+      for(var key in remoteConfig) {
+        if(remoteConfig.hasOwnProperty(key) && config[key] === undefined && key !== 'isRemoteConfig') {
+          config[key] = remoteConfig[key];
+        }
+      }
 
       _setConfig.call(self, config);
 
@@ -39,7 +48,7 @@ var h54s = function(config) {
         self.call(sasProgram, null, callback, params);
       }
     }).error(function (err) {
-      throw new h54s.Error('ajaxError', 'Remote config cannot be loaded');
+      throw new h54s.Error('ajaxError', 'Remote config file cannot be loaded. Http status code: ' + err.status);
     });
   } else {
     _setConfig.call(this, config);

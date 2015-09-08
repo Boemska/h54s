@@ -1,4 +1,4 @@
-/* global describe, it, assert, serverData, h54s, proclaim */
+/* global describe, it, assert, serverData, h54s, proclaim, setTimeout */
 describe('h54s', function() {
   describe('init:', function() {
 
@@ -56,13 +56,18 @@ describe('h54s', function() {
     //TODO: this test should run when we figure how to serve static json file with config using grunt and karma
     it('Test remote config', function(done) {
       var sasAdapter = new h54s({
-        isRemoteConfig: true
+        isRemoteConfig: true,
+        debug: false
       });
       //wait for the file
       setTimeout(function() {
+        console.log(sasAdapter);
         assert.equal('/SASStoredProcess/do', sasAdapter.url, 'Url is not set with config');
-        assert.equal('/AJAX/', sasAdapter.metadataRoot, 'Metadata root is wrong');
-        assert.equal(20000, sasAdapter.ajaxTimeout, 'Metadata root is wrong');
+        assert.equal('/AJAX/', sasAdapter.metadataRoot, 'Metadata root has wrong value');
+        assert.equal(20000, sasAdapter.ajaxTimeout, 'Aajax timeout has wrong value');
+        //config property should have higher priority over remote config properties
+        //so debug should be false from the constructor - override the remote config property
+        assert.isFalse(sasAdapter.debug, 'Constructor config is not overriding the remote config');
         done();
       }, 100);
     });
