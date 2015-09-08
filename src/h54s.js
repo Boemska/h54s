@@ -18,6 +18,8 @@ var h54s = function(config) {
   this.sasApp           = 'Stored Process Web App 9.3';
   this.ajaxTimeout      = 30000;
 
+  this.remoteConfigUpdateCallbacks = [];
+
   this._pendingCalls    = [];
 
   if(config && config.isRemoteConfig) {
@@ -38,7 +40,14 @@ var h54s = function(config) {
 
       _setConfig.call(self, config);
 
-      //execute calls disabled while waiting for the config
+      //execute callbacks when we have remote config
+      //note that remote conifg is merged with instance config
+      for(var i = 0, n = self.remoteConfigUpdateCallbacks.length; i < n; i++) {
+        var fn = self.remoteConfigUpdateCallbacks[i];
+        fn();
+      }
+
+      //execute sas calls disabled while waiting for the config
       self._disableCalls = false;
       while(self._pendingCalls.length > 0) {
         var pendingCall = self._pendingCalls.shift();
@@ -57,6 +66,16 @@ var h54s = function(config) {
   } else {
     _setConfig.call(this, config);
   }
+};
+
+/*
+* Add callback functions executed when properties are updated with remote config
+*
+*@callback - callback pushed to array
+*
+*/
+h54s.prototype.onRemoteConfigUpdate = function(callback) {
+  this.remoteConfigUpdateCallbacks.push(callback);
 };
 
 /*

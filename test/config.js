@@ -60,9 +60,9 @@ describe('h54s', function() {
       });
       //wait for the file
       setTimeout(function() {
-        assert.equal('/SASStoredProcess/do', sasAdapter.url, 'Url is not set with config');
-        assert.equal('/AJAX/', sasAdapter.metadataRoot, 'Metadata root has wrong value');
-        assert.equal(20000, sasAdapter.ajaxTimeout, 'Aajax timeout has wrong value');
+        assert.equal(sasAdapter.url, '/SASStoredProcess/do', 'Url is not set with config');
+        assert.equal(sasAdapter.metadataRoot, '/AJAX/', 'Metadata root has wrong value');
+        assert.equal(sasAdapter.ajaxTimeout, 20000, 'Aajax timeout has wrong value');
         //config property should have higher priority over remote config properties
         //so debug should be false from the constructor - override the remote config property
         assert.isFalse(sasAdapter.debug, 'Constructor config is not overriding the remote config');
@@ -78,6 +78,21 @@ describe('h54s', function() {
 
       sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err) {
         assert.isUndefined(err, 'We got error on sas program ajax call');
+        done();
+      });
+    });
+
+    it('Test remote config load event', function(done) {
+      var sasAdapter = new h54s({
+        isRemoteConfig: true
+      });
+
+      //it should be false - default from the constructor
+      assert.isFalse(sasAdapter.debug, 'Debug property should be false at this point');
+
+      sasAdapter.onRemoteConfigUpdate(function() {
+        //same as in h54sConfig.json
+        assert.isTrue(sasAdapter.debug, 'We have wrong value for debug property');
         done();
       });
     });
