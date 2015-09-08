@@ -61,7 +61,6 @@ describe('h54s', function() {
       });
       //wait for the file
       setTimeout(function() {
-        console.log(sasAdapter);
         assert.equal('/SASStoredProcess/do', sasAdapter.url, 'Url is not set with config');
         assert.equal('/AJAX/', sasAdapter.metadataRoot, 'Metadata root has wrong value');
         assert.equal(20000, sasAdapter.ajaxTimeout, 'Aajax timeout has wrong value');
