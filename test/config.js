@@ -119,5 +119,36 @@ describe('h54s', function() {
       done();
     });
 
+    it('Test metadataRoot value', function(done) {
+      var callback = function() {};
+      var expectedProgram = '/ajax/program.sas';
+
+      var sasAdapter = new h54s({
+        metadataRoot: '/ajax/'
+      });
+
+      sasAdapter._disableCalls = true; //disable calls for testing
+
+      sasAdapter.call('program.sas', null, callback);
+      sasAdapter.call('/program.sas', null, callback);
+
+      assert.equal(sasAdapter._pendingCalls[0].params._program, expectedProgram, 'Wrong _program parameter - attempt 1');
+      assert.equal(sasAdapter._pendingCalls[1].params._program, expectedProgram, 'Wrong _program parameter - attempt 2');
+
+      sasAdapter = new h54s({
+        metadataRoot: '/ajax'
+      });
+
+      sasAdapter._disableCalls = true; //disable calls for testing
+
+      sasAdapter.call('program.sas', null, callback);
+      sasAdapter.call('/program.sas', null, callback);
+
+      assert.equal(sasAdapter._pendingCalls[0].params._program, expectedProgram, 'Wrong _program parameter - attempt 3');
+      assert.equal(sasAdapter._pendingCalls[1].params._program, expectedProgram, 'Wrong _program parameter - attempt 4');
+
+      done();
+    });
+
   });
 });
