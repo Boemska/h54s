@@ -37,18 +37,18 @@ describe('h54s', function() {
           libname: 'WORK',
           memname: 'CHOSENLIB'
         }
-      ], 'data1');
+      ], 'dataOne');
 
-      assert.isDefined(data._tables.data1, 'data1 macro not inserted');
+      assert.isDefined(data._tables.dataOne, 'dataOne macro not inserted');
 
       data.add([
         {
           libname: 'Test',
           memname: 'chl'
         }
-      ], 'data2');
+      ], 'dataTwo');
 
-      assert.isDefined(data._tables.data2, 'data2 macro not inserted');
+      assert.isDefined(data._tables.dataTwo, 'dataTwo macro not inserted');
 
       done();
     });
@@ -71,6 +71,7 @@ describe('h54s', function() {
     });
 
     it('Test config override with call', function(done) {
+      this.timeout(4000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url,
         isRemoteConfig: true
@@ -95,6 +96,27 @@ describe('h54s', function() {
         assert.isTrue(sasAdapter.debug, 'We have wrong value for debug property');
         done();
       });
+    });
+
+    it('Test macrro name exception with number at the end', function(done) {
+      proclaim.throws(function() {
+        var data = new h54s.Tables([
+          {
+            libname: 'WORK',
+            memname: 'CHOSENLIB'
+          }
+        ], 'data1');
+      }, 'Macro name cannot have number at the end');
+
+      proclaim.doesNotThrow(function() {
+        var data = new h54s.Tables([
+          {
+            libname: 'WORK',
+            memname: 'CHOSENLIB'
+          }
+        ], 'dataOne');
+      });
+      done();
     });
 
   });

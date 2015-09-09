@@ -300,6 +300,9 @@ h54s.Tables.prototype.add = function(table, macroName) {
     if(typeof macroName !== 'string') {
       throw new h54s.Error('argumentError', 'Second argument must be string');
     }
+    if(!isNaN(macroName[macroName.length - 1])) {
+      throw new h54s.Error('argumentError', 'Macro name cannot have number at the end');
+    }
   } else {
     throw new h54s.Error('argumentError', 'Missing arguments');
   }
