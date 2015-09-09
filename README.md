@@ -23,12 +23,16 @@ Default configuration looks like this:
   retryAfterLogin: true
   sasApp: 'Stored Process Web App 9.3',
   ajaxTimeout: 30000,
-  isRemoteConfig: false
+  isRemoteConfig: false,
+  metadataRoot: undefined
 }
 ```
-> `maxXhrRetries` is number of retries if request failed with sas error or no data.
+> `maxXhrRetries` is number of retries if request failed with SAS error or no data.
 
 > `sasApp` is SAS version - _sasapp parameter on login redirect
+
+> Define `metadataRoot` if you don't want to enter full `sasProgram` path in `call` methods.
+> If `metadataRoot` is defined SAS program path will be `metadataRoot + sasProgram`.
 
 > Set `isRemoteConfig` to true if you want the adapter to use config from the file called `h54sConfig.json` at the root of your web application.
 > Config properties in the constructor will override the remote properties.
@@ -236,7 +240,7 @@ adapter.clearDebugData()
 ---
 
 ###clearSasErrors()
-Clears sas errors array
+Clears SAS errors array
 ```js
 adapter.clearSasErrors()
 ```
