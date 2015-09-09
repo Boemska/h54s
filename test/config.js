@@ -100,7 +100,7 @@ describe('h54s', function() {
 
     it('Test macrro name exception with number at the end', function(done) {
       proclaim.throws(function() {
-        var data = new h54s.Tables([
+        new h54s.Tables([
           {
             libname: 'WORK',
             memname: 'CHOSENLIB'
@@ -109,7 +109,7 @@ describe('h54s', function() {
       }, 'Macro name cannot have number at the end');
 
       proclaim.doesNotThrow(function() {
-        var data = new h54s.Tables([
+        new h54s.Tables([
           {
             libname: 'WORK',
             memname: 'CHOSENLIB'
