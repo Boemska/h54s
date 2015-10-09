@@ -1,0 +1,21 @@
+{
+  "name": "h54s",
+  "version": "0.6.3",
+  "homepage": "https://github.com/Boemska/h54s",
+  "authors": [
+    "Bojan Djurdjevic <bojan88@gmail.com>"
+  ],
+  "description": "HTML5 Data Adapter for SAS",
+  "main": "dist/h54s.js",
+  "moduleType": [
+    "globals"
+  ],
+  "license": "GPL V3",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
