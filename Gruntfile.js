@@ -4,7 +4,7 @@ module.exports = function (grunt) {
       ' *  License: <%= pkg.license %> \n' +
       ' *  Author: <%= pkg.author %> \n*/\n';
 
-  var name        = '<%= pkg.name %>-v<%= pkg.version%>';
+  var name        = '<%= pkg.name %>';
   var devRelease  = 'dist/'+name+'.js';
   var minRelease  = 'dist/'+name+'.min.js';
 
@@ -56,20 +56,36 @@ module.exports = function (grunt) {
     },
     karma: {
       options: {
+        configFile: 'karma.conf.js',
         files: [
-          srcFiles,
           'test/**/*.js',
           {pattern: 'test/**/*.json', served: true, included: false}
         ],
-      },
-      dev: {
-        configFile: 'karma.conf.js',
-        autoWatch: true
-      },
-      run: {
-        configFile: 'karma.conf.js',
         singleRun: true
       },
+      dev: {
+        files: [
+          {src: srcFiles, served: true}
+        ],
+        autoWatch: true
+      },
+      run: {},
+      release: {
+        files: [
+          {src: 'dist/h54s.js', served: true},
+        ],
+        exclude: [
+          'test/remoteConfig.js'
+        ]
+      },
+      ugly: {
+        files: [
+          {src: 'dist/h54s.min.js', served: true},
+        ],
+        exclude: [
+          'test/remoteConfig.js'
+        ]
+      }
     },
     connect: {
       angular: {
@@ -101,8 +117,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-connect');
 
   grunt.registerTask('default', ['jshint', 'karma:run']);
-  grunt.registerTask('compress', 'uglify');
-  grunt.registerTask('build', ['jshint', 'karma:run', 'concat']);
+  grunt.registerTask('release', ['jshint', 'concat', 'karma:release', 'uglify', 'karma:ugly']);
   grunt.registerTask('watch', 'karma:dev');
 
   grunt.registerTask('serveAngular', 'connect:angular');
