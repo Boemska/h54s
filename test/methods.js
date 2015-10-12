@@ -74,17 +74,6 @@ describe('h54s', function() {
       });
     });
 
-    it('Try to log in with only callback', function(done) {
-      this.timeout(10000);
-      var sasAdapter = new h54s({
-        hostUrl: serverData.url
-      });
-      sasAdapter.login(serverData.user, serverData.pass, function(status) {
-        assert.equal(status, 200, "We got wrong status code");
-        done();
-      });
-    });
-
     it('Call sas program without logging in', function(done) {
       this.timeout(10000);
       var sasAdapter = new h54s({
