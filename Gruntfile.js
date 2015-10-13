@@ -67,7 +67,8 @@ module.exports = function (grunt) {
         files: [
           {src: srcFiles, served: true}
         ],
-        autoWatch: true
+        autoWatch: true,
+        singleRun: false
       },
       run: {},
       release: {
