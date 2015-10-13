@@ -81,6 +81,7 @@ describe('h54s', function() {
           }
         ], 'data');
       }, 'Row 1 exceeds size limit of 32kb');
+
       proclaim.doesNotThrow(function() {
         var rows = [
           {

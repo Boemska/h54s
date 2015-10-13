@@ -82,7 +82,7 @@ describe('h54s', function() {
       //logout because we are already logged in in previeous tests
       sasAdapter._utils.ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
         assert.equal(res.status, 200, 'Log out is not successful');
-        sasAdapter.call('/Shared Folders/h54s_Apps/logReporting/startupService', null, function(err, res) {
+        sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err, res) {
           assert.equal(err.message, 'You are not logged in', 'Should throw error because user is not logged in');
           assert.isUndefined(res, 'We got error, res should be undefined');
           done();
