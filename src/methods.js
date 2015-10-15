@@ -109,7 +109,7 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
           unescapedResObj = self._utils.unescapeValues(resObj);
         } catch(e) {
           self._utils.parseErrorResponse(res.responseText, sasProgram);
-          callback(new h54s.Error('parseError', 'Unable to parse response json'));
+          callback(new h54s.Error('parseError', e.message));
         } finally {
           if(unescapedResObj) {
             self._utils.addApplicationLogs(resObj.logmessage);
