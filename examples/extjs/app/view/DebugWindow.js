@@ -4,14 +4,14 @@ Ext.define('h54sExample.view.DebugWindow', {
   alias: 'widget.debugwindow',
 
   alternateClassName: [
-        'h54sDebugWindow'
-    ],
+    'h54sDebugWindow'
+  ],
   requires: [
-        'Ext.tab.Panel',
-        'Ext.tab.Tab',
-        'Ext.toolbar.Toolbar',
-        'Ext.toolbar.Fill'
-    ],
+    'Ext.tab.Panel',
+    'Ext.tab.Tab',
+    'Ext.toolbar.Toolbar',
+    'Ext.toolbar.Fill'
+  ],
 
   focusOnToFront: false,
   frame: true,
@@ -66,7 +66,7 @@ Ext.define('h54sExample.view.DebugWindow', {
           scrollable: 'y',
           bodyPadding: 10,
           title: 'Application Logs'
-                },
+        },
         {
           xtype: 'panel',
           updateTabData: function () {
@@ -83,7 +83,7 @@ Ext.define('h54sExample.view.DebugWindow', {
                   {
                     xtype: 'label',
                     text: debugArray[i].time.toString()
-                                },
+                  },
                   {
                     layout: 'fit',
                     xtype: 'panel',
@@ -95,7 +95,7 @@ Ext.define('h54sExample.view.DebugWindow', {
                     style: {
                       'word-wrap': 'break-word !important'
                     }
-                                },
+                  },
                   {
                     xtype: 'component',
                     autoEl: {
@@ -105,8 +105,8 @@ Ext.define('h54sExample.view.DebugWindow', {
                       marginTop: '20px',
                       marginBottom: '15px'
                     }
-                                }
-                                ]
+                  }
+                ]
               });
             }
 
@@ -122,7 +122,7 @@ Ext.define('h54sExample.view.DebugWindow', {
           },
           addedItems: [
 
-                    ],
+          ],
           itemId: 'debugData',
           scrollable: true,
           bodyPadding: 10,
@@ -130,7 +130,7 @@ Ext.define('h54sExample.view.DebugWindow', {
           listeners: {
             destroy: 'onDebugDataDestroy'
           }
-                },
+        },
         {
           xtype: 'panel',
           updateTabData: function () {
@@ -155,7 +155,7 @@ Ext.define('h54sExample.view.DebugWindow', {
           scrollable: 'y',
           bodyPadding: 10,
           title: 'SAS Errors'
-                },
+        },
         {
           xtype: 'panel',
           updateTabData: function () {
@@ -172,7 +172,7 @@ Ext.define('h54sExample.view.DebugWindow', {
                   {
                     xtype: 'label',
                     text: failedReqArray[i].time.toString()
-                                },
+                  },
                   {
                     layout: 'fit',
                     xtype: 'panel',
@@ -184,7 +184,7 @@ Ext.define('h54sExample.view.DebugWindow', {
                     style: {
                       'word-wrap': 'break-word !important'
                     }
-                                },
+                  },
                   {
                     xtype: 'component',
                     autoEl: {
@@ -194,8 +194,8 @@ Ext.define('h54sExample.view.DebugWindow', {
                       marginTop: '20px',
                       marginBottom: '15px'
                     }
-                                }
-                                ]
+                  }
+                ]
               });
             }
             this.doLayout();
@@ -206,9 +206,7 @@ Ext.define('h54sExample.view.DebugWindow', {
             this.setTitle('Failed Requests' + badgeHtml);
           },
           autoScroll: true,
-          addedItems: [
-
-                    ],
+          addedItems: [],
           itemId: 'failedRequests',
           scrollable: true,
           bodyPadding: 10,
@@ -216,8 +214,8 @@ Ext.define('h54sExample.view.DebugWindow', {
           listeners: {
             destroy: 'onFailedRequestsDestroy'
           }
-                }
-            ],
+        }
+      ],
       dockedItems: [
         {
           xtype: 'toolbar',
@@ -225,40 +223,40 @@ Ext.define('h54sExample.view.DebugWindow', {
           items: [
             {
               xtype: 'tbfill'
-                        },
+            },
             {
               xtype: 'button',
               handler: function () {
                 var win = this.up('window');
                 var tab = win.down('tabpanel').getActiveTab();
                 switch (tab.itemId) {
-                case 'appLogs':
-                  sasAdapter.clearApplicationLogs();
-                  break;
-                case 'debugData':
-                  sasAdapter.clearDebugData();
-                  break;
-                case 'sasErrors':
-                  sasAdapter.clearSasErrors();
-                  break;
-                case 'failedRequests':
-                  sasAdapter.clearFailedRequests();
-                  break;
+                  case 'appLogs':
+                    sasAdapter.clearApplicationLogs();
+                    break;
+                  case 'debugData':
+                    sasAdapter.clearDebugData();
+                    break;
+                  case 'sasErrors':
+                    sasAdapter.clearSasErrors();
+                    break;
+                  case 'failedRequests':
+                    sasAdapter.clearFailedRequests();
+                    break;
                 }
                 tab.removeAll();
                 tab.updateBadge();
                 tab.updateTabData();
               },
               text: 'Clear'
-                        }
-                    ]
-                }
-            ],
+            }
+          ]
+        }
+      ],
       listeners: {
         tabchange: 'onTabpanelTabChange'
       }
-        }
-    ],
+    }
+  ],
   listeners: {
     close: 'onDebugWindowClose',
     afterrender: 'onDebugWindowAfterRender'

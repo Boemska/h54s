@@ -132,6 +132,55 @@ Ext.define('h54sExample.view.DebugWindow', {
             var badgeHtml = this.up().getBadge(errArray.length);
             this.setTitle('Sas Errors' + badgeHtml);
           }
+        },
+        {
+          itemId: 'failedRequests',
+          title: 'Failed Requests',
+          bodyPadding: 10,
+          overflowY: 'scroll',
+
+          updateTab: function () {
+            var failedRequestsArray = sasAdapter.getFailedRequests();
+            this.removeAll(true);
+            for (var i = 0; i < failedRequestsArray.length; i++) {
+              this.add({
+                xtype: 'container',
+                items: [
+                  {
+                    xtype: 'label',
+                    text: failedRequestsArray[i].time.toString()
+                  },
+                  {
+                    layout: 'fit',
+                    xtype: 'panel',
+                    title: failedRequestsArray[i].sasProgram,
+                    html: failedRequestsArray[i].responseHtml,
+                    collapsible: true,
+                    collapsed: true,
+                    autoScroll: true,
+                    style: {
+                      'word-wrap': 'break-word !important'
+                    }
+                  },
+                  {
+                    xtype: 'component',
+                    autoEl: {
+                      tag: 'hr'
+                    },
+                    style: {
+                      marginTop: '20px',
+                      marginBottom: '15px'
+                    }
+                  }
+                ]
+
+              });
+            }
+            this.doLayout();
+
+            var badgeHtml = this.up().getBadge(failedRequestsArray.length);
+            this.setTitle('Failed Requests' + badgeHtml);
+          }
         }
       ],
 
