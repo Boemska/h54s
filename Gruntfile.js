@@ -70,7 +70,13 @@ module.exports = function (grunt) {
         autoWatch: true,
         singleRun: false
       },
-      run: {},
+      run: {
+        files: [
+          {src: srcFiles},
+          {src: 'test/**/*.js'},
+          {src: 'test/**/*.json', served: true, included: false}
+        ]
+      },
       release: {
         files: [
           {src: 'dist/h54s.js', served: true},
