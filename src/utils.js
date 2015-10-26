@@ -1,10 +1,13 @@
 /* global h54s, XMLHttpRequest, ActiveXObject, document, clearTimeout, setTimeout */
-h54s.prototype._utils                   = {};
-h54s.Tables.prototype._utils            = {};
-h54s.prototype._utils._applicationLogs  = [];
-h54s.prototype._utils._debugData        = [];
-h54s.prototype._utils._sasErrors        = [];
-h54s.prototype._utils._failedRequests   = [];
+h54s.prototype._utils        = {};
+h54s.Tables.prototype._utils = {};
+
+h54s._logs = {
+  applicationLogs: [],
+  debugData: [],
+  sasErrors: [],
+  failedRequests: []
+};
 
 h54s.prototype._utils.ajax = (function () {
   var timeout = 30000;
@@ -144,6 +147,9 @@ h54s.Tables.prototype._utils.convertTableObject = function(inObject) {
       var thisType  = typeof (thisValue);
       var isDate = thisValue instanceof Date;
       if (thisType === 'number') { // straightforward number
+        if(thisValue < Number.MIN_SAFE_INTEGER || thisValue > Number.MAX_SAFE_INTEGER) {
+          h54s.prototype._utils.addApplicationLogs.call(null, 'Object[' + i + '].' + key + ' - This value exceeds expected numeric precision.');
+        }
         thisSpec.colName                    = key;
         thisSpec.colType                    = 'num';
         thisSpec.colLength                  = 8;
@@ -230,7 +236,7 @@ h54s.prototype._utils.parseDebugRes = function(responseText, sasProgram, params)
   var debugText = bodyMatches[1].replace(/<[^>]*>/g, '');
   debugText     = this.decodeHTMLEntities(debugText);
 
-  this._debugData.push({
+  h54s._logs.debugData.push({
     debugHtml:  bodyMatches[1],
     debugText:  debugText,
     sasProgram: sasProgram,
@@ -239,8 +245,8 @@ h54s.prototype._utils.parseDebugRes = function(responseText, sasProgram, params)
   });
 
   //max 20 debug objects
-  if(this._debugData.length > 20) {
-    this._debugData.shift();
+  if(h54s._logs.debugData.length > 20) {
+    h54s._logs.debugData.shift();
   }
 
   this.parseErrorResponse(responseText, sasProgram);
@@ -269,7 +275,7 @@ h54s.prototype._utils.addFailedResponse = function(responseText, sasProgram) {
   var debugText = responseText.replace(/<[^>]*>/g, '');
   debugText = this.decodeHTMLEntities(debugText);
 
-  this._failedRequests.push({
+  h54s._logs.failedRequests.push({
     responseHtml: responseText,
     responseText: debugText,
     sasProgram:   sasProgram,
@@ -277,8 +283,8 @@ h54s.prototype._utils.addFailedResponse = function(responseText, sasProgram) {
   });
 
   //max 20 failed requests
-  if(this._failedRequests.length > 20) {
-    this._failedRequests.shift();
+  if(h54s._logs.failedRequests.length > 20) {
+    h54s._logs.failedRequests.shift();
   }
 };
 
@@ -323,10 +329,10 @@ h54s.prototype._utils.parseErrorResponse = function(res, sasProgram) {
       time:       new Date()
     };
   }
-  this._sasErrors = this._sasErrors.concat(errors);
+  h54s._logs.sasErrors = h54s._logs.sasErrors.concat(errors);
 
-  while(this._sasErrors.length > 100) {
-    this._sasErrors.shift();
+  while(h54s._logs.sasErrors.length > 100) {
+    h54s._logs.sasErrors.shift();
   }
 };
 
@@ -363,11 +369,11 @@ h54s.prototype._utils.addApplicationLogs = function(message, sasProgram) {
     time:       new Date(),
     sasProgram: sasProgram
   };
-  this._applicationLogs.push(log);
+  h54s._logs.applicationLogs.push(log);
 
   //100 log messages max
-  if(this._applicationLogs.length > 100) {
-    this._applicationLogs.shift();
+  if(h54s._logs.applicationLogs.length > 100) {
+    h54s._logs.applicationLogs.shift();
   }
 };
 

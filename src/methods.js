@@ -200,7 +200,7 @@ h54s.prototype.login = function(user, pass, callback) {
 *
 */
 h54s.prototype.getSasErrors = function() {
-  return this._utils._sasErrors;
+  return h54s._logs.sasErrors;
 };
 
 /*
@@ -208,7 +208,7 @@ h54s.prototype.getSasErrors = function() {
 *
 */
 h54s.prototype.getApplicationLogs = function() {
-  return this._utils._applicationLogs;
+  return h54s._logs.applicationLogs;
 };
 
 /*
@@ -216,7 +216,7 @@ h54s.prototype.getApplicationLogs = function() {
 *
 */
 h54s.prototype.getDebugData = function() {
-  return this._utils._debugData;
+  return h54s._logs.debugData;
 };
 
 /*
@@ -224,7 +224,7 @@ h54s.prototype.getDebugData = function() {
 *
 */
 h54s.prototype.getFailedRequests = function() {
-  return this._utils._failedRequests;
+  return h54s._logs.failedRequests;
 };
 
 /*
@@ -248,7 +248,7 @@ h54s.prototype.unsetDebugMode = function() {
 *
 */
 h54s.prototype.clearApplicationLogs = function() {
-  this._utils._applicationLogs = [];
+  h54s._logs.applicationLogs = [];
 };
 
 /*
@@ -256,7 +256,7 @@ h54s.prototype.clearApplicationLogs = function() {
 *
 */
 h54s.prototype.clearDebugData = function() {
-  this._utils._debugData = [];
+  h54s._logs.debugData = [];
 };
 
 /*
@@ -264,7 +264,7 @@ h54s.prototype.clearDebugData = function() {
 *
 */
 h54s.prototype.clearSasErrors = function() {
-  this._utils._sasErrors = [];
+  h54s._logs.sasErrors = [];
 };
 
 /*
@@ -272,7 +272,7 @@ h54s.prototype.clearSasErrors = function() {
 *
 */
 h54s.prototype.clearFailedRequests = function() {
-  this._utils._failedRequests = [];
+  h54s._logs.failedRequests = [];
 };
 
 /*
