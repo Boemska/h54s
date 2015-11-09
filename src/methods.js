@@ -159,12 +159,16 @@ h54s.prototype.login = function(user, pass, callback) {
     _service: 'default',
     ux: user,
     px: pass,
+    //for SAS 9.4,
+    username: user,
+    password: pass
   };
 
   this._utils.ajax.post(this.loginUrl, loginParams).success(function(res) {
     if(self._needToLogin(res)) {
       //we are getting form again after redirect
       //and need to login again using the new url
+      //_loginChanged is set in _needToLogin function
       if(self._loginChanged) {
         delete self._loginChanged;
 
@@ -175,13 +179,12 @@ h54s.prototype.login = function(user, pass, callback) {
             loginParams[valueMatch[1]] = valueMatch[2];
           });
         }
-        loginParams.username = loginParams.ux;
-        loginParams.password = loginParams.px;
         self._utils.ajax.post(self.loginUrl, loginParams).success(this.success).error(this.error);
+      } else {
+        //getting form again, but it wasn't a redirect
+        self._utils.addApplicationLogs('Wrong username or password');
+        callback(-1);
       }
-
-      self._utils.addApplicationLogs('Wrong username or password');
-      callback(-1);
     } else {
       callback(res.status);
 

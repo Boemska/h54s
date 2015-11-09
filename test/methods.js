@@ -54,23 +54,15 @@ describe('h54s', function() {
     it('Try to log in with credentials and callback', function(done) {
       this.timeout(10000);
       var sasAdapter = new h54s({
-        hostUrl: serverData.url,
-        loginUrl: '/invalidUrl'
-      });
-      sasAdapter.login(serverData.user, serverData.pass, function(status) {
-        assert.equal(status, 404, "We got wrong status code");
-        done();
-      });
-    });
-
-    it('Try to log in with credentials and callback', function(done) {
-      this.timeout(10000);
-      var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
-      sasAdapter.login(serverData.user, serverData.pass, function(status) {
-        assert.equal(status, 200, "We got wrong status code");
-        done();
+      sasAdapter._utils.ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
+        assert.equal(res.status, 200, 'Log out is not successful');
+
+        sasAdapter.login(serverData.user, serverData.pass, function(status) {
+          assert.equal(status, 200, "We got wrong status code");
+          done();
+        });
       });
     });
 
@@ -162,7 +154,7 @@ describe('h54s', function() {
     });
 
     it('Test pending calls after login', function(done) {
-      this.timeout(20000);
+      this.timeout(30000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
@@ -185,13 +177,14 @@ describe('h54s', function() {
             counter++;
           }
         });
+
         sasAdapter.login(serverData.user, serverData.pass, function(status) {
           assert.equal(status, 200, 'We got wrong status code');
           assert.equal(counter, 0, 'Some calls are already executed - should\'ve waited for login');
           setTimeout(function() {
             assert.equal(counter, 3, 'Some pending calls are not executed');
             done();
-          }, 2000);
+          }, 5000);
         });
       });
     });

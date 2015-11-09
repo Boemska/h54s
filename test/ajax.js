@@ -8,7 +8,7 @@ describe('h54s', function() {
         ajaxTimeout: 1 //1ms
       });
       assert.isDefined(sasAdapter._utils.ajax, 'Ajax is not defined');
-      assert.isFunction(sasAdapter._utils.ajax.setTimeout, 'Ajax get method is not defined');
+      assert.isFunction(sasAdapter._utils.ajax.setTimeout, 'Ajax setTimeout method is not defined');
 
       sasAdapter._utils.ajax.get(serverData.url + 'SASLogon/Logon.do', {
         _debug: "0",
