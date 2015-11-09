@@ -62,7 +62,7 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
       return;
     }
 
-    if(/<form.+action="Logon.do".+/.test(res.responseText)) {
+    if(self._needToLogin(res)) {
       self._disableCalls = true;
       self._pendingCalls.push({
         sasProgram: sasProgram,
@@ -154,44 +154,57 @@ h54s.prototype.login = function(user, pass, callback) {
     throw new h54s.Error('argumentError', 'You must provide callback');
   }
 
-  var callCallback = function(status) {
-    if(typeof callback === 'function') {
-      callback(status);
-    }
-  };
-
-  this._utils.ajax.post(this.loginUrl, {
+  var loginParams = {
     _sasapp: self.sasApp,
     _service: 'default',
     ux: user,
     px: pass,
-  }).success(function(res) {
-    if(/<form.+action="Logon.do".+/.test(res.responseText)) {
+  };
+
+  this._utils.ajax.post(this.loginUrl, loginParams).success(function(res) {
+    if(self._needToLogin(res)) {
+      //we are getting form again after redirect
+      //and need to login again using the new url
+      if(self._loginChanged) {
+        delete self._loginChanged;
+
+        var inputs = res.responseText.match(/<input.*"hidden"[^>]*>/g);
+        if(inputs) {
+          inputs.forEach(function(inputStr) {
+            var valueMatch = inputStr.match(/name="([^"]*)"\svalue="([^"]*)/);
+            loginParams[valueMatch[1]] = valueMatch[2];
+          });
+        }
+        loginParams.username = loginParams.ux;
+        loginParams.password = loginParams.px;
+        self._utils.ajax.post(self.loginUrl, loginParams).success(this.success).error(this.error);
+      }
+
       self._utils.addApplicationLogs('Wrong username or password');
-      callCallback(-1);
+      callback(-1);
     } else {
-      callCallback(res.status);
+      callback(res.status);
 
       self._disableCalls = false;
 
       while(self._pendingCalls.length > 0) {
-        var pendingCall = self._pendingCalls.shift();
-        var sasProgram  = pendingCall.sasProgram;
-        var callback    = pendingCall.callback;
-        var params      = pendingCall.params;
+        var pendingCall     = self._pendingCalls.shift();
+        var sasProgram      = pendingCall.sasProgram;
+        var callbackPending = pendingCall.callback;
+        var params          = pendingCall.params;
 
         //update debug because it may change in the meantime
         params._debug = self.debug ? 131 : 0;
 
         if(self.retryAfterLogin) {
-          self.call(sasProgram, null, callback, params);
+          self.call(sasProgram, null, callbackPending, params);
         }
       }
     }
   }).error(function(res) {
     //NOTE: error 502 if sasApp parameter is wrong
     self._utils.addApplicationLogs('Login failed with status code: ' + res.status);
-    callCallback(res.status);
+    callback(res.status);
   });
 };
 

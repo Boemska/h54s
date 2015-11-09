@@ -442,3 +442,34 @@ h54s.prototype._utils.convertDates = function(obj) {
   }
   return obj;
 };
+
+h54s.prototype._needToLogin = function(responseObj) {
+  var patt = /<form.+action="(.*Logon[^"]*).*>/;
+  var matches = patt.exec(responseObj.responseText);
+  var newLoginUrl;
+
+  if(!matches) {
+    return false;
+  } else {
+    var actionUrl = matches[1].replace(/\?.*/, '');
+    if(actionUrl.charAt(0) === '/') {
+      newLoginUrl = this.hostUrl ? this.hostUrl + actionUrl : actionUrl;
+      if(newLoginUrl !== this.loginUrl) {
+        this._loginChanged = true;
+        this.loginUrl = newLoginUrl;
+      }
+    } else {
+      //relative path
+
+      var lastIndOfSlash = responseObj.responseURL.lastIndexOf('/') + 1;
+      //remove everything after the last slash, and everything until the first
+      var relativeLoginUrl = responseObj.responseURL.substr(0, lastIndOfSlash).replace(/.*\/{2}[^\/]*/, '') + actionUrl;
+      newLoginUrl = this.hostUrl ? this.hostUrl + relativeLoginUrl : relativeLoginUrl;
+      if(newLoginUrl !== this.loginUrl) {
+        this._loginChanged = true;
+        this.loginUrl = newLoginUrl;
+      }
+    }
+    return true;
+  }
+};
