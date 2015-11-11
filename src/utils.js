@@ -449,6 +449,7 @@ h54s.prototype._needToLogin = function(responseObj) {
   var newLoginUrl;
 
   if(!matches) {
+    //there's no form, we are in. hooray!
     return false;
   } else {
     var actionUrl = matches[1].replace(/\?.*/, '');
@@ -470,6 +471,20 @@ h54s.prototype._needToLogin = function(responseObj) {
         this.loginUrl = newLoginUrl;
       }
     }
+
+    //save parameters from hidden form fields
+    var inputs = responseObj.responseText.match(/<input.*"hidden"[^>]*>/g);
+    var hiddenFormParams = {};
+    if(inputs) {
+      //it's new login page if we have these additional parameters
+      this._isNewLoginPage = true;
+      inputs.forEach(function(inputStr) {
+        var valueMatch = inputStr.match(/name="([^"]*)"\svalue="([^"]*)/);
+        hiddenFormParams[valueMatch[1]] = valueMatch[2];
+      });
+      this._aditionalLoginParams = hiddenFormParams;
+    }
+
     return true;
   }
 };

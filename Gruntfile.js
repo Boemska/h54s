@@ -57,15 +57,20 @@ module.exports = function (grunt) {
     karma: {
       options: {
         configFile: 'karma.conf.js',
-        files: [
-          'test/**/*.js',
-          {pattern: 'test/**/*.json', served: true, included: false}
-        ],
         singleRun: true
       },
       dev: {
         files: [
-          {src: srcFiles, served: true}
+          {src: srcFiles, served: true},
+          {src: 'test/**/*.js'}
+        ],
+        autoWatch: true,
+        singleRun: false
+      },
+      methods: {
+        files: [
+          {src: srcFiles, served: true},
+          {src: ['test/methods.js', 'test/_server_data.js', 'test/_helpers.js']}
         ],
         autoWatch: true,
         singleRun: false
@@ -79,7 +84,8 @@ module.exports = function (grunt) {
       },
       release: {
         files: [
-          {src: 'dist/h54s.js', served: true},
+          {src: 'test/**/*.js'},
+          {src: 'dist/h54s.js', served: true}
         ],
         exclude: [
           'test/remoteConfig.js'
@@ -87,7 +93,8 @@ module.exports = function (grunt) {
       },
       ugly: {
         files: [
-          {src: 'dist/h54s.min.js', served: true},
+          {src: 'test/**/*.js'},
+          {src: 'dist/h54s.min.js', served: true}
         ],
         exclude: [
           'test/remoteConfig.js'

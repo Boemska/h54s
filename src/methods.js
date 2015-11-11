@@ -52,23 +52,20 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
   }
 
   this._utils.ajax.post(this.url, params).success(function(res) {
-    //maybe we already got past previous check
-    if(self._disableCalls) {
-      self._pendingCalls.push({
-        sasProgram: sasProgram,
-        callback:   callback,
-        params:     params
-      });
-      return;
-    }
-
     if(self._needToLogin(res)) {
-      self._disableCalls = true;
+      //remember the call for latter use
       self._pendingCalls.push({
         sasProgram: sasProgram,
         callback:   callback,
         params:     params
       });
+
+      //there's no need to continue if previous call returned login error
+      if(self._disableCalls) {
+        return;
+      } else {
+        self._disableCalls = true;
+      }
 
       try {
         var sasAppMatches = res.responseURL.match(/_sasapp=([^&]*)/);
@@ -164,12 +161,17 @@ h54s.prototype.login = function(user, pass, callback) {
     password: pass
   };
 
+  for (var key in this._aditionalLoginParams) {
+    loginParams[key] = this._aditionalLoginParams[key];
+  }
+
   this._utils.ajax.post(this.loginUrl, loginParams).success(function(res) {
     if(self._needToLogin(res)) {
       //we are getting form again after redirect
       //and need to login again using the new url
       //_loginChanged is set in _needToLogin function
-      if(self._loginChanged) {
+      //but if login url is not different, we are checking if there are aditional parameters
+      if(self._loginChanged || (self._isNewLoginPage && !self._aditionalLoginParams)) {
         delete self._loginChanged;
 
         var inputs = res.responseText.match(/<input.*"hidden"[^>]*>/g);
@@ -179,6 +181,7 @@ h54s.prototype.login = function(user, pass, callback) {
             loginParams[valueMatch[1]] = valueMatch[2];
           });
         }
+
         self._utils.ajax.post(self.loginUrl, loginParams).success(this.success).error(this.error);
       } else {
         //getting form again, but it wasn't a redirect

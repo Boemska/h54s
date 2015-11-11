@@ -178,14 +178,17 @@ describe('h54s', function() {
           }
         });
 
-        sasAdapter.login(serverData.user, serverData.pass, function(status) {
-          assert.equal(status, 200, 'We got wrong status code');
+        setTimeout(function() {
           assert.equal(counter, 0, 'Some calls are already executed - should\'ve waited for login');
-          setTimeout(function() {
-            assert.equal(counter, 3, 'Some pending calls are not executed');
-            done();
-          }, 5000);
-        });
+
+          sasAdapter.login(serverData.user, serverData.pass, function(status) {
+            assert.equal(status, 200, 'We got wrong status code');
+            setTimeout(function() {
+              assert.equal(counter, 3, 'Some pending calls are not executed');
+              done();
+            }, 4000);
+          });
+        }, 1000);
       });
     });
 
