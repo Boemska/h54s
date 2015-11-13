@@ -1,5 +1,5 @@
-/*! h54s v0.6.3 - 2015-10-09 
- *  License: GPL 
+/*! h54s v0.7.0 - 2015-11-13 
+ *  License: GPL V3 
  *  Author: Boemska 
 */
 if (!Object.create) {
@@ -54,6 +54,42 @@ if (!Object.keys) {
       return result;
     };
   }());
+}
+
+// From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/lastIndexOf
+if (!Array.prototype.lastIndexOf) {
+  Array.prototype.lastIndexOf = function(searchElement /*, fromIndex*/) {
+    'use strict';
+
+    if (this === void 0 || this === null) {
+      throw new TypeError();
+    }
+
+    var n, k,
+      t = Object(this),
+      len = t.length >>> 0;
+    if (len === 0) {
+      return -1;
+    }
+
+    n = len - 1;
+    if (arguments.length > 1) {
+      n = Number(arguments[1]);
+      if (n != n) {
+        n = 0;
+      }
+      else if (n !== 0 && n != (1 / 0) && n != -(1 / 0)) {
+        n = (n > 0 || -1) * Math.floor(Math.abs(n));
+      }
+    }
+
+    for (k = n >= 0 ? Math.min(n, len - 1) : len - Math.abs(n); k >= 0; k--) {
+      if (k in t && t[k] === searchElement) {
+        return k;
+      }
+    }
+    return -1;
+  };
 }
 
 /* global h54s: true */
@@ -124,6 +160,38 @@ var h54s = function(config) {
   } else {
     _setConfig.call(this, config);
   }
+
+  // private function to set h54s instance properties
+  function _setConfig(config) {
+    if(!config) {
+      return;
+    } else if(typeof config !== 'object') {
+      throw new h54s.Error('argumentError', 'First parameter should be config object');
+    }
+
+    //merge config object from parameter with this
+    for(var key in config) {
+      if(config.hasOwnProperty(key)) {
+        if((key === 'url' || key === 'loginUrl') && config[key].charAt(0) !== '/') {
+          config[key] = '/' + config[key];
+        }
+        this[key] = config[key];
+      }
+    }
+
+    //if server is remote use the full server url
+    //NOTE: this is not permited by the same-origin policy
+    if(config.hostUrl) {
+      if(config.hostUrl.charAt(config.hostUrl.length - 1) === '/') {
+        config.hostUrl = config.hostUrl.slice(0, -1);
+      }
+      this.hostUrl  = config.hostUrl;
+      this.url      = config.hostUrl + this.url;
+      this.loginUrl = config.hostUrl + this.loginUrl;
+    }
+
+    this._utils.ajax.setTimeout(this.ajaxTimeout);
+  }
 };
 
 /*
@@ -167,43 +235,6 @@ h54s.Tables = function(table, macroName) {
 
   this.add(table, macroName);
 };
-
-/*
-* private function to set h54s instance properties
-*
-*@param {object} config - adapter config object, with keys like url, debug, etc.
-*
-*/
-function _setConfig(config) {
-  if(!config) {
-    return;
-  } else if(typeof config !== 'object') {
-    throw new h54s.Error('argumentError', 'First parameter should be config object');
-  }
-
-  //merge config object from parameter with this
-  for(var key in config) {
-    if(config.hasOwnProperty(key)) {
-      if((key === 'url' || key === 'loginUrl') && config[key].charAt(0) !== '/') {
-        config[key] = '/' + config[key];
-      }
-      this[key] = config[key];
-    }
-  }
-
-  //if server is remote use the full server url
-  //NOTE: this is not permited by the same-origin policy
-  if(config.hostUrl) {
-    if(config.hostUrl.charAt(config.hostUrl.length - 1) === '/') {
-      config.hostUrl = config.hostUrl.slice(0, -1);
-    }
-    this.hostUrl  = config.hostUrl;
-    this.url      = config.hostUrl + this.url;
-    this.loginUrl = config.hostUrl + this.loginUrl;
-  }
-
-  this._utils.ajax.setTimeout(this.ajaxTimeout);
-}
 
 /* global h54s */
 
@@ -259,23 +290,20 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
   }
 
   this._utils.ajax.post(this.url, params).success(function(res) {
-    //maybe we already got past previous check
-    if(self._disableCalls) {
+    if(self._needToLogin(res)) {
+      //remember the call for latter use
       self._pendingCalls.push({
         sasProgram: sasProgram,
         callback:   callback,
         params:     params
       });
-      return;
-    }
 
-    if(/<form.+action="Logon.do".+/.test(res.responseText)) {
-      self._disableCalls = true;
-      self._pendingCalls.push({
-        sasProgram: sasProgram,
-        callback:   callback,
-        params:     params
-      });
+      //there's no need to continue if previous call returned login error
+      if(self._disableCalls) {
+        return;
+      } else {
+        self._disableCalls = true;
+      }
 
       try {
         var sasAppMatches = res.responseURL.match(/_sasapp=([^&]*)/);
@@ -316,7 +344,7 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
           unescapedResObj = self._utils.unescapeValues(resObj);
         } catch(e) {
           self._utils.parseErrorResponse(res.responseText, sasProgram);
-          callback(new h54s.Error('parseError', 'Unable to parse response json'));
+          callback(new h54s.Error('parseError', e.message));
         } finally {
           if(unescapedResObj) {
             self._utils.addApplicationLogs(resObj.logmessage);
@@ -361,44 +389,66 @@ h54s.prototype.login = function(user, pass, callback) {
     throw new h54s.Error('argumentError', 'You must provide callback');
   }
 
-  var callCallback = function(status) {
-    if(typeof callback === 'function') {
-      callback(status);
-    }
-  };
-
-  this._utils.ajax.post(this.loginUrl, {
+  var loginParams = {
     _sasapp: self.sasApp,
     _service: 'default',
     ux: user,
     px: pass,
-  }).success(function(res) {
-    if(/<form.+action="Logon.do".+/.test(res.responseText)) {
-      self._utils.addApplicationLogs('Wrong username or password');
-      callCallback(-1);
+    //for SAS 9.4,
+    username: user,
+    password: pass
+  };
+
+  for (var key in this._aditionalLoginParams) {
+    loginParams[key] = this._aditionalLoginParams[key];
+  }
+
+  this._utils.ajax.post(this.loginUrl, loginParams).success(function(res) {
+    if(self._needToLogin(res)) {
+      //we are getting form again after redirect
+      //and need to login again using the new url
+      //_loginChanged is set in _needToLogin function
+      //but if login url is not different, we are checking if there are aditional parameters
+      if(self._loginChanged || (self._isNewLoginPage && !self._aditionalLoginParams)) {
+        delete self._loginChanged;
+
+        var inputs = res.responseText.match(/<input.*"hidden"[^>]*>/g);
+        if(inputs) {
+          inputs.forEach(function(inputStr) {
+            var valueMatch = inputStr.match(/name="([^"]*)"\svalue="([^"]*)/);
+            loginParams[valueMatch[1]] = valueMatch[2];
+          });
+        }
+
+        self._utils.ajax.post(self.loginUrl, loginParams).success(this.success).error(this.error);
+      } else {
+        //getting form again, but it wasn't a redirect
+        self._utils.addApplicationLogs('Wrong username or password');
+        callback(-1);
+      }
     } else {
-      callCallback(res.status);
+      callback(res.status);
 
       self._disableCalls = false;
 
       while(self._pendingCalls.length > 0) {
-        var pendingCall = self._pendingCalls.shift();
-        var sasProgram  = pendingCall.sasProgram;
-        var callback    = pendingCall.callback;
-        var params      = pendingCall.params;
+        var pendingCall     = self._pendingCalls.shift();
+        var sasProgram      = pendingCall.sasProgram;
+        var callbackPending = pendingCall.callback;
+        var params          = pendingCall.params;
 
         //update debug because it may change in the meantime
         params._debug = self.debug ? 131 : 0;
 
         if(self.retryAfterLogin) {
-          self.call(sasProgram, null, callback, params);
+          self.call(sasProgram, null, callbackPending, params);
         }
       }
     }
   }).error(function(res) {
     //NOTE: error 502 if sasApp parameter is wrong
     self._utils.addApplicationLogs('Login failed with status code: ' + res.status);
-    callCallback(res.status);
+    callback(res.status);
   });
 };
 
@@ -407,7 +457,7 @@ h54s.prototype.login = function(user, pass, callback) {
 *
 */
 h54s.prototype.getSasErrors = function() {
-  return this._utils._sasErrors;
+  return h54s._logs.sasErrors;
 };
 
 /*
@@ -415,7 +465,7 @@ h54s.prototype.getSasErrors = function() {
 *
 */
 h54s.prototype.getApplicationLogs = function() {
-  return this._utils._applicationLogs;
+  return h54s._logs.applicationLogs;
 };
 
 /*
@@ -423,7 +473,7 @@ h54s.prototype.getApplicationLogs = function() {
 *
 */
 h54s.prototype.getDebugData = function() {
-  return this._utils._debugData;
+  return h54s._logs.debugData;
 };
 
 /*
@@ -431,7 +481,7 @@ h54s.prototype.getDebugData = function() {
 *
 */
 h54s.prototype.getFailedRequests = function() {
-  return this._utils._failedRequests;
+  return h54s._logs.failedRequests;
 };
 
 /*
@@ -455,7 +505,7 @@ h54s.prototype.unsetDebugMode = function() {
 *
 */
 h54s.prototype.clearApplicationLogs = function() {
-  this._utils._applicationLogs = [];
+  h54s._logs.applicationLogs = [];
 };
 
 /*
@@ -463,7 +513,7 @@ h54s.prototype.clearApplicationLogs = function() {
 *
 */
 h54s.prototype.clearDebugData = function() {
-  this._utils._debugData = [];
+  h54s._logs.debugData = [];
 };
 
 /*
@@ -471,7 +521,7 @@ h54s.prototype.clearDebugData = function() {
 *
 */
 h54s.prototype.clearSasErrors = function() {
-  this._utils._sasErrors = [];
+  h54s._logs.sasErrors = [];
 };
 
 /*
@@ -479,7 +529,7 @@ h54s.prototype.clearSasErrors = function() {
 *
 */
 h54s.prototype.clearFailedRequests = function() {
-  this._utils._failedRequests = [];
+  h54s._logs.failedRequests = [];
 };
 
 /*
@@ -526,12 +576,15 @@ h54s.Tables.prototype.add = function(table, macroName) {
 };
 
 /* global h54s, XMLHttpRequest, ActiveXObject, document, clearTimeout, setTimeout */
-h54s.prototype._utils                   = {};
-h54s.Tables.prototype._utils            = {};
-h54s.prototype._utils._applicationLogs  = [];
-h54s.prototype._utils._debugData        = [];
-h54s.prototype._utils._sasErrors        = [];
-h54s.prototype._utils._failedRequests   = [];
+h54s.prototype._utils        = {};
+h54s.Tables.prototype._utils = {};
+
+h54s._logs = {
+  applicationLogs: [],
+  debugData: [],
+  sasErrors: [],
+  failedRequests: []
+};
 
 h54s.prototype._utils.ajax = (function () {
   var timeout = 30000;
@@ -671,6 +724,9 @@ h54s.Tables.prototype._utils.convertTableObject = function(inObject) {
       var thisType  = typeof (thisValue);
       var isDate = thisValue instanceof Date;
       if (thisType === 'number') { // straightforward number
+        if(thisValue < Number.MIN_SAFE_INTEGER || thisValue > Number.MAX_SAFE_INTEGER) {
+          h54s.prototype._utils.addApplicationLogs.call(null, 'Object[' + i + '].' + key + ' - This value exceeds expected numeric precision.');
+        }
         thisSpec.colName                    = key;
         thisSpec.colType                    = 'num';
         thisSpec.colLength                  = 8;
@@ -757,7 +813,7 @@ h54s.prototype._utils.parseDebugRes = function(responseText, sasProgram, params)
   var debugText = bodyMatches[1].replace(/<[^>]*>/g, '');
   debugText     = this.decodeHTMLEntities(debugText);
 
-  this._debugData.push({
+  h54s._logs.debugData.push({
     debugHtml:  bodyMatches[1],
     debugText:  debugText,
     sasProgram: sasProgram,
@@ -766,8 +822,8 @@ h54s.prototype._utils.parseDebugRes = function(responseText, sasProgram, params)
   });
 
   //max 20 debug objects
-  if(this._debugData.length > 20) {
-    this._debugData.shift();
+  if(h54s._logs.debugData.length > 20) {
+    h54s._logs.debugData.shift();
   }
 
   this.parseErrorResponse(responseText, sasProgram);
@@ -796,7 +852,7 @@ h54s.prototype._utils.addFailedResponse = function(responseText, sasProgram) {
   var debugText = responseText.replace(/<[^>]*>/g, '');
   debugText = this.decodeHTMLEntities(debugText);
 
-  this._failedRequests.push({
+  h54s._logs.failedRequests.push({
     responseHtml: responseText,
     responseText: debugText,
     sasProgram:   sasProgram,
@@ -804,8 +860,8 @@ h54s.prototype._utils.addFailedResponse = function(responseText, sasProgram) {
   });
 
   //max 20 failed requests
-  if(this._failedRequests.length > 20) {
-    this._failedRequests.shift();
+  if(h54s._logs.failedRequests.length > 20) {
+    h54s._logs.failedRequests.shift();
   }
 };
 
@@ -850,10 +906,10 @@ h54s.prototype._utils.parseErrorResponse = function(res, sasProgram) {
       time:       new Date()
     };
   }
-  this._sasErrors = this._sasErrors.concat(errors);
+  h54s._logs.sasErrors = h54s._logs.sasErrors.concat(errors);
 
-  while(this._sasErrors.length > 100) {
-    this._sasErrors.shift();
+  while(h54s._logs.sasErrors.length > 100) {
+    h54s._logs.sasErrors.shift();
   }
 };
 
@@ -890,11 +946,11 @@ h54s.prototype._utils.addApplicationLogs = function(message, sasProgram) {
     time:       new Date(),
     sasProgram: sasProgram
   };
-  this._applicationLogs.push(log);
+  h54s._logs.applicationLogs.push(log);
 
   //100 log messages max
-  if(this._applicationLogs.length > 100) {
-    this._applicationLogs.shift();
+  if(h54s._logs.applicationLogs.length > 100) {
+    h54s._logs.applicationLogs.shift();
   }
 };
 
@@ -962,4 +1018,50 @@ h54s.prototype._utils.convertDates = function(obj) {
     }
   }
   return obj;
+};
+
+h54s.prototype._needToLogin = function(responseObj) {
+  var patt = /<form.+action="(.*Logon[^"]*).*>/;
+  var matches = patt.exec(responseObj.responseText);
+  var newLoginUrl;
+
+  if(!matches) {
+    //there's no form, we are in. hooray!
+    return false;
+  } else {
+    var actionUrl = matches[1].replace(/\?.*/, '');
+    if(actionUrl.charAt(0) === '/') {
+      newLoginUrl = this.hostUrl ? this.hostUrl + actionUrl : actionUrl;
+      if(newLoginUrl !== this.loginUrl) {
+        this._loginChanged = true;
+        this.loginUrl = newLoginUrl;
+      }
+    } else {
+      //relative path
+
+      var lastIndOfSlash = responseObj.responseURL.lastIndexOf('/') + 1;
+      //remove everything after the last slash, and everything until the first
+      var relativeLoginUrl = responseObj.responseURL.substr(0, lastIndOfSlash).replace(/.*\/{2}[^\/]*/, '') + actionUrl;
+      newLoginUrl = this.hostUrl ? this.hostUrl + relativeLoginUrl : relativeLoginUrl;
+      if(newLoginUrl !== this.loginUrl) {
+        this._loginChanged = true;
+        this.loginUrl = newLoginUrl;
+      }
+    }
+
+    //save parameters from hidden form fields
+    var inputs = responseObj.responseText.match(/<input.*"hidden"[^>]*>/g);
+    var hiddenFormParams = {};
+    if(inputs) {
+      //it's new login page if we have these additional parameters
+      this._isNewLoginPage = true;
+      inputs.forEach(function(inputStr) {
+        var valueMatch = inputStr.match(/name="([^"]*)"\svalue="([^"]*)/);
+        hiddenFormParams[valueMatch[1]] = valueMatch[2];
+      });
+      this._aditionalLoginParams = hiddenFormParams;
+    }
+
+    return true;
+  }
 };

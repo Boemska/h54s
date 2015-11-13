@@ -1,4 +1,4 @@
-/* global describe, it, assert, serverData, h54s, unescape */
+/* global describe, it, assert, serverData, h54s */
 describe('h54s', function() {
   describe('utils test:', function() {
 

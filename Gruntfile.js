@@ -57,7 +57,10 @@ module.exports = function (grunt) {
     karma: {
       options: {
         configFile: 'karma.conf.js',
-        singleRun: true
+        singleRun: true,
+        files: [
+          {pattern: 'test/**/*.json', served: true, included: false}
+        ]
       },
       dev: {
         files: [
