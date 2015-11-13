@@ -1,62 +1,50 @@
-/* global describe, it, assert, serverData, h54s, unescape */
+/* global describe, it, assert, serverData, h54s */
 describe('h54s', function() {
   describe('utils test:', function() {
 
-    it('All strings in returned object should be escaped', function(done) {
+    it('Strings in returned object should be decoded', function(done) {
       this.timeout(6000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
+      var str = 'Is it escaped? Yeah!';
+
+      var table = new h54s.Tables([
+        {
+          data: str,
+        }
+      ], 'data');
+
       sasAdapter.login(serverData.user, serverData.pass, function(status) {
         if(status === 200) {
-          sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err, res) {
+          sasAdapter.call('/AJAX/h54s_test/bounceData', table, function(err, res) {
             assert.isUndefined(err, 'We got error on sas program ajax call');
-            var topLevelProcess = res.toplevelProcess;
-            var donutLev1 = res.donutLev1;
-            var donutLev2 = res.donutLev2;
-            var n, i;
-            for(i = 0, n = topLevelProcess.length; i < n; i++) {
-              assert.equal(topLevelProcess[i].programname, unescape(topLevelProcess[i].programname), 'String not decoded');
-              assert.equal(topLevelProcess[i].shortName, unescape(topLevelProcess[i].shortName), 'String not decoded');
-
-            }
-            for(i = 0, n = donutLev1.length; i< n; i++) {
-              assert.equal(donutLev1[i].value, unescape(donutLev1[i].value), 'String not decoded');
-            }
-            for(i = 0, n = donutLev2.length; i< n; i++) {
-              assert.equal(donutLev2[i].value, unescape(donutLev2[i].value), 'String not decoded');
-            }
+            assert.equal(res.outputdata[0].DATA, decodeURIComponent(str), 'String not escaped');
             done();
           });
         }
       });
     });
 
-    it('All values in returned object with debug=true should be escaped - string and date', function(done) {
+    it('Strings in returned object with debug=true should be decoded', function(done) {
       this.timeout(4000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url,
         debug: true
       });
+      var str = 'Is it escaped? Yeah!';
+
+      var table = new h54s.Tables([
+        {
+          data: str,
+        }
+      ], 'data');
+
       sasAdapter.login(serverData.user, serverData.pass, function(status) {
         if(status === 200) {
-          sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err, res) {
+          sasAdapter.call('/AJAX/h54s_test/bounceData', table, function(err, res) {
             assert.isUndefined(err, 'We got error on sas program ajax call');
-            var topLevelProcess = res.toplevelProcess;
-            var donutLev1 = res.donutLev1;
-            var donutLev2 = res.donutLev2;
-            var n, i;
-            for(i = 0, n = topLevelProcess.length; i < n; i++) {
-              assert.equal(topLevelProcess[i].programname, decodeURIComponent(topLevelProcess[i].programname), 'String not decoded');
-              assert.equal(topLevelProcess[i].shortName, decodeURIComponent(topLevelProcess[i].shortName), 'String not decoded');
-
-            }
-            for(i = 0, n = donutLev1.length; i< n; i++) {
-              assert.equal(donutLev1[i].value, decodeURIComponent(donutLev1[i].value), 'String not decoded');
-            }
-            for(i = 0, n = donutLev2.length; i< n; i++) {
-              assert.equal(donutLev2[i].value, decodeURIComponent(donutLev2[i].value), 'String not decoded');
-            }
+            assert.equal(res.outputdata[0].DATA, decodeURIComponent(str), 'String not escaped');
             done();
           });
         }
@@ -120,6 +108,8 @@ describe('h54s', function() {
             }
             done();
           });
+        } else {
+          assert.fail(status, 200, 'Wrong status code on login');
         }
       });
     });
@@ -145,6 +135,8 @@ describe('h54s', function() {
             assert.equal(resSeconds, dateSeconds, 'Date is not the same');
             done();
           });
+        } else {
+          assert.fail(status, 200, 'Wrong status code on login');
         }
       });
     });
@@ -207,6 +199,8 @@ describe('h54s', function() {
               done();
             });
           });
+        } else {
+          assert.fail(status, 200, 'Wrong status code on login');
         }
       });
     });
