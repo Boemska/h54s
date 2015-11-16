@@ -1,4 +1,4 @@
-/*! h54s v0.7.0 - 2015-11-13 
+/*! h54s v0.7.1 - 2015-11-16 
  *  License: GPL V3 
  *  Author: Boemska 
 */
@@ -720,6 +720,25 @@ h54s.Tables.prototype._utils.convertTableObject = function(inObject) {
     for (var key in inObject[i]) {
       var thisSpec  = {};
       var thisValue = inObject[i][key];
+
+      //skip undefined values
+      if(thisValue === undefined || thisValue === null) {
+        continue;
+      }
+
+      //throw an error if there's NaN value
+      if(typeof thisValue === 'number' && isNaN(thisValue)) {
+        throw new h54s.Error('typeError', 'NaN value in one of the values (columns) is not allowed');
+      }
+
+      if(thisValue === -Infinity || thisValue === Infinity) {
+        throw new h54s.Error('typeError', thisValue.toString() + ' value in one of the values (columns) is not allowed');
+      }
+
+      if(thisValue === true || thisValue === false) {
+        throw new h54s.Error('typeError', 'Boolean value in one of the values (columns) is not allowed');
+      }
+
       // get type... if it is an object then convert it to json and store as a string
       var thisType  = typeof (thisValue);
       var isDate = thisValue instanceof Date;
@@ -760,7 +779,7 @@ h54s.Tables.prototype._utils.convertTableObject = function(inObject) {
       chunkRowCount = chunkRowCount + 6 + key.length + thisSpec.encodedLength;
 
       if (checkAndIncrement(thisSpec) == -1) {
-        throw new h54s.Error('typeError', 'There is a type mismatch in the array between elements (columns) of the same name.');
+        throw new h54s.Error('typeError', 'There is a type mismatch in the array between values (columns) of the same name.');
       }
     }
 
