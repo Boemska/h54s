@@ -1,4 +1,4 @@
-/* global describe, it, assert, serverData, h54s */
+/* global describe, it, assert, serverData, h54s, proclaim */
 describe('h54s', function() {
   describe('utils test:', function() {
 
@@ -203,6 +203,40 @@ describe('h54s', function() {
           assert.fail(status, 200, 'Wrong status code on login');
         }
       });
+    });
+
+    it('Exceptions in tables', function(done) {
+      proclaim.throws(function() {
+        new h54s.Tables([
+          {a: "Dummy Name", specialNumberVal :NaN}
+        ], 'data');
+      }, 'NaN value in one of the values (columns) is not allowed');
+
+      proclaim.throws(function() {
+        new h54s.Tables([
+          {b: "Dummy Name", specialNumberVal: Infinity}
+        ], 'data');
+      }, 'Infinity value in one of the values (columns) is not allowed');
+
+      proclaim.throws(function() {
+        new h54s.Tables([
+          {c: "Dummy Name", specialNumberVal: -Infinity}
+        ], 'data');
+      }, '-Infinity value in one of the values (columns) is not allowed');
+
+      proclaim.throws(function() {
+        new h54s.Tables([
+          {d: "Dummy Name", boolVal: true}
+        ], 'data');
+      }, 'Boolean value in one of the values (columns) is not allowed');
+
+      proclaim.throws(function() {
+        new h54s.Tables([
+          {e: "Dummy Name", boolVal: false}
+        ], 'data');
+      }, 'Boolean value in one of the values (columns) is not allowed');
+
+      done();
     });
 
   });
