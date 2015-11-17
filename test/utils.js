@@ -239,5 +239,32 @@ describe('h54s', function() {
       done();
     });
 
+    it('Keys to upper case', function(done) {
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url,
+        toUpperCase: true
+      });
+
+      function isUpperCase(obj) {
+        for(var key in obj) {
+          if(obj.hasOwnProperty(key) && key !== key.toUpperCase()) {
+            return false;
+          }
+          if(typeof obj[key] === 'object') {
+            if(!isUpperCase(obj[key])) {
+              return false;
+            }
+          }
+        }
+        return true;
+      }
+
+      sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err, res) {
+        assert.isUndefined(err, 'We got error on sas program ajax call');
+        assert.isTrue(isUpperCase(res), 'Object keys are not converted to upper case');
+        done();
+      });
+    });
+
   });
 });

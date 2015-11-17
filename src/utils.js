@@ -462,6 +462,26 @@ h54s.prototype._utils.convertDates = function(obj) {
   return obj;
 };
 
+/*
+* Recursively convert object keys to upper case
+*
+* @param {object} obj
+*
+*/
+h54s.prototype._utils.keysToUpperCase = function(obj) {
+  var tmp;
+  for (var key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      tmp = obj[key];
+      delete obj[key];
+      obj[key.toUpperCase()] = tmp;
+      if(typeof tmp === 'object') {
+        this.keysToUpperCase(tmp);
+      }
+    }
+  }
+};
+
 h54s.prototype._needToLogin = function(responseObj) {
   var patt = /<form.+action="(.*Logon[^"]*).*>/;
   var matches = patt.exec(responseObj.responseText);

@@ -96,6 +96,9 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
         } finally {
           if(unescapedResObj) {
             self._utils.addApplicationLogs(resObj.logmessage, sasProgram);
+            if(self.toUpperCase) {
+              self._utils.keysToUpperCase(unescapedResObj);
+            }
             callback(undefined, unescapedResObj);
           }
         }
@@ -113,6 +116,9 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
             if(resObj.hasErrors) {
               callback(new h54s.Error('sasError', 'Sas program completed with errors'), unescapedResObj);
             } else {
+              if(self.toUpperCase) {
+                self._utils.keysToUpperCase(unescapedResObj);
+              }
               callback(undefined, unescapedResObj);
             }
           }
