@@ -24,7 +24,8 @@ Default configuration looks like this:
   sasApp: 'Stored Process Web App 9.3',
   ajaxTimeout: 30000,
   isRemoteConfig: false,
-  metadataRoot: undefined
+  metadataRoot: undefined,
+  toUpperCase: false
 }
 ```
 > `maxXhrRetries` is number of retries if request failed with SAS error or no data.
@@ -41,6 +42,9 @@ Default configuration looks like this:
 
 > Disabled calls will be executed automatically after login if `retryAfterLogin` is set to true.
 > If one request fails with `err.type = 'notLoggedinError'`, other calls will be disabled, and executed or not based on the `retryAfterLogin` property.
+
+> Set `toUpperCase` to true if you want response object keys converted to upper case.
+> This can be handy when SAS is using some case insensitive functions.
 
 
 You can also provide hostUrl if your SAS instance is on another domain:
