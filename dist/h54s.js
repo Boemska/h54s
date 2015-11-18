@@ -1,4 +1,4 @@
-/*! h54s v0.8.0 - 2015-11-17 
+/*! h54s v0.7.1 - 2015-11-16 
  *  License: GPL V3 
  *  Author: Boemska 
 */
@@ -111,7 +111,6 @@ var h54s = function(config) {
   this.retryAfterLogin  = true;
   this.sasApp           = 'Stored Process Web App 9.3';
   this.ajaxTimeout      = 30000;
-  this.toUpperCase      = false;
 
   this.remoteConfigUpdateCallbacks = [];
 
@@ -335,9 +334,6 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
         } finally {
           if(unescapedResObj) {
             self._utils.addApplicationLogs(resObj.logmessage, sasProgram);
-            if(self.toUpperCase) {
-              self._utils.keysToUpperCase(unescapedResObj);
-            }
             callback(undefined, unescapedResObj);
           }
         }
@@ -355,9 +351,6 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
             if(resObj.hasErrors) {
               callback(new h54s.Error('sasError', 'Sas program completed with errors'), unescapedResObj);
             } else {
-              if(self.toUpperCase) {
-                self._utils.keysToUpperCase(unescapedResObj);
-              }
               callback(undefined, unescapedResObj);
             }
           }
@@ -1044,26 +1037,6 @@ h54s.prototype._utils.convertDates = function(obj) {
     }
   }
   return obj;
-};
-
-/*
-* Recursively convert object keys to upper case
-*
-* @param {object} obj
-*
-*/
-h54s.prototype._utils.keysToUpperCase = function(obj) {
-  var tmp;
-  for (var key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      tmp = obj[key];
-      delete obj[key];
-      obj[key.toUpperCase()] = tmp;
-      if(typeof tmp === 'object') {
-        this.keysToUpperCase(tmp);
-      }
-    }
-  }
 };
 
 h54s.prototype._needToLogin = function(responseObj) {
