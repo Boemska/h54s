@@ -17,7 +17,6 @@ var h54s = function(config) {
   this.retryAfterLogin  = true;
   this.sasApp           = 'Stored Process Web App 9.3';
   this.ajaxTimeout      = 30000;
-  this.toUpperCase      = false;
 
   this.remoteConfigUpdateCallbacks = [];
 
