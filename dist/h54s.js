@@ -1,4 +1,4 @@
-/*! h54s v0.7.1 - 2015-11-16 
+/*! h54s v0.7.1 - 2015-11-18 
  *  License: GPL V3 
  *  Author: Boemska 
 */
@@ -148,6 +148,11 @@ var h54s = function(config) {
         var sasProgram  = pendingCall.sasProgram;
         var callback    = pendingCall.callback;
         var params      = pendingCall.params;
+
+        //update program with metadataRoot if it's not set
+        if(self.metadataRoot && pendingCall.params._program.indexOf(self.metadataRoot) === -1) {
+          pendingCall.params._program = self.metadataRoot.replace(/\/?$/, '/') + pendingCall.params._program.replace(/^\//, '');
+        }
 
         //update debug because it may change in the meantime
         params._debug = self.debug ? 131 : 0;
