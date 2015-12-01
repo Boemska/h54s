@@ -1,5 +1,7 @@
 #h54s - HTML5 Data Adapter for SAS
 
+[![Join the chat at https://gitter.im/Boemska/h54s](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Boemska/h54s?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 HTML5 Data Adapter for SAS (‘h54s’ for short) lets SAS BI customers engage with HTML5 app developers to create modern data-driven frontends, while the SAS and data SMEs already embedded within the organisation transparently take care of the data and analytics requirements at the backend.
 
 ##Usage
