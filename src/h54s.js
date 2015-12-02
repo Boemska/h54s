@@ -146,3 +146,6 @@ h54s.Tables = function(table, macroName) {
 
   this.add(table, macroName);
 };
+
+//replaced in concat and uglify-replace tasks
+h54s.version = '__version__';
