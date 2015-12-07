@@ -147,7 +147,7 @@ If you're logged into your SPWA and have a session cookie already, you should se
 
 Otherwise, if you're not logged in yet, you should see this:
 
-   ![Chrome console animation](img/loggedout.gif)
+   ![Chrome console animation](img/loggedout.png)
 
 The easist thing to do at this point is to log into your SPWA in another tab, refresh your page and try running the code again. However, if you're feeling adventurous you could skip ahead and try this in the console:
 
