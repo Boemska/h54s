@@ -449,28 +449,6 @@ options NOQUOTELENMAX LRECL=32000 spool;
 %hfsQuietenUp;
 %mend;
 
-%macro hfsOutCounts(libn, dsn);
-* keep quiet in the log;
-  %hfsQuietenDown;
-
-  proc sql;
-    select nobs into :rowCount from dictionary.tables where memname=upcase("&dsn.") and libname=upcase("&libn.");
-  quit;
-
-  %if (%symexist(rowCount) = 0) %then %do;
-    %let rowCount =-1;
-  %end;
-
-  data _null_;
-    file &h54starget.;
-    put '"totalCount" :' "&rowCount." ',';
-    put;
-  run;
-
-* Come back ;
-%hfsQuietenUp;
-%mend;
-
 %macro hfsOutDataset(objectName, libn, dsn);
 * keep quiet in the log;
   %hfsQuietenDown;
