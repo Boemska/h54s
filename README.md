@@ -143,11 +143,11 @@ adapter.call('/Apps/myFirstService', tables, function(err, res) {
 ```
 If you're logged into your SPWA and have a session cookie already, you should see this:
 
-   ![Chrome console animation](loggedin.gif)
+   ![Chrome console animation](img/loggedin.gif)
 
 Otherwise, if you're not logged in yet, you should see this:
 
-   ![Chrome console animation](loggedout.gif)
+   ![Chrome console animation](img/loggedout.gif)
 
 The easist thing to do at this point is to log into your SPWA in another tab, refresh your page and try running the code again. However, if you're feeling adventurous you could skip ahead and try this in the console:
 
