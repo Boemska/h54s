@@ -44,7 +44,7 @@
  * Macro Quick Reference:
  * ===================== 
  *
- * %hfsGetDataset(jsonvarname, outdset):
+ * %hfsGetDataset(jsonvarname, outdset);
  *      This macro deserialises a JavaScript data object into a SAS table.
  *        jsonvarname:  the name given to the table array from the front end,
  *                      coresponding to macroName in the 
