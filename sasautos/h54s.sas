@@ -489,7 +489,7 @@ options NOQUOTELENMAX LRECL=32000 spool;
 
   proc sql;
     create table tempCols as
-    select upcase(name) as name, type, length from dictionary.columns where memname=upcase("&dsn.") and libname = upcase("&libn.");
+    select upcase(name) as name, type, length from dictionary.columns where upcase(memname)=upcase("&dsn.") and libname = upcase("&libn.");
   quit;
 
   %let totalCols = &sqlObs;
