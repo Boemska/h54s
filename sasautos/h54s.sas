@@ -338,6 +338,13 @@ options NOQUOTELENMAX LRECL=32000 spool;
             currentpairnum + 1 ;
           end ;
           output;
+          /* set all vars back to missing to prevent retained
+             SAS values when parsing incomplete JSON records  */
+          call missing (%sysfunc(tranwrd(
+            %sysfunc(compbl(
+              &string_colnames &num_colnames &date_colnames
+            )),%str( ),%str(,))
+          ));
           call prxnext(rowregexid, rowstart, rowstop, jsonString, rowpos, rowlen) ;
         end ;
         keep &string_colnames. &num_colnames. &date_colnames. ;
