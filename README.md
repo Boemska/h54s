@@ -169,7 +169,7 @@ Easy, right? Read on.
 
 ## Data Structures and Conventions
 
-The *Atomic Unit of Data transfer* for a H54S based App is the Dataset. This is a universal concept familiar to both JS and SAS programmers. In JavaScript Speak, a Dataset is an [object array](http://www.w3schools.com/json/json_syntax.asp), similar to the one created in the example above. Using [this terminology](http://www.w3schools.com/js/js_arrays.asp), ach object in an array is the row of a dataset, and each of it's named members is the value of a variable of the same name. 
+The *Atomic Unit of Data transfer* for a H54S based App is the Dataset. This is a universal concept familiar to both JS and SAS programmers. In JavaScript Speak, a Dataset is an [object array](http://www.w3schools.com/json/json_syntax.asp), similar to the one created in the example above. Using [this terminology](http://www.w3schools.com/js/js_arrays.asp), each object in an array is the row of a dataset, and each of it's named members is the value of a variable of the same name. 
 
 Data Types between the front-end and back-end are mapped as follows:
 
@@ -228,7 +228,7 @@ Voila.
 
 This macro deserialises a JavaScript data object into a SAS table.
 
-`jsonvarname` is  the name given to the table array from the front end, coresponding to macroName in the `h54s.Tables(tableArray, macroName)` example 
+`jsonvarname` is  the name given to the table array from the front end, corresponding to macroName in the `h54s.Tables(tableArray, macroName)` example 
 
 `outdset` is the name of the target dataset that the tableArray is to be deserialised into
 
