@@ -254,16 +254,6 @@ This macro closes the output stream for data objects. Counterpart to `%hfsHeader
 
 This macro checks for the existence of an `&h54src` return code macro variable, and if present and is not set to 0, will output the associated error message to the front end before terminating the rest of the Stored Process code. 
 
-### hfsOutSingleMacro(objectName, singleValue);
-
-**Note: Avoid using this**
-
-This outputs a simple numeric value to the front end. Only designed for outputting things like SQLXRC. Breaks datasets in / datasets out convention. Will probably get removed but some older implementations still use it. 
-
-`objectName` is the name of the target JS object that the macro will be transmitted as 
-
-`singleValue` is the value in question
-
 
 ## JavaScript API Reference
 
