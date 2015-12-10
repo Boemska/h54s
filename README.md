@@ -106,7 +106,7 @@ Assuming that you have a local Web Server installed for development:
 
    Fire up your browser. This is where Chrome comes in handy, as it allows developers to disable [Same-Origin Policy](https://en.wikipedia.org/wiki/Same-origin_policy). To tell your browser to allow background requests to non-local pages while you develop, you need to start Chrome with the `--disable-web-security` command line flag. When you see this warning, you're in business:
 
-   ![Chrome with --disable-web-security](img/chrome_dws.png)
+   ![Chrome with --disable-web-security](https://cloud.githubusercontent.com/assets/1783133/11691304/abd0cb1a-9e9a-11e5-8d5e-9706b62a272f.png)
 
 3. Load your `index.html` page, Open Chrome Developer Tools (F12), Open the Console tab.
 
@@ -143,11 +143,11 @@ adapter.call('/Apps/myFirstService', tables, function(err, res) {
 ```
 If you're logged into your SPWA and have a session cookie already, you should see this:
 
-   ![Chrome console animation](img/loggedin.gif)
+   ![Chrome console animation](https://cloud.githubusercontent.com/assets/1783133/11691306/aff89f10-9e9a-11e5-9edd-f9a4d4e8c1b1.gif)
 
 Otherwise, if you're not logged in yet, you should see this:
 
-   ![Chrome console animation](img/loggedout.png)
+   ![Chrome console animation](https://cloud.githubusercontent.com/assets/1783133/11691314/b763135c-9e9a-11e5-9e2a-cad9c4b50bd4.png)
 
 The easist thing to do at this point is to log into your SPWA in another tab, refresh your page and try running the code again. However, if you're feeling adventurous you could skip ahead and try this in the console:
 
