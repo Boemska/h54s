@@ -460,8 +460,8 @@ options NOQUOTELENMAX LRECL=32000 spool;
 * keep quiet in the log;
   %hfsQuietenDown;
 
-  * check if the specified dataset exists and if not then gracefully quit this macro ;
-  %if (%sysfunc(exist(&libn..&dsn)) = 0) %then %do;
+  * check if the specified dataset / view exists and if not then gracefully quit this macro ;
+  %if (%sysfunc(exist(&libn..&dsn))=0 and %sysfunc(exist(&libn..&dsn,VIEW))=0) %then %do;
     *abort macro execution but first make sure there is a message;
     %global logmessage h54src;
     %let logmessage=ERROR - Output table &libn..&dsn was not found;
@@ -477,19 +477,16 @@ options NOQUOTELENMAX LRECL=32000 spool;
 
 
   data _null_;
-    qc = '"';
-    call symput('qc', qc);
-    prefix = upcase("&dsn.");
-    call symput('pf', prefix);
-    dc='$';
-    call symput('dc', dc);
-    dt_='dt_';
-    call symput('dt_', dt_);
+    call symput('qc', '"');
+    call symput('pf', "%upcase(&dsn)");
+    call symput('dc', '$');
+    call symput('dt_', 'dt_');
   run;
 
   proc sql;
     create table tempCols as
-    select upcase(name) as name, type, length from dictionary.columns where upcase(memname)=upcase("&dsn.") and libname = upcase("&libn.");
+    select upcase(name) as name, type, length from dictionary.columns 
+    where upcase(memname)="%upcase(&dsn)" and libname="%upcase(&libn)";
   quit;
 
   %let totalCols = &sqlObs;
