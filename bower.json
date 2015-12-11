@@ -17,6 +17,7 @@
     "karma.conf.js",
     "Package.json",
     "test",
-    "examples"
+    "examples",
+    "sasautos"
   ]
 }
