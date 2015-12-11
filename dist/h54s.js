@@ -1,4 +1,4 @@
-/*! h54s v0.7.1 - 2015-11-18 
+/*! h54s v0.7.3 - 2015-12-11 
  *  License: GPL V3 
  *  Author: Boemska 
 */
@@ -240,6 +240,9 @@ h54s.Tables = function(table, macroName) {
 
   this.add(table, macroName);
 };
+
+//replaced in concat and uglify-replace tasks
+h54s.version = '0.7.3';
 
 /* global h54s */
 
@@ -616,9 +619,11 @@ h54s.prototype._utils.ajax = (function () {
       }
     };
 
-    timeoutHandle = setTimeout(function() {
-      request.abort();
-    }, timeout);
+    if(timeout > 0) {
+      timeoutHandle = setTimeout(function() {
+        request.abort();
+      }, timeout);
+    }
 
     request.send(data);
 
