@@ -34,7 +34,9 @@ module.exports = function (grunt) {
       options: {
         banner: bannerContent,
         process: function(src, filepath) {
-          return src.replace("('/base/test/h54sConfig.json')", "('h54sConfig.json')");
+          var pkg = require('./package.json');
+          return src.replace("('/base/test/h54sConfig.json')", "('h54sConfig.json')")
+                    .replace('__version__', pkg.version);
         }
       },
       target: {
@@ -52,6 +54,22 @@ module.exports = function (grunt) {
       target : {
         src : srcFiles,
         dest : 'dist/' + name + '.min.js'
+      }
+    },
+    'string-replace': {
+      dist: {
+        files: {
+          'dist/h54s.min.js': 'dist/h54s.min.js'
+        },
+        options: {
+          replacements: [{
+            pattern: '__version__',
+            replacement: '<%= pkg.version %>'
+          }, {
+            pattern: '/base/test/h54sConfig.json',
+            replacement: 'h54sConfig.json'
+          }]
+        }
       }
     },
     karma: {
@@ -132,9 +150,12 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-connect');
+  grunt.loadNpmTasks('grunt-string-replace');
+
+  grunt.registerTask('uglify-replace', ['uglify', 'string-replace']);
 
   grunt.registerTask('default', ['jshint', 'karma:run']);
-  grunt.registerTask('release', ['jshint', 'concat', 'karma:release', 'uglify', 'karma:ugly']);
+  grunt.registerTask('release', ['jshint', 'concat', 'karma:release', 'uglify-replace', 'karma:ugly']);
   grunt.registerTask('watch', 'karma:dev');
 
   grunt.registerTask('serveAngular', 'connect:angular');
