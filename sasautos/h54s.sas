@@ -475,7 +475,7 @@ options NOQUOTELENMAX LRECL=32000 spool;
     %return;
   %end;
 
-
+  * macro variables in datastep enables logging via mprint;
   data _null_;
     call symput('qc', '"');
     call symput('pf', "%upcase(&dsn)");
@@ -483,52 +483,40 @@ options NOQUOTELENMAX LRECL=32000 spool;
     call symput('dt_', 'dt_');
   run;
 
-  proc sql;
-    create table tempCols as
-    select upcase(name) as name, type, length from dictionary.columns 
-    where upcase(memname)="%upcase(&dsn)" and libname="%upcase(&libn)";
-  quit;
-
-  %let totalCols = &sqlObs;
-
-  proc sql;
-    select trim(name), trim(type), length into :name1-:name999, :type1-:type999, :length1-:length999
-    from tempCols;
-  quit;
-
-  * get first and last column names;
-
-  data tempCols;
-    set tempCols end=lastcol;
-    if _n_ = 1 then do;
-      call symput('firstCol', strip(name));
-    end;
-    if lastcol then do;
-      call symput('lastCol', strip(name));
-    end;
+  proc contents noprint data=&libn..&dsn out=tempCols(keep=name type length);
   run;
 
+  * get first and last column names;
+  data _null_;
+    set tempCols end=lastcol;
+    name=upcase(name);
+    if _n_ = 1 then do;
+      call symputx('firstCol',name,'l');
+    end;
+    call symputx(cats('name',_n_),name,'l');
+    call symputx(cats('type',_n_),type,'l');
+    call symputx(cats('length',_n_),length,'l');
+    if lastcol then do;
+      call symputx('lastCol',name,'l');
+      call symputx('totalCols',_n_,'l');
+    end;
+  run;
+  
 
   *create the urlencoded view here;
   proc sql;
     create view tempOutputView as 
   select
   %do colNo= 1 %to &totalCols;
-    %if &&&name&colNo = &lastCol %then %do;
-      %if &&&type&colNo = char %then %do;
-        urlencode(strip(&&&name&colNo)) as &&&name&colNo length=30000
-      %end;
-      %else %do;
-        &&&name&colNo as &&&name&colNo
-      %end;
+    /* type 1=numeric, type 2=character in proc contents */
+    %if &&&type&colNo = 2 %then %do;
+      urlencode(strip(&&&name&colNo)) as &&&name&colNo length=30000
     %end;
     %else %do;
-      %if &&&type&colNo = char %then %do;
-        urlencode(strip(&&&name&colNo)) as &&&name&colNo length=30000,
-      %end;
-      %else %do;
-        &&&name&colNo as &&&name&colNo,
-      %end;
+      &&&name&colNo as &&&name&colNo
+    %end;
+    %if &&&name&colNo ne &lastCol %then %do;
+      ,
     %end;
   %end;
 
@@ -537,22 +525,25 @@ options NOQUOTELENMAX LRECL=32000 spool;
 
 
   *column types have changed so get metadata for output again;
-  * TODO: This needs to be changed from dictionary cols to proc datasets
-          so that there is an faster option for servers with many preassigned
-          DBMS libs etc 
-  ; 
-  proc sql;
-    create table tempCols as
-    select name, type, length from dictionary.columns where memname="TEMPOUTPUTVIEW" and libname = "WORK";
-  quit;
+  proc contents noprint data=TEMPOUTPUTVIEW out=tempCols(keep=name type length);
+  run;
 
-  %let totalCols = &sqlObs;
-
-  proc sql;
-    select trim(name), trim(type), length into :name1-:name999, :type1-:type999, :length1-:length999
-    from tempCols;
-  quit;
-
+  * get first and last column names;
+  data _null_;
+    set tempCols end=lastcol;
+    name=upcase(name);
+    if _n_ = 1 then do;
+      call symputx('firstCol',name,'l');
+    end;
+    call symputx(cats('name',_n_),name,'l');
+    call symputx(cats('type',_n_),type,'l');
+    call symputx(cats('length',_n_),length,'l');
+    
+    if lastcol then do;
+      call symputx('lastCol',name,'l');
+      call symputx('totalCols',_n_,'l');
+    end;
+  run;
 
   *output to webout ;
   data _null_;
@@ -563,15 +554,15 @@ options NOQUOTELENMAX LRECL=32000 spool;
   data _null_;
     file &h54starget.;
     set tempOutputView end=lastrec;
-    format _all_;
-
+    /* strip SAS numeric formats whilst retaining precision */ 
+    format _numeric_ best32.;
     %do colNo= 1 %to &totalCols;
       %if &totalCols = 1 %then %do;
-        %if &&&type&colNo = char %then %do;
+        %if &&&type&colNo = 2 %then %do;
           put '{"' "&&&name&colNo" '":"' &&&name&colNo +(-1) '"}';
           if not lastrec then put ",";
         %end;
-      %if &&&type&colNo = num %then %do;
+      %if &&&type&colNo = 1 %then %do;
         if &&&name&colNo = . then put '{"' "&&&name&colNo" '":' 'null ' +(-1) '}';
         else put '{"' "&&&name&colNo" '":' &&&name&colNo +(-1) '}';
         if not lastrec then put ",";
@@ -579,21 +570,21 @@ options NOQUOTELENMAX LRECL=32000 spool;
       %end;
 
       %else %if &&&name&colNo = &firstCol %then %do;
-        %if &&&type&colNo = char %then %do;
+        %if &&&type&colNo = 2 %then %do;
           put '{"' "&&&name&colNo" '":"' &&&name&colNo +(-1) '",';
         %end;
-        %if &&&type&colNo = num %then %do;
+        %if &&&type&colNo = 1 %then %do;
           if &&&name&colNo = . then put '{"' "&&&name&colNo" '":' 'null ' +(-1) ',';
           else put '{"' "&&&name&colNo" '":' &&&name&colNo +(-1) ',';
         %end;
       %end;
 
       %else %if &&&name&colNo = &lastCol %then %do;
-        %if &&&type&colNo = char %then %do;
+        %if &&&type&colNo = 2 %then %do;
           put '"' "&&&name&colNo" '":"' &&&name&colNo +(-1) '"}';
           if not lastrec then put ",";
         %end;
-        %if &&&type&colNo = num %then %do;
+        %if &&&type&colNo = 1 %then %do;
           if &&&name&colNo = . then put '"' "&&&name&colNo" '":' 'null ' +(-1) '}';
           else put '"' "&&&name&colNo" '":' &&&name&colNo +(-1) '}';
           if not lastrec then put ",";
@@ -601,10 +592,10 @@ options NOQUOTELENMAX LRECL=32000 spool;
       %end;
 
       %else %do;
-        %if &&&type&colNo = char %then %do;
+        %if &&&type&colNo = 2 %then %do;
           put '"' "&&&name&colNo" '":"' &&&name&colNo +(-1) '",';
         %end;
-        %if &&&type&colNo = num %then %do;
+        %if &&&type&colNo = 1 %then %do;
           if &&&name&colNo = . then put '"' "&&&name&colNo" '":' 'null ' +(-1) ',';
           else put '"' "&&&name&colNo" '":' &&&name&colNo +(-1) ',';
         %end;
