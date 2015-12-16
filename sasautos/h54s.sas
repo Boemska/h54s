@@ -475,14 +475,6 @@ options NOQUOTELENMAX LRECL=32000 spool;
     %return;
   %end;
 
-  * macro variables in datastep enables logging via mprint;
-  data _null_;
-    call symput('qc', '"');
-    call symput('pf', "%upcase(&dsn)");
-    call symput('dc', '$');
-    call symput('dt_', 'dt_');
-  run;
-
   proc contents noprint data=&libn..&dsn out=tempCols(keep=name type length);
   run;
 
@@ -495,7 +487,9 @@ options NOQUOTELENMAX LRECL=32000 spool;
     end;
     call symputx(cats('name',_n_),name,'l');
     call symputx(cats('type',_n_),type,'l');
-    call symputx(cats('length',_n_),length,'l');
+    /* char vars are urlencoded and lengthened to 30000 in next step */
+    if type=2 then call symputx(cats('length',_n_),30000,'l');
+    else call symputx(cats('length',_n_),length,'l');
     if lastcol then do;
       call symputx('lastCol',name,'l');
       call symputx('totalCols',_n_,'l');
@@ -505,8 +499,8 @@ options NOQUOTELENMAX LRECL=32000 spool;
 
   *create the urlencoded view here;
   proc sql;
-    create view tempOutputView as 
-  select
+  create view tempOutputView as 
+    select
   %do colNo= 1 %to &totalCols;
     /* type 1=numeric, type 2=character in proc contents */
     %if &&&type&colNo = 2 %then %do;
@@ -519,31 +513,8 @@ options NOQUOTELENMAX LRECL=32000 spool;
       ,
     %end;
   %end;
-
-  from &libn..&dsn.
+    from &libn..&dsn.
   quit;
-
-
-  *column types have changed so get metadata for output again;
-  proc contents noprint data=TEMPOUTPUTVIEW out=tempCols(keep=name type length);
-  run;
-
-  * get first and last column names;
-  data _null_;
-    set tempCols end=lastcol;
-    name=upcase(name);
-    if _n_ = 1 then do;
-      call symputx('firstCol',name,'l');
-    end;
-    call symputx(cats('name',_n_),name,'l');
-    call symputx(cats('type',_n_),type,'l');
-    call symputx(cats('length',_n_),length,'l');
-    
-    if lastcol then do;
-      call symputx('lastCol',name,'l');
-      call symputx('totalCols',_n_,'l');
-    end;
-  run;
 
   *output to webout ;
   data _null_;
@@ -562,10 +533,10 @@ options NOQUOTELENMAX LRECL=32000 spool;
           put '{"' "&&&name&colNo" '":"' &&&name&colNo +(-1) '"}';
           if not lastrec then put ",";
         %end;
-      %if &&&type&colNo = 1 %then %do;
-        if &&&name&colNo = . then put '{"' "&&&name&colNo" '":' 'null ' +(-1) '}';
-        else put '{"' "&&&name&colNo" '":' &&&name&colNo +(-1) '}';
-        if not lastrec then put ",";
+        %else %if &&&type&colNo = 1 %then %do;
+          if &&&name&colNo = . then put '{"' "&&&name&colNo" '":' 'null ' +(-1) '}';
+          else put '{"' "&&&name&colNo" '":' &&&name&colNo +(-1) '}';
+          if not lastrec then put ",";
         %end;
       %end;
 
@@ -573,7 +544,7 @@ options NOQUOTELENMAX LRECL=32000 spool;
         %if &&&type&colNo = 2 %then %do;
           put '{"' "&&&name&colNo" '":"' &&&name&colNo +(-1) '",';
         %end;
-        %if &&&type&colNo = 1 %then %do;
+        %else %if &&&type&colNo = 1 %then %do;
           if &&&name&colNo = . then put '{"' "&&&name&colNo" '":' 'null ' +(-1) ',';
           else put '{"' "&&&name&colNo" '":' &&&name&colNo +(-1) ',';
         %end;
@@ -584,7 +555,7 @@ options NOQUOTELENMAX LRECL=32000 spool;
           put '"' "&&&name&colNo" '":"' &&&name&colNo +(-1) '"}';
           if not lastrec then put ",";
         %end;
-        %if &&&type&colNo = 1 %then %do;
+        %else %if &&&type&colNo = 1 %then %do;
           if &&&name&colNo = . then put '"' "&&&name&colNo" '":' 'null ' +(-1) '}';
           else put '"' "&&&name&colNo" '":' &&&name&colNo +(-1) '}';
           if not lastrec then put ",";
@@ -595,7 +566,7 @@ options NOQUOTELENMAX LRECL=32000 spool;
         %if &&&type&colNo = 2 %then %do;
           put '"' "&&&name&colNo" '":"' &&&name&colNo +(-1) '",';
         %end;
-        %if &&&type&colNo = 1 %then %do;
+        %else %if &&&type&colNo = 1 %then %do;
           if &&&name&colNo = . then put '"' "&&&name&colNo" '":' 'null ' +(-1) ',';
           else put '"' "&&&name&colNo" '":' &&&name&colNo +(-1) ',';
         %end;
