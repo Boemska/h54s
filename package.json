@@ -1,6 +1,6 @@
 {
   "name": "h54s",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "HTML5 Data Adapter for SAS",
   "main": "index.js",
   "scripts": {
@@ -15,6 +15,7 @@
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-contrib-uglify": "^0.6.0",
     "grunt-karma": "^0.12.0",
+    "grunt-string-replace": "^1.2.0",
     "karma": "^0.13.9",
     "karma-chrome-launcher": "^0.2.0",
     "karma-mocha": "^0.1.9",

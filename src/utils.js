@@ -34,9 +34,11 @@ h54s.prototype._utils.ajax = (function () {
       }
     };
 
-    timeoutHandle = setTimeout(function() {
-      request.abort();
-    }, timeout);
+    if(timeout > 0) {
+      timeoutHandle = setTimeout(function() {
+        request.abort();
+      }, timeout);
+    }
 
     request.send(data);
 

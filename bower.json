@@ -1,6 +1,6 @@
 {
   "name": "h54s",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "homepage": "https://github.com/Boemska/h54s",
   "authors": [
     "Bojan Djurdjevic <bojan@boemskats.com>"
@@ -17,6 +17,7 @@
     "karma.conf.js",
     "Package.json",
     "test",
-    "examples"
+    "examples",
+    "sasautos"
   ]
 }
