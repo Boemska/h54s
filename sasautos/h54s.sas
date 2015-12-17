@@ -475,8 +475,11 @@ options NOQUOTELENMAX LRECL=32000 spool;
     %return;
   %end;
 
-  proc contents noprint data=&libn..&dsn out=tempCols(keep=name type length);
+  proc contents noprint data=&libn..&dsn 
+    out=tempCols(keep=name type length varnum);
   run;
+  
+  proc sort data=tempCols; by varnum; run;
 
   * get first and last column names;
   data _null_;
