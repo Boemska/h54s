@@ -306,3 +306,4 @@ module.exports.clearAllLogs = function() {
 };
 
 module.exports._utils = require('./utils.js');
+module.exports._utils.ajax = require('./ajax.js');

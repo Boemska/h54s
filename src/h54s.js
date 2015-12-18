@@ -126,9 +126,7 @@ h54s._logs = {
 };
 
 
-//wrapp it all together
 h54s.prototype = require('./methods/methods.js');
-h54s.prototype._utils.ajax = require('./methods/ajax.js');
 
 h54s.Tables = require('./tables/tables.js');
 h54s.Error = require('./error.js');
