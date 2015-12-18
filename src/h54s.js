@@ -7,7 +7,7 @@
 *@param {object} config - adapter config object, with keys like url, debug, etc.
 *
 */
-var h54s = function(config) {
+var h54s = module.exports = function(config) {
 
   //default config values
   this.maxXhrRetries    = 5;
@@ -115,37 +115,23 @@ h54s.prototype.onRemoteConfigUpdate = function(callback) {
   this.remoteConfigUpdateCallbacks.push(callback);
 };
 
-/*
-* h54s error constructor
-* @constructor
-*
-*@param {string} type - Error type
-*@param {string} message - Error message
-*
-*/
-h54s.Error = function(type, message) {
-  if(Error.captureStackTrace) {
-    Error.captureStackTrace(this);
-  }
-  this.message  = message;
-  this.type     = type;
-};
-
-h54s.Error.prototype = Object.create(Error.prototype);
-
-/*
-* h54s tables object constructor
-* @constructor
-*
-*@param {array} table - Table added when object is created
-*@param {string} message - macro name
-*
-*/
-h54s.Tables = function(table, macroName) {
-  this._tables = {};
-
-  this.add(table, macroName);
-};
-
 //replaced in concat and uglify-replace tasks
 h54s.version = '__version__';
+
+h54s._logs = {
+  applicationLogs: [],
+  debugData: [],
+  sasErrors: [],
+  failedRequests: []
+};
+
+
+//wrapp it all together
+h54s.prototype = require('./methods/methods.js');
+h54s.prototype._utils.ajax = require('./methods/ajax.js');
+
+h54s.Tables = require('./tables/tables.js');
+h54s.Error = require('./error.js');
+
+//self invoked function module
+require('./ie_polyfills.js');

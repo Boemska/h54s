@@ -1,0 +1,273 @@
+/*
+* Parse response from server in debug mode
+*
+* @param {object} responseText - response html from the server
+* @param {string} sasProgram - sas program path
+* @param {object} params - params sent to sas program with addTable
+*
+*/
+module.exports.parseDebugRes = function(responseText, sasProgram, params) {
+  //find json
+  var patt          = /^(.?--h54s-data-start--)([\S\s]*)(--h54s-data-end--)/m;
+  var matches       = responseText.match(patt);
+
+  var page          = responseText.replace(patt, '');
+  var htmlBodyPatt  = /<body.*>([\s\S]*)<\/body>/;
+  var bodyMatches   = page.match(htmlBodyPatt);
+
+  //remove html tags
+  var debugText = bodyMatches[1].replace(/<[^>]*>/g, '');
+  debugText     = this.decodeHTMLEntities(debugText);
+
+  h54s._logs.debugData.push({
+    debugHtml:  bodyMatches[1],
+    debugText:  debugText,
+    sasProgram: sasProgram,
+    params:     params,
+    time:       new Date()
+  });
+
+  //max 20 debug objects
+  if(h54s._logs.debugData.length > 20) {
+    h54s._logs.debugData.shift();
+  }
+
+  this.parseErrorResponse(responseText, sasProgram);
+
+  //remove new lines in json response
+  var jsonObj = JSON.parse(matches[2].replace(/(\r\n|\r|\n)/g, ''));
+  if(debugText.indexOf('ERROR:') !== -1) {
+    jsonObj.hasErrors = true;
+  }
+
+  return jsonObj;
+};
+
+/*
+* Add failed response to logs - used only if debug=false
+*
+* @param {object} responseText - response html from the server
+* @param {string} sasProgram - sas program path
+*
+*/
+module.exports.addFailedResponse = function(responseText, sasProgram) {
+  var patt      = /<script([\s\S]*)\/form>/;
+  var patt2     = /display\s?:\s?none;?\s?/;
+  //remove script with form for toggling the logs and "display:none" from style
+  responseText  = responseText.replace(patt, '').replace(patt2, '');
+  var debugText = responseText.replace(/<[^>]*>/g, '');
+  debugText = this.decodeHTMLEntities(debugText);
+
+  h54s._logs.failedRequests.push({
+    responseHtml: responseText,
+    responseText: debugText,
+    sasProgram:   sasProgram,
+    time:         new Date()
+  });
+
+  //max 20 failed requests
+  if(h54s._logs.failedRequests.length > 20) {
+    h54s._logs.failedRequests.shift();
+  }
+};
+
+/*
+* Unescape all string values in returned object
+*
+* @param {object} obj
+*
+*/
+module.exports.unescapeValues = function(obj) {
+  for (var key in obj) {
+    if (typeof obj[key] === 'string') {
+      obj[key] = decodeURIComponent(obj[key]);
+    } else if(typeof obj === 'object') {
+      this.unescapeValues(obj[key]);
+    }
+  }
+  return obj;
+};
+
+/*
+* Parse error response from server and save errors in memory
+*
+* @param {string} res - server response
+* #param {string} sasProgram - sas program which returned the response
+*
+*/
+module.exports.parseErrorResponse = function(res, sasProgram) {
+  var patt    = /ERROR(.*\.|.*\n.*\.)/g;
+  var errors  = res.match(patt);
+  if(!errors) {
+    return;
+  }
+
+  var errMessage;
+  for(var i = 0, n = errors.length; i < n; i++) {
+    errMessage  = errors[i].replace(/<[^>]*>/g, '').replace(/(\n|\s{2,})/g, ' ');
+    errMessage  = this.decodeHTMLEntities(errMessage);
+    errors[i]   = {
+      sasProgram: sasProgram,
+      message:    errMessage,
+      time:       new Date()
+    };
+  }
+  h54s._logs.sasErrors = h54s._logs.sasErrors.concat(errors);
+
+  while(h54s._logs.sasErrors.length > 100) {
+    h54s._logs.sasErrors.shift();
+  }
+};
+
+/*
+* Decode HTML entities
+*
+* @param {string} res - server response
+*
+*/
+module.exports.decodeHTMLEntities = function (html) {
+  var tempElement = document.createElement('span');
+  var str         = html.replace(/&(#(?:x[0-9a-f]+|\d+)|[a-z]+);/gi,
+    function (str) {
+      tempElement.innerHTML = str;
+      str                   = tempElement.textContent || tempElement.innerText;
+      return str;
+    }
+  );
+  return str;
+};
+
+/*
+* Adds application logs to an array of logs
+*
+* @param {string} res - server response
+*
+*/
+module.exports.addApplicationLogs = function(message, sasProgram) {
+  if(message === 'blank') {
+    return;
+  }
+  var log = {
+    message:    message,
+    time:       new Date(),
+    sasProgram: sasProgram
+  };
+  h54s._logs.applicationLogs.push(log);
+
+  //100 log messages max
+  if(h54s._logs.applicationLogs.length > 100) {
+    h54s._logs.applicationLogs.shift();
+  }
+};
+
+/*
+* Convert javascript date to sas time
+*
+* @param {object} jsDate - javascript Date object
+*
+*/
+module.exports.toSasDateTime = function (jsDate) {
+  var basedate = new Date("January 1, 1960 00:00:00");
+  var currdate = jsDate;
+
+  // offsets for UTC and timezones and BST
+  var baseOffset = basedate.getTimezoneOffset(); // in minutes
+  var currOffset = currdate.getTimezoneOffset(); // in minutes
+
+  // convert currdate to a sas datetime
+  var offsetSecs    = (currOffset - baseOffset) * 60; // offsetDiff is in minutes to start with
+  var baseDateSecs  = basedate.getTime() / 1000; // get rid of ms
+  var currdateSecs  = currdate.getTime() / 1000; // get rid of ms
+  var sasDatetime   = Math.round(currdateSecs - baseDateSecs - offsetSecs); // adjust
+
+  return sasDatetime;
+};
+
+/*
+* Convert sas time to javascript date
+*
+* @param {number} sasDate - sas Tate object
+*
+*/
+module.exports.fromSasDateTime = function (sasDate) {
+  var basedate = new Date("January 1, 1960 00:00:00");
+  var currdate = sasDate;
+
+  // offsets for UTC and timezones and BST
+  var baseOffset = basedate.getTimezoneOffset(); // in minutes
+
+  // convert sas datetime to a current valid javascript date
+  var basedateMs  = basedate.getTime(); // in ms
+  var currdateMs  = currdate * 1000; // to ms
+  var sasDatetime = currdateMs + basedateMs;
+  var jsDate      = new Date();
+  jsDate.setTime(sasDatetime); // first time to get offset BST daylight savings etc
+  var currOffset  = jsDate.getTimezoneOffset(); // adjust for offset in minutes
+  var offsetVar   = (baseOffset - currOffset) * 60 * 1000; // difference in milliseconds
+  var offsetTime  = sasDatetime - offsetVar; // finding BST and daylight savings
+  jsDate.setTime(offsetTime); // update with offset
+  return jsDate;
+};
+
+/*
+* Convert sas timestamps to javascript Date object
+*
+* @param {object} obj
+*
+*/
+module.exports.convertDates = function(obj) {
+  for (var key in obj) {
+    if (typeof obj[key] === 'number' && (key.indexOf('dt_') === 0 || key.indexOf('DT_') === 0)) {
+      obj[key] = this.fromSasDateTime(obj[key]);
+    } else if(typeof obj === 'object') {
+      this.convertDates(obj[key]);
+    }
+  }
+  return obj;
+};
+
+module.exports.needToLogin = function(responseObj) {
+  var patt = /<form.+action="(.*Logon[^"]*).*>/;
+  var matches = patt.exec(responseObj.responseText);
+  var newLoginUrl;
+
+  if(!matches) {
+    //there's no form, we are in. hooray!
+    return false;
+  } else {
+    var actionUrl = matches[1].replace(/\?.*/, '');
+    if(actionUrl.charAt(0) === '/') {
+      newLoginUrl = this.hostUrl ? this.hostUrl + actionUrl : actionUrl;
+      if(newLoginUrl !== this.loginUrl) {
+        this._loginChanged = true;
+        this.loginUrl = newLoginUrl;
+      }
+    } else {
+      //relative path
+
+      var lastIndOfSlash = responseObj.responseURL.lastIndexOf('/') + 1;
+      //remove everything after the last slash, and everything until the first
+      var relativeLoginUrl = responseObj.responseURL.substr(0, lastIndOfSlash).replace(/.*\/{2}[^\/]*/, '') + actionUrl;
+      newLoginUrl = this.hostUrl ? this.hostUrl + relativeLoginUrl : relativeLoginUrl;
+      if(newLoginUrl !== this.loginUrl) {
+        this._loginChanged = true;
+        this.loginUrl = newLoginUrl;
+      }
+    }
+
+    //save parameters from hidden form fields
+    var inputs = responseObj.responseText.match(/<input.*"hidden"[^>]*>/g);
+    var hiddenFormParams = {};
+    if(inputs) {
+      //it's new login page if we have these additional parameters
+      this._isNewLoginPage = true;
+      inputs.forEach(function(inputStr) {
+        var valueMatch = inputStr.match(/name="([^"]*)"\svalue="([^"]*)/);
+        hiddenFormParams[valueMatch[1]] = valueMatch[2];
+      });
+      this._aditionalLoginParams = hiddenFormParams;
+    }
+
+    return true;
+  }
+};

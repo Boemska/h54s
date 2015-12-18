@@ -7,7 +7,7 @@
 * @param {function} callback - Callback function called when ajax call is finished
 *
 */
-h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
+module.exports.call = function(sasProgram, tablesObj, callback, params) {
   var self        = this;
   var retryCount  = 0;
   var dbg         = this.debug;
@@ -52,7 +52,7 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
   }
 
   this._utils.ajax.post(this.url, params).success(function(res) {
-    if(self._needToLogin(res)) {
+    if(self._utils.needToLogin.call(self, res)) {
       //remember the call for latter use
       self._pendingCalls.push({
         sasProgram: sasProgram,
@@ -137,7 +137,7 @@ h54s.prototype.call = function(sasProgram, tablesObj, callback, params) {
 * @param {function} callback - Callback function called when ajax call is finished
 *
 */
-h54s.prototype.login = function(user, pass, callback) {
+module.exports.login = function(user, pass, callback) {
   var self = this;
 
   if(!user || !pass) {
@@ -166,7 +166,7 @@ h54s.prototype.login = function(user, pass, callback) {
   }
 
   this._utils.ajax.post(this.loginUrl, loginParams).success(function(res) {
-    if(self._needToLogin(res)) {
+    if(self._utils.needToLogin.call(self, res)) {
       //we are getting form again after redirect
       //and need to login again using the new url
       //_loginChanged is set in _needToLogin function
@@ -218,7 +218,7 @@ h54s.prototype.login = function(user, pass, callback) {
 * Get sas errors if there are some
 *
 */
-h54s.prototype.getSasErrors = function() {
+module.exports.getSasErrors = function() {
   return h54s._logs.sasErrors;
 };
 
@@ -226,7 +226,7 @@ h54s.prototype.getSasErrors = function() {
 * Get application logs
 *
 */
-h54s.prototype.getApplicationLogs = function() {
+module.exports.getApplicationLogs = function() {
   return h54s._logs.applicationLogs;
 };
 
@@ -234,7 +234,7 @@ h54s.prototype.getApplicationLogs = function() {
 * Get debug data
 *
 */
-h54s.prototype.getDebugData = function() {
+module.exports.getDebugData = function() {
   return h54s._logs.debugData;
 };
 
@@ -242,7 +242,7 @@ h54s.prototype.getDebugData = function() {
 * Get failed requests
 *
 */
-h54s.prototype.getFailedRequests = function() {
+module.exports.getFailedRequests = function() {
   return h54s._logs.failedRequests;
 };
 
@@ -250,7 +250,7 @@ h54s.prototype.getFailedRequests = function() {
 * Enter debug mode
 *
 */
-h54s.prototype.setDebugMode = function() {
+module.exports.setDebugMode = function() {
   this.debug = true;
 };
 
@@ -258,7 +258,7 @@ h54s.prototype.setDebugMode = function() {
 * Exit debug mode
 *
 */
-h54s.prototype.unsetDebugMode = function() {
+module.exports.unsetDebugMode = function() {
   this.debug = false;
 };
 
@@ -266,7 +266,7 @@ h54s.prototype.unsetDebugMode = function() {
 * Clear application logs
 *
 */
-h54s.prototype.clearApplicationLogs = function() {
+module.exports.clearApplicationLogs = function() {
   h54s._logs.applicationLogs = [];
 };
 
@@ -274,7 +274,7 @@ h54s.prototype.clearApplicationLogs = function() {
 * Clear debug data
 *
 */
-h54s.prototype.clearDebugData = function() {
+module.exports.clearDebugData = function() {
   h54s._logs.debugData = [];
 };
 
@@ -282,7 +282,7 @@ h54s.prototype.clearDebugData = function() {
 * Clear Sas errors
 *
 */
-h54s.prototype.clearSasErrors = function() {
+module.exports.clearSasErrors = function() {
   h54s._logs.sasErrors = [];
 };
 
@@ -290,7 +290,7 @@ h54s.prototype.clearSasErrors = function() {
 * Clear failed requests
 *
 */
-h54s.prototype.clearFailedRequests = function() {
+module.exports.clearFailedRequests = function() {
   h54s._logs.failedRequests = [];
 };
 
@@ -298,41 +298,11 @@ h54s.prototype.clearFailedRequests = function() {
 * Clear all logs
 *
 */
-h54s.prototype.clearAllLogs = function() {
+module.exports.clearAllLogs = function() {
   this.clearApplicationLogs();
   this.clearDebugData();
   this.clearSasErrors();
   this.clearFailedRequests();
 };
 
-/*
-* Add table to tables object
-* @param {array} table - Array of table objects
-* @param {string} macroName - Sas macro name
-*
-*/
-h54s.Tables.prototype.add = function(table, macroName) {
-  if(table && macroName) {
-    if(!(table instanceof Array)) {
-      throw new h54s.Error('argumentError', 'First argument must be array');
-    }
-    if(typeof macroName !== 'string') {
-      throw new h54s.Error('argumentError', 'Second argument must be string');
-    }
-    if(!isNaN(macroName[macroName.length - 1])) {
-      throw new h54s.Error('argumentError', 'Macro name cannot have number at the end');
-    }
-  } else {
-    throw new h54s.Error('argumentError', 'Missing arguments');
-  }
-
-  var result = this._utils.convertTableObject(table);
-
-  var tableArray = [];
-  tableArray.push(JSON.stringify(result.spec));
-  for (var numberOfTables = 0; numberOfTables < result.data.length; numberOfTables++) {
-    var outString = JSON.stringify(result.data[numberOfTables]);
-    tableArray.push(outString);
-  }
-  this._tables[macroName] = tableArray;
-};
+module.exports._utils = require('./utils.js');
