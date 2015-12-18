@@ -6,7 +6,7 @@
 *@param {string} message - Error message
 *
 */
-module.exports = function TypeError(type, message) {
+function h54sError(type, message) {
   if(Error.captureStackTrace) {
     Error.captureStackTrace(this);
   }
@@ -14,4 +14,6 @@ module.exports = function TypeError(type, message) {
   this.type     = type;
 };
 
-TypeError.prototype = Object.create(Error.prototype);
+h54sError.prototype = Object.create(Error.prototype);
+
+module.exports = h54sError;

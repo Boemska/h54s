@@ -1,3 +1,5 @@
+var h54sError = require('../error.js');
+
 /*
 * Convert table object to Sas readable object
 *
@@ -10,12 +12,12 @@ module.exports.convertTableObject = function(inObject) {
 
   // first check that the object is an array
   if (typeof (inObject) !== 'object') {
-    throw new h54s.Error('argumentError', 'The parameter passed to checkAndGetTypeObject is not an object');
+    throw new h54sError('argumentError', 'The parameter passed to checkAndGetTypeObject is not an object');
   }
 
   var arrayLength = inObject.length;
   if (typeof (arrayLength) !== 'number') {
-    throw new h54s.Error('argumentError', 'The parameter passed to checkAndGetTypeObject does not have a valid length and is most likely not an array');
+    throw new h54sError('argumentError', 'The parameter passed to checkAndGetTypeObject does not have a valid length and is most likely not an array');
   }
 
   var existingCols = {}; // this is just to make lookup easier rather than traversing array each time. Will transform after
@@ -60,15 +62,15 @@ module.exports.convertTableObject = function(inObject) {
 
       //throw an error if there's NaN value
       if(typeof thisValue === 'number' && isNaN(thisValue)) {
-        throw new h54s.Error('typeError', 'NaN value in one of the values (columns) is not allowed');
+        throw new h54sError('typeError', 'NaN value in one of the values (columns) is not allowed');
       }
 
       if(thisValue === -Infinity || thisValue === Infinity) {
-        throw new h54s.Error('typeError', thisValue.toString() + ' value in one of the values (columns) is not allowed');
+        throw new h54sError('typeError', thisValue.toString() + ' value in one of the values (columns) is not allowed');
       }
 
       if(thisValue === true || thisValue === false) {
-        throw new h54s.Error('typeError', 'Boolean value in one of the values (columns) is not allowed');
+        throw new h54sError('typeError', 'Boolean value in one of the values (columns) is not allowed');
       }
 
       // get type... if it is an object then convert it to json and store as a string
@@ -111,12 +113,12 @@ module.exports.convertTableObject = function(inObject) {
       chunkRowCount = chunkRowCount + 6 + key.length + thisSpec.encodedLength;
 
       if (checkAndIncrement(thisSpec) == -1) {
-        throw new h54s.Error('typeError', 'There is a type mismatch in the array between values (columns) of the same name.');
+        throw new h54sError('typeError', 'There is a type mismatch in the array between values (columns) of the same name.');
       }
     }
 
     if (chunkRowCount > chunkThreshold) {
-      throw new h54s.Error('argumentError', 'Row ' + j + ' exceeds size limit of 32kb');
+      throw new h54sError('argumentError', 'Row ' + j + ' exceeds size limit of 32kb');
     } else if(chunkArrayCount + chunkRowCount > chunkThreshold) {
       //create new array if this one is full and move the last item to the new array
       var lastRow = targetArray[currentTarget].pop(); // get rid of that last row

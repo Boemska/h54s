@@ -1,4 +1,4 @@
-/* global h54s */
+var h54sError = require('../error.js');
 
 /*
 * Call Sas program
@@ -13,13 +13,13 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
   var dbg         = this.debug;
 
   if (!callback || typeof callback !== 'function'){
-    throw new h54s.Error('argumentError', 'You must provide callback');
+    throw new h54sError('argumentError', 'You must provide callback');
   }
   if(!sasProgram) {
-    throw new h54s.Error('argumentError', 'You must provide Sas program file path');
+    throw new h54sError('argumentError', 'You must provide Sas program file path');
   }
   if(typeof sasProgram !== 'string') {
-    throw new h54s.Error('argumentError', 'First parameter should be string');
+    throw new h54sError('argumentError', 'First parameter should be string');
   }
 
   if(!params) {
@@ -38,7 +38,7 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
         }
       }
     } else {
-      throw new h54s.Error('argumentError', 'Wrong type of tables object');
+      throw new h54sError('argumentError', 'Wrong type of tables object');
     }
   }
 
@@ -74,7 +74,7 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
         self._utils.addApplicationLogs('Cannot extract _sasapp parameter from login URL');
       }
 
-      callback(new h54s.Error('notLoggedinError', 'You are not logged in'));
+      callback(new h54sError('notLoggedinError', 'You are not logged in'));
     } else {
       var resObj, unescapedResObj;
       if(!dbg) {
@@ -91,7 +91,7 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
           } else {
             self._utils.parseErrorResponse(res.responseText, sasProgram);
             self._utils.addFailedResponse(res.responseText, sasProgram);
-            callback(new h54s.Error('parseError', 'Unable to parse response json'));
+            callback(new h54sError('parseError', 'Unable to parse response json'));
           }
         } finally {
           if(unescapedResObj) {
@@ -106,12 +106,12 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
           unescapedResObj = self._utils.unescapeValues(resObj);
         } catch(e) {
           self._utils.parseErrorResponse(res.responseText, sasProgram);
-          callback(new h54s.Error('parseError', e.message));
+          callback(new h54sError('parseError', e.message));
         } finally {
           if(unescapedResObj) {
             self._utils.addApplicationLogs(resObj.logmessage);
             if(resObj.hasErrors) {
-              callback(new h54s.Error('sasError', 'Sas program completed with errors'), unescapedResObj);
+              callback(new h54sError('sasError', 'Sas program completed with errors'), unescapedResObj);
             } else {
               callback(undefined, unescapedResObj);
             }
@@ -121,7 +121,7 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
     }
   }).error(function(res) {
     self._utils.addApplicationLogs('Request failed with status: ' + res.status, sasProgram);
-    callback(new h54s.Error('httpError', res.statusText));
+    callback(new h54sError('httpError', res.statusText));
   });
 };
 
@@ -141,14 +141,14 @@ module.exports.login = function(user, pass, callback) {
   var self = this;
 
   if(!user || !pass) {
-    throw new h54s.Error('argumentError', 'Credentials not set');
+    throw new h54sError('argumentError', 'Credentials not set');
   }
   if(typeof user !== 'string' || typeof pass !== 'string') {
-    throw new h54s.Error('argumentError', 'User and pass parameters must be strings');
+    throw new h54sError('argumentError', 'User and pass parameters must be strings');
   }
   //NOTE: callback optional?
   if(!callback || typeof callback !== 'function') {
-    throw new h54s.Error('argumentError', 'You must provide callback');
+    throw new h54sError('argumentError', 'You must provide callback');
   }
 
   var loginParams = {

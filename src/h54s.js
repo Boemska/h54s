@@ -1,4 +1,4 @@
-/* global h54s: true */
+var h54sError = require('../error.js');
 
 /*
 * Represents html5 for sas adapter
@@ -66,7 +66,7 @@ var h54s = module.exports = function(config) {
         self.call(sasProgram, null, callback, params);
       }
     }).error(function (err) {
-      throw new h54s.Error('ajaxError', 'Remote config file cannot be loaded. Http status code: ' + err.status);
+      throw new h54sError('ajaxError', 'Remote config file cannot be loaded. Http status code: ' + err.status);
     });
   } else {
     _setConfig.call(this, config);
@@ -77,7 +77,7 @@ var h54s = module.exports = function(config) {
     if(!config) {
       return;
     } else if(typeof config !== 'object') {
-      throw new h54s.Error('argumentError', 'First parameter should be config object');
+      throw new h54sError('argumentError', 'First parameter should be config object');
     }
 
     //merge config object from parameter with this
@@ -129,7 +129,6 @@ h54s._logs = {
 h54s.prototype = require('./methods/methods.js');
 
 h54s.Tables = require('./tables/tables.js');
-h54s.Error = require('./error.js');
 
 //self invoked function module
 require('./ie_polyfills.js');

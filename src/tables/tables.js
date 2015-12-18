@@ -1,3 +1,5 @@
+var h54sError = require('../error.js');
+
 /*
 * h54s tables object constructor
 * @constructor
@@ -21,16 +23,16 @@ function Tables(table, macroName) {
 Tables.prototype.add = function(table, macroName) {
   if(table && macroName) {
     if(!(table instanceof Array)) {
-      throw new h54s.Error('argumentError', 'First argument must be array');
+      throw new h54sError('argumentError', 'First argument must be array');
     }
     if(typeof macroName !== 'string') {
-      throw new h54s.Error('argumentError', 'Second argument must be string');
+      throw new h54sError('argumentError', 'Second argument must be string');
     }
     if(!isNaN(macroName[macroName.length - 1])) {
-      throw new h54s.Error('argumentError', 'Macro name cannot have number at the end');
+      throw new h54sError('argumentError', 'Macro name cannot have number at the end');
     }
   } else {
-    throw new h54s.Error('argumentError', 'Missing arguments');
+    throw new h54sError('argumentError', 'Missing arguments');
   }
 
   var result = this._utils.convertTableObject(table);
