@@ -1,3 +1,5 @@
+var logs = require('../logs.js');
+
 /*
 * Parse response from server in debug mode
 *
@@ -19,18 +21,7 @@ module.exports.parseDebugRes = function(responseText, sasProgram, params) {
   var debugText = bodyMatches[1].replace(/<[^>]*>/g, '');
   debugText     = this.decodeHTMLEntities(debugText);
 
-  h54s._logs.debugData.push({
-    debugHtml:  bodyMatches[1],
-    debugText:  debugText,
-    sasProgram: sasProgram,
-    params:     params,
-    time:       new Date()
-  });
-
-  //max 20 debug objects
-  if(h54s._logs.debugData.length > 20) {
-    h54s._logs.debugData.shift();
-  }
+  logs.addDebugData(bodyMatches[1], debugText, sasProgram, params);
 
   this.parseErrorResponse(responseText, sasProgram);
 
@@ -58,17 +49,7 @@ module.exports.addFailedResponse = function(responseText, sasProgram) {
   var debugText = responseText.replace(/<[^>]*>/g, '');
   debugText = this.decodeHTMLEntities(debugText);
 
-  h54s._logs.failedRequests.push({
-    responseHtml: responseText,
-    responseText: debugText,
-    sasProgram:   sasProgram,
-    time:         new Date()
-  });
-
-  //max 20 failed requests
-  if(h54s._logs.failedRequests.length > 20) {
-    h54s._logs.failedRequests.shift();
-  }
+  logs.addFailedRequest(responseText, debugText, sasProgram);
 };
 
 /*
@@ -112,11 +93,8 @@ module.exports.parseErrorResponse = function(res, sasProgram) {
       time:       new Date()
     };
   }
-  h54s._logs.sasErrors = h54s._logs.sasErrors.concat(errors);
 
-  while(h54s._logs.sasErrors.length > 100) {
-    h54s._logs.sasErrors.shift();
-  }
+  addSasErrors(errors);
 };
 
 /*
@@ -135,29 +113,6 @@ module.exports.decodeHTMLEntities = function (html) {
     }
   );
   return str;
-};
-
-/*
-* Adds application logs to an array of logs
-*
-* @param {string} res - server response
-*
-*/
-module.exports.addApplicationLogs = function(message, sasProgram) {
-  if(message === 'blank') {
-    return;
-  }
-  var log = {
-    message:    message,
-    time:       new Date(),
-    sasProgram: sasProgram
-  };
-  h54s._logs.applicationLogs.push(log);
-
-  //100 log messages max
-  if(h54s._logs.applicationLogs.length > 100) {
-    h54s._logs.applicationLogs.shift();
-  }
 };
 
 /*

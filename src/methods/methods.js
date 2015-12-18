@@ -1,4 +1,5 @@
 var h54sError = require('../error.js');
+var logs = require('../logs.js');
 
 /*
 * Call Sas program
@@ -71,7 +72,7 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
         var sasAppMatches = res.responseURL.match(/_sasapp=([^&]*)/);
         self.sasApp = sasAppMatches[1].replace(/\+/g, ' ');
       } catch(e) {
-        self._utils.addApplicationLogs('Cannot extract _sasapp parameter from login URL');
+        self._utils.addApplicationLog('Cannot extract _sasapp parameter from login URL');
       }
 
       callback(new h54sError('notLoggedinError', 'You are not logged in'));
@@ -87,7 +88,7 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
           if(retryCount < self.maxXhrRetries) {
             self._utils.ajax.post(self.url, params).success(this.success).error(this.error);
             retryCount++;
-            self._utils.addApplicationLogs("Retrying #" + retryCount, sasProgram);
+            logs.addApplicationLog("Retrying #" + retryCount, sasProgram);
           } else {
             self._utils.parseErrorResponse(res.responseText, sasProgram);
             self._utils.addFailedResponse(res.responseText, sasProgram);
@@ -95,7 +96,7 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
           }
         } finally {
           if(unescapedResObj) {
-            self._utils.addApplicationLogs(resObj.logmessage, sasProgram);
+            logs.addApplicationLog(resObj.logmessage, sasProgram);
             callback(undefined, unescapedResObj);
           }
         }
@@ -109,7 +110,7 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
           callback(new h54sError('parseError', e.message));
         } finally {
           if(unescapedResObj) {
-            self._utils.addApplicationLogs(resObj.logmessage);
+            logs.addApplicationLog(resObj.logmessage);
             if(resObj.hasErrors) {
               callback(new h54sError('sasError', 'Sas program completed with errors'), unescapedResObj);
             } else {
@@ -120,7 +121,7 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
       }
     }
   }).error(function(res) {
-    self._utils.addApplicationLogs('Request failed with status: ' + res.status, sasProgram);
+    logs.addApplicationLog('Request failed with status: ' + res.status, sasProgram);
     callback(new h54sError('httpError', res.statusText));
   });
 };
@@ -185,7 +186,7 @@ module.exports.login = function(user, pass, callback) {
         self._utils.ajax.post(self.loginUrl, loginParams).success(this.success).error(this.error);
       } else {
         //getting form again, but it wasn't a redirect
-        self._utils.addApplicationLogs('Wrong username or password');
+        logs.addApplicationLog('Wrong username or password');
         callback(-1);
       }
     } else {
@@ -209,41 +210,9 @@ module.exports.login = function(user, pass, callback) {
     }
   }).error(function(res) {
     //NOTE: error 502 if sasApp parameter is wrong
-    self._utils.addApplicationLogs('Login failed with status code: ' + res.status);
+    logs.addApplicationLog('Login failed with status code: ' + res.status);
     callback(res.status);
   });
-};
-
-/*
-* Get sas errors if there are some
-*
-*/
-module.exports.getSasErrors = function() {
-  return h54s._logs.sasErrors;
-};
-
-/*
-* Get application logs
-*
-*/
-module.exports.getApplicationLogs = function() {
-  return h54s._logs.applicationLogs;
-};
-
-/*
-* Get debug data
-*
-*/
-module.exports.getDebugData = function() {
-  return h54s._logs.debugData;
-};
-
-/*
-* Get failed requests
-*
-*/
-module.exports.getFailedRequests = function() {
-  return h54s._logs.failedRequests;
 };
 
 /*
@@ -262,48 +231,17 @@ module.exports.unsetDebugMode = function() {
   this.debug = false;
 };
 
-/*
-* Clear application logs
-*
-*/
-module.exports.clearApplicationLogs = function() {
-  h54s._logs.applicationLogs = [];
-};
+for(var key in logs.get) {
+  if(logs.get.hasOwnProperty(key)) {
+    module.exports[key] = logs.get[key];
+  }
+}
 
-/*
-* Clear debug data
-*
-*/
-module.exports.clearDebugData = function() {
-  h54s._logs.debugData = [];
-};
-
-/*
-* Clear Sas errors
-*
-*/
-module.exports.clearSasErrors = function() {
-  h54s._logs.sasErrors = [];
-};
-
-/*
-* Clear failed requests
-*
-*/
-module.exports.clearFailedRequests = function() {
-  h54s._logs.failedRequests = [];
-};
-
-/*
-* Clear all logs
-*
-*/
-module.exports.clearAllLogs = function() {
-  this.clearApplicationLogs();
-  this.clearDebugData();
-  this.clearSasErrors();
-  this.clearFailedRequests();
-};
+for(var key in logs.clear) {
+  if(logs.clear.hasOwnProperty(key)) {
+    module.exports[key] = logs.clear[key];
+  }
+}
 
 module.exports._utils = require('./utils.js');
 module.exports._utils.ajax = require('./ajax.js');

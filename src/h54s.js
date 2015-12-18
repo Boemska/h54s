@@ -1,4 +1,4 @@
-var h54sError = require('../error.js');
+var h54sError = require('./error.js');
 
 /*
 * Represents html5 for sas adapter
@@ -117,13 +117,6 @@ h54s.prototype.onRemoteConfigUpdate = function(callback) {
 
 //replaced in concat and uglify-replace tasks
 h54s.version = '__version__';
-
-h54s._logs = {
-  applicationLogs: [],
-  debugData: [],
-  sasErrors: [],
-  failedRequests: []
-};
 
 
 h54s.prototype = require('./methods/methods.js');

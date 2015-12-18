@@ -1,4 +1,5 @@
 var h54sError = require('../error.js');
+var logs = require('../logs.js');
 
 /*
 * Convert table object to Sas readable object
@@ -78,7 +79,7 @@ module.exports.convertTableObject = function(inObject) {
       var isDate = thisValue instanceof Date;
       if (thisType === 'number') { // straightforward number
         if(thisValue < Number.MIN_SAFE_INTEGER || thisValue > Number.MAX_SAFE_INTEGER) {
-          h54s.prototype._utils.addApplicationLogs.call(null, 'Object[' + i + '].' + key + ' - This value exceeds expected numeric precision.');
+          logs.addApplicationLog('Object[' + i + '].' + key + ' - This value exceeds expected numeric precision.');
         }
         thisSpec.colName                    = key;
         thisSpec.colType                    = 'num';
