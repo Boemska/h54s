@@ -117,7 +117,7 @@ module.exports.addFailedRequest = function(responseText, debugText, sasProgram) 
 *
 */
 module.exports.addSasErrors = function(errors) {
-  logs.sasErrors.concat(errors);
+  logs.sasErrors = logs.sasErrors.concat(errors);
 
   while(logs.sasErrors.length > limits.sasErrors) {
     logs.sasErrors.shift();

@@ -243,5 +243,15 @@ for(var key in logs.clear) {
   }
 }
 
+/*
+* Add callback functions executed when properties are updated with remote config
+*
+*@callback - callback pushed to array
+*
+*/
+module.exports.onRemoteConfigUpdate = function(callback) {
+  this.remoteConfigUpdateCallbacks.push(callback);
+};
+
 module.exports._utils = require('./utils.js');
 module.exports._utils.ajax = require('./ajax.js');

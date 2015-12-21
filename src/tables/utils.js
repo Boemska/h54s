@@ -145,3 +145,26 @@ module.exports.convertTableObject = function(inObject) {
   }; // the spec will be the macro[0], with the data split into arrays of macro[1-n]
   // means in terms of dojo xhr object at least they need to go into the same array
 };
+
+/*
+* Convert javascript date to sas time
+*
+* @param {object} jsDate - javascript Date object
+*
+*/
+module.exports.toSasDateTime = function (jsDate) {
+  var basedate = new Date("January 1, 1960 00:00:00");
+  var currdate = jsDate;
+
+  // offsets for UTC and timezones and BST
+  var baseOffset = basedate.getTimezoneOffset(); // in minutes
+  var currOffset = currdate.getTimezoneOffset(); // in minutes
+
+  // convert currdate to a sas datetime
+  var offsetSecs    = (currOffset - baseOffset) * 60; // offsetDiff is in minutes to start with
+  var baseDateSecs  = basedate.getTime() / 1000; // get rid of ms
+  var currdateSecs  = currdate.getTime() / 1000; // get rid of ms
+  var sasDatetime   = Math.round(currdateSecs - baseDateSecs - offsetSecs); // adjust
+
+  return sasDatetime;
+};

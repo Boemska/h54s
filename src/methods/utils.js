@@ -94,7 +94,7 @@ module.exports.parseErrorResponse = function(res, sasProgram) {
     };
   }
 
-  addSasErrors(errors);
+  logs.addSasErrors(errors);
 };
 
 /*
@@ -113,29 +113,6 @@ module.exports.decodeHTMLEntities = function (html) {
     }
   );
   return str;
-};
-
-/*
-* Convert javascript date to sas time
-*
-* @param {object} jsDate - javascript Date object
-*
-*/
-module.exports.toSasDateTime = function (jsDate) {
-  var basedate = new Date("January 1, 1960 00:00:00");
-  var currdate = jsDate;
-
-  // offsets for UTC and timezones and BST
-  var baseOffset = basedate.getTimezoneOffset(); // in minutes
-  var currOffset = currdate.getTimezoneOffset(); // in minutes
-
-  // convert currdate to a sas datetime
-  var offsetSecs    = (currOffset - baseOffset) * 60; // offsetDiff is in minutes to start with
-  var baseDateSecs  = basedate.getTime() / 1000; // get rid of ms
-  var currdateSecs  = currdate.getTime() / 1000; // get rid of ms
-  var sasDatetime   = Math.round(currdateSecs - baseDateSecs - offsetSecs); // adjust
-
-  return sasDatetime;
 };
 
 /*

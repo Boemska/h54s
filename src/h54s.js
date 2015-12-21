@@ -28,7 +28,7 @@ var h54s = module.exports = function(config) {
     this._disableCalls = true;
 
     // '/base/test/h54sConfig.json' is for the testing with karma
-    //replaced with grunt concat in build
+    //replaced with gulp in dev build
     this._utils.ajax.get('/base/test/h54sConfig.json').success(function(res) {
       var remoteConfig = JSON.parse(res.responseText);
 
@@ -103,16 +103,6 @@ var h54s = module.exports = function(config) {
 
     this._utils.ajax.setTimeout(this.ajaxTimeout);
   }
-};
-
-/*
-* Add callback functions executed when properties are updated with remote config
-*
-*@callback - callback pushed to array
-*
-*/
-h54s.prototype.onRemoteConfigUpdate = function(callback) {
-  this.remoteConfigUpdateCallbacks.push(callback);
 };
 
 //replaced in concat and uglify-replace tasks
