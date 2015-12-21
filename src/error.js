@@ -12,7 +12,7 @@ function h54sError(type, message) {
   }
   this.message  = message;
   this.type     = type;
-};
+}
 
 h54sError.prototype = Object.create(Error.prototype);
 

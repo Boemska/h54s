@@ -88,7 +88,7 @@ module.exports.addDebugData = function(htmlData, debugText, sasProgram, params) 
   if(logs.debugData.length > limits.debugData) {
     logs.debugData.shift();
   }
-}
+};
 
 /*
 * Adds failed requests to an array of logs
@@ -108,7 +108,7 @@ module.exports.addFailedRequest = function(responseText, debugText, sasProgram) 
   if(logs.failedRequests.length > limits.failedRequests) {
     logs.failedRequests.shift();
   }
-}
+};
 
 /*
 * Adds SAS errors to an array of logs
@@ -122,4 +122,4 @@ module.exports.addSasErrors = function(errors) {
   while(logs.sasErrors.length > limits.sasErrors) {
     logs.sasErrors.shift();
   }
-}
+};

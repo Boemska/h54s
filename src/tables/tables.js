@@ -12,7 +12,7 @@ function Tables(table, macroName) {
   this._tables = {};
 
   this.add(table, macroName);
-};
+}
 
 /*
 * Add table to tables object

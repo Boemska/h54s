@@ -72,7 +72,7 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
         var sasAppMatches = res.responseURL.match(/_sasapp=([^&]*)/);
         self.sasApp = sasAppMatches[1].replace(/\+/g, ' ');
       } catch(e) {
-        self._utils.addApplicationLog('Cannot extract _sasapp parameter from login URL');
+        logs.addApplicationLog('Cannot extract _sasapp parameter from login URL');
       }
 
       callback(new h54sError('notLoggedinError', 'You are not logged in'));
