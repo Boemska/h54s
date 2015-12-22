@@ -14,6 +14,7 @@ var stylish = require('jshint-stylish');
 var replace = require('gulp-replace');
 var rename = require("gulp-rename");
 var gulpsync = require('gulp-sync')(gulp);
+var webserver = require('gulp-webserver');
 
 var pkg = require('./package.json');
 
@@ -165,4 +166,32 @@ gulp.task('test-ugly', ['jshint', 'build-ugly'], function(done) {
 gulp.task('release', gulpsync.sync(['set-production', 'clean', 'test-release', 'test-ugly']), function(done) {
   done();
   process.exit();
+});
+
+gulp.task('serveAngular', function() {
+  return gulp.src(['./examples/angular/', './dist/', './test/'])
+    .pipe(webserver({
+      port: 1337
+    }));
+});
+
+gulp.task('serveExtjs', function() {
+  return gulp.src(['./examples/extjs/', './dist/', './test/'])
+    .pipe(webserver({
+      port: 1337
+    }));
+});
+
+gulp.task('serveExtjs2', function() {
+  return gulp.src(['./examples/extjs2/', './dist/', './test/'])
+    .pipe(webserver({
+      port: 1337
+    }));
+});
+
+gulp.task('serveW2UI', function() {
+  return gulp.src(['./examples/w2ui/', './dist/', './test/'])
+    .pipe(webserver({
+      port: 1337
+    }));
 });
