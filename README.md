@@ -6,7 +6,7 @@
 
 H54S is a library that facilitates and manages seamless bi-directional communication between a HTML5 (JavaScript) based Web Application and back-end data services written in SAS and deployed on the SAS Enterprise BI platform. It lets Web Programmers and SAS Developers collaborate easily to build general purpose Web Applications with unprecedented speed and agility.
 
-Yes. Unprecedented. 
+Yes. Unprecedented.
 
 #### Server Requirements
 
@@ -40,7 +40,7 @@ Then put your SAS hat on.
 2. Register a new SAS Stored Process, with Streaming output enabled. We called our Stored Process `/Apps/myFirstService`.
 
 3. Set this to be the body of your program:
-   
+
 ```sas
 * get H54s (from wherever you placed it in step 1) ;
 %include '/pub/sasautos/h54s.sas';                
@@ -50,8 +50,8 @@ Then put your SAS hat on.
 
 * Check if the dataset(s) were received ok;
 %hfsErrorCheck;
- 
-* Do some SAS. Can be Anything. Merge and sort as an example ; 
+
+* Do some SAS. Can be Anything. Merge and sort as an example ;
 data mydata;
   set sashelp.class (obs=3 keep=name sex weight) work.additions;
 run;
@@ -71,13 +71,13 @@ run;
 5. Log on to your SAS Stored Process Web Application and run the STP. It should produce something like this output:
 
 ```json
-{ 
-  "usermessage" : "blank", 
-  "logmessage" : "H54S Exception - Input object datain was not found", 
-  "executingUser" : "sasdemo", 
-  "executingPerson" : "SAS Demo User", 
-  "executingPid" : 1337, 
-  "sasDatetime" : 1764789146.3, 
+{
+  "usermessage" : "blank",
+  "logmessage" : "H54S Exception - Input object datain was not found",
+  "executingUser" : "sasdemo",
+  "executingPerson" : "SAS Demo User",
+  "executingPid" : 1337,
+  "sasDatetime" : 1764789146.3,
   "status" : "inputTableNotFound"
 }
 ```
@@ -110,12 +110,12 @@ Assuming that you have a local Web Server installed for development:
 
 3. Load your `index.html` page, Open Chrome Developer Tools (F12), Open the Console tab.
 
-4. Create an instance of the adapter. In the console, try typing `h5`... Chrome should autocomplete to `h54s`, meaning the script is sourced correctly. 
-  
+4. Create an instance of the adapter. In the console, try typing `h5`... Chrome should autocomplete to `h54s`, meaning the script is sourced correctly.
+
    Assuming your SAS webapp URIs are the default `SASStoredProcess` and `SASLogon`, the following should be enough to get you started:
 
 ```javascript
-// Instantiate adapter. If SPWA was located at 
+// Instantiate adapter. If SPWA was located at
 // http://myServer:8080/SASStoredProcess/, you would do a
 var adapter = new h54s({hostUrl: 'http://myServer:8080/'});
 // (note trailing slash)
@@ -129,7 +129,7 @@ var myFirstTable = [
 
 // add it to a h54s Tables object
 var tables = new h54s.Tables(myFirstTable, 'datain');
-                                                       
+
 // make your first call to SAS
 adapter.call('/Apps/myFirstService', tables, function(err, res) {
   if(err) {
@@ -152,7 +152,7 @@ Otherwise, if you're not logged in yet, you should see this:
 The easist thing to do at this point is to log into your SPWA in another tab, refresh your page and try running the code again. However, if you're feeling adventurous you could skip ahead and try this in the console:
 
 ```javascript
-adapter.login('mysasusername','mysaspassword'); // More on this later 
+adapter.login('mysasusername','mysaspassword'); // More on this later
 ```
 
 Any queued `adapter.call()` calls should resume after a successful `adapter.login()`.
@@ -163,13 +163,13 @@ First, we registered a SAS Stored Process based back-end service. We told it to 
 
 When the table arrived as expected, the program would do some SAS-based stuff (which given the power and flexibility of SAS could have been anything, from a secured lookup into a legacy mainframe-based system so you can pre-populate a form, to an on-the-fly Hadoop query built into your app). For this example, we just told it to merge the input dataset with a few records from the good old `SASHELP.CLASS` into a new temporary dataset called `WORK.MYDATA`, sort it, and return the resulting dataset to the client as an object array called `processed`.
 
-Then, from the Web side, we started a new project by creating an `index.html` page which sources the client-side `h54s.js` script. We then used the Chrome Dev Console to run some JavaScript code - to create a configured instance of the h54s Adapter, create a sample dataset, attach that dataset to a call to SAS as `datain`, fire it over, and use a simple function to either show us the dataset that was returned by SAS as `processed`, or have a look at any errors that might have occured. 
+Then, from the Web side, we started a new project by creating an `index.html` page which sources the client-side `h54s.js` script. We then used the Chrome Dev Console to run some JavaScript code - to create a configured instance of the h54s Adapter, create a sample dataset, attach that dataset to a call to SAS as `datain`, fire it over, and use a simple function to either show us the dataset that was returned by SAS as `processed`, or have a look at any errors that might have occured.
 
 Easy, right? Read on.
 
 ## Data Structures and Conventions
 
-The *Atomic Unit of Data transfer* for a H54S based App is the Dataset. This is a universal concept familiar to both JS and SAS programmers. In JavaScript Speak, a Dataset is an [object array](http://www.w3schools.com/json/json_syntax.asp), similar to the one created in the example above. Using [this terminology](http://www.w3schools.com/js/js_arrays.asp), each object in an array is the row of a dataset, and each of it's named members is the value of a variable of the same name. 
+The *Atomic Unit of Data transfer* for a H54S based App is the Dataset. This is a universal concept familiar to both JS and SAS programmers. In JavaScript Speak, a Dataset is an [object array](http://www.w3schools.com/json/json_syntax.asp), similar to the one created in the example above. Using [this terminology](http://www.w3schools.com/js/js_arrays.asp), each object in an array is the row of a dataset, and each of it's named members is the value of a variable of the same name.
 
 Data Types between the front-end and back-end are mapped as follows:
 
@@ -197,7 +197,7 @@ Data Types between the front-end and back-end are mapped as follows:
 
 ### But what about Parameters? I'm used to Parameters
 
-Say goodbye to Parameters. For the purposes of H54S-based apps, Datasets supersede them. Input validation and typechecking should be done by your JavaScript app, and the Adapter ensures type safety and handles exceptions. If you're just looking to pass a single value back, you'll need to use a 'single-column, single-row table'. It might not seem like it to start with, but it's a blessing once you start working with multiple programmers and writing interface specifications. 
+Say goodbye to Parameters. For the purposes of H54S-based apps, Datasets supersede them. Input validation and typechecking should be done by your JavaScript app, and the Adapter ensures type safety and handles exceptions. If you're just looking to pass a single value back, you'll need to use a 'single-column, single-row table'. It might not seem like it to start with, but it's a blessing once you start working with multiple programmers and writing interface specifications.
 
 To get a control table with some parameters, your JS code would look like this:
 ```javascript
@@ -223,12 +223,12 @@ Voila.
 ## SAS API Reference
 
 
- 
+
 ### %hfsGetDataset(jsonvarname, outdset);
 
 This macro deserialises a JavaScript data object into a SAS table.
 
-`jsonvarname` is  the name given to the table array from the front end, corresponding to macroName in the `h54s.Tables(tableArray, macroName)` example 
+`jsonvarname` is  the name given to the table array from the front end, corresponding to macroName in the `h54s.Tables(tableArray, macroName)` example
 
 `outdset` is the name of the target dataset that the tableArray is to be deserialised into
 
@@ -237,7 +237,7 @@ This macro deserialises a JavaScript data object into a SAS table.
 This macro prepares the output stream for data object output. Conceptually similar to `%STPBEGIN`
 
 ### %hfsOutDataset(objectName, libn, dsn);
-      
+
 This macro serialises a SAS dataset to a JavaScript data object.
 
 `objectName` is the name of the target JS object that the table will be serialised into
@@ -245,14 +245,14 @@ This macro serialises a SAS dataset to a JavaScript data object.
 `libn` is the libname of the dataset to be serialised and transmitted to the frontend
 
 `dsn` is the name of the dataset itself
- 
+
 ### %hfsFooter;
 
-This macro closes the output stream for data objects. Counterpart to `%hfsHeader`. Conceptually similar to `%STPEND`. 
- 
+This macro closes the output stream for data objects. Counterpart to `%hfsHeader`. Conceptually similar to `%STPEND`.
+
 ### %hfsErrorCheck;
 
-This macro checks for the existence of an `&h54src` return code macro variable, and if present and is not set to 0, will output the associated error message to the front end before terminating the rest of the Stored Process code. 
+This macro checks for the existence of an `&h54src` return code macro variable, and if present and is not set to 0, will output the associated error message to the front end before terminating the rest of the Stored Process code.
 
 
 ## JavaScript API Reference
@@ -282,7 +282,7 @@ The default configuration looks like this:
 ```
 `url` is the URI of the SAS Stored Process Web Application (SPWA), as configured on your SAS server.
 
-`debug` sets or unsets the H54S debug mode by default. 
+`debug` sets or unsets the H54S debug mode by default.
 
 `loginUrl` is the URI of the SAS Logon Application, as configured on your SAS server.
 
@@ -390,7 +390,7 @@ var tables = new h54s.Tables([
 ### getSasErrors()
 Returns an array of SAS program errors. Last 100 SAS errors are retained by the adapter.
 
-It returns array of objects: 
+It returns array of objects:
 ```js
 var errors = adapter.getSasErrors();
 ```
@@ -495,27 +495,27 @@ adapter.clearSasErrors();
 adapter.clearFailedRequests();
 ```
 
-### Development and Testing of JS adapter code 
+### Development and Testing of JS adapter code
 
 1. Clone the project.
 2. Run `npm install`
-3. Install grunt-cli if it's not installed already - `npm install -g grunt-cli`.
-4. Edit the host url, user and pass in /test/_server_data.js.
-5. Run `grunt`. It will run jshint and karma tests. There are more grunt tasks.
+3. Install gulp-cli if it's not installed already - `npm install -g gulp-cli`.
+4. Edit the host URL, user and pass in /test/_server_data.js.
+5. Run `gulp`. It will run jshint and karma tests and creates build in dev/ directory. There are more gulp tasks.
 
-  * `grunt compress` - Create minified h54s file.
+  * `gulp watch` - Runs tests on file change.
 
-  * `grunt build` - Runs jshint, karma tests and creates build file - concatenate files in /src (debug release, not minified).
+  * `gulp release` - Creates dist/h54s.js and dist/h54s.min.js release files and runs karma tests with those files.
 
-  * `grunt watch` - Runs tests on file change.
+  * `gulp serveAngular` - Creates web server and serves angular.js example (default port is 1337)
 
-  * `grunt serveAngular` - Creates web server and serves angular.js example (default port is 1337)
+  * `gulp serveExtjs` - Creates web server and serves ext.js example (default port is 1337)
 
-  * `grunt serveExtjs` - Creates web server and serves ext.js example (default port is 1337)
+  * `gulp serveExtjs2` - Creates web server and serves ext.js example (default port is 1337)
 
-  * `grunt serveExtjs2` - Creates web server and serves ext.js example (default port is 1337)
+  * `gulp serveW2UI` - Creates web server and serves w2ui example (default port is 1337)
 
 
-#### Any questions or comments? Come join the chat. [![Join the chat at https://gitter.im/Boemska/h54s](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Boemska/h54s?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) 
+#### Any questions or comments? Come join the chat. [![Join the chat at https://gitter.im/Boemska/h54s](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Boemska/h54s?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ![Analytics](https://ga-beacon.appspot.com/UA-40531601-4/Boemska/h54s)
