@@ -129,6 +129,7 @@ describe('h54s', function() {
             }
           ], 'data');
           sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
+            //sas is outputing data in seconds, so we need to round those dates
             var resSeconds = Math.round(res.outputdata[0].DT_SOME_DATE.getTime() / 1000); // jshint ignore:line
             var dateSeconds = Math.round(date.getTime() / 1000);
             assert.isUndefined(err, 'We got error on sas program ajax call');
