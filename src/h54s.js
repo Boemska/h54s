@@ -105,7 +105,7 @@ var h54s = module.exports = function(config) {
   }
 };
 
-//replaced in concat and uglify-replace tasks
+//replaced with gulp
 h54s.version = '__version__';
 
 
