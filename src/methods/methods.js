@@ -170,7 +170,7 @@ module.exports.login = function(user, pass, callback) {
     if(self._utils.needToLogin.call(self, res)) {
       //we are getting form again after redirect
       //and need to login again using the new url
-      //_loginChanged is set in _needToLogin function
+      //_loginChanged is set in needToLogin function
       //but if login url is not different, we are checking if there are aditional parameters
       if(self._loginChanged || (self._isNewLoginPage && !self._aditionalLoginParams)) {
         delete self._loginChanged;
