@@ -74,6 +74,8 @@ var h54s = module.exports = function(config) {
 
   // private function to set h54s instance properties
   function _setConfig(config) {
+    this._utils.ajax = require('./methods/ajax.js')();
+
     if(!config) {
       return;
     } else if(typeof config !== 'object') {

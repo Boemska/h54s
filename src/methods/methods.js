@@ -254,4 +254,3 @@ module.exports.onRemoteConfigUpdate = function(callback) {
 };
 
 module.exports._utils = require('./utils.js');
-module.exports._utils.ajax = require('./ajax.js');
