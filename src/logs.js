@@ -29,16 +29,16 @@ module.exports.get = {
 
 module.exports.clear = {
   clearApplicationLogs: function() {
-    logs.applicationLogs = [];
+    logs.applicationLogs.splice(0, logs.applicationLogs.length);
   },
   clearDebugData: function() {
-    logs.debugData = [];
+    logs.debugData.splice(0, logs.debugData.length);
   },
   clearSasErrors: function() {
-    logs.sasErrors = [];
+    logs.sasErrors.splice(0, logs.sasErrors.length);
   },
   clearFailedRequests: function() {
-    logs.failedRequests = [];
+    logs.failedRequests.splice(0, logs.failedRequests.length);
   },
   clearAllLogs: function() {
     this.clearApplicationLogs();
