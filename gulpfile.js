@@ -27,7 +27,11 @@ var filePaths = {
   srcDir: './src/',
   srcFiles: './src/**/*.js',
   srcEntryfile: './src/h54s.js',
-  testFiles: './test/**/*.js'
+  unitTestFiles: './test/js/unit/**/*.js',
+  browserifyTestFiles: './test/js/browserify/**/*.js',
+  integrationTestFiles: './test/js/integration/**/*.js',
+  helperTestFiles: './test/js/*.js',
+  testRemoteConfigFile: './test/h54sConfig.json'
 };
 
 var production = false,
@@ -43,7 +47,7 @@ function bundle() {
     packageCache: {}
   });
 
-  if(!watch) {
+  if(watch) {
     b = watchify(b);
   }
 
@@ -64,7 +68,7 @@ function bundle() {
     .pipe(gulp.dest(buildPath));
   };
 
-  if(!watch) {
+  if(watch) {
     b.on('update', rebundle);
   }
   return rebundle();
@@ -94,7 +98,10 @@ gulp.task('jshint', function() {
   return gulp.src([
     'gulpfile.js',
     filePaths.srcFiles,
-    filePaths.testFiles
+    filePaths.helperTestFiles,
+    filePaths.unitTestFiles,
+    filePaths.integrationTestFiles,
+    filePaths.browserifyTestFiles
   ])
   .pipe(jshint())
   .pipe(jshint.reporter(stylish))
@@ -111,9 +118,11 @@ gulp.task('default', ['jshint', 'unset-watch', 'build-dev'], function(done) {
   new karma.Server({
     configFile: __dirname + '/karma.conf.js',
     files: [
-      {pattern: 'test/**/*.json', served: true, included: false},
+      {pattern: 'test/*.json', served: true, included: false},
       {pattern: filePaths.devBuild, served: true},
-      {pattern: filePaths.testFiles}
+      {pattern: filePaths.helperTestFiles},
+      {pattern: filePaths.unitTestFiles},
+      {pattern: filePaths.integrationTestFiles}
     ],
     singleRun: true
   }, function() {
@@ -127,10 +136,42 @@ gulp.task('watch', ['build-dev'], function(done) {
   new karma.Server({
     configFile: __dirname + '/karma.conf.js',
     files: [
-      {pattern: 'test/**/*.json', served: true, included: false},
+      {pattern: 'test/*.json', served: true, included: false},
       {pattern: filePaths.devBuild, served: true},
-      {pattern: filePaths.testFiles}
+      {pattern: filePaths.helperTestFiles},
+      {pattern: filePaths.unitTestFiles},
+      {pattern: filePaths.integrationTestFiles},
+      {pattern: filePaths.browserifyTestFiles}
     ],
+    frameworks: ['browserify', 'mocha', 'proclaim'],
+    preprocessors: {
+      './test/js/browserify/**/*.js': [ 'browserify' ]
+    },
+    browserify: {
+      debug: true
+    },
+    singleRun: false
+  }, done).start();
+});
+
+//used in development
+gulp.task('watch-unit', ['build-dev'], function(done) {
+  new karma.Server({
+    configFile: __dirname + '/karma.conf.js',
+    files: [
+      {pattern: 'test/*.json', served: true, included: false},
+      {pattern: filePaths.devBuild, served: true},
+      {pattern: filePaths.helperTestFiles},
+      {pattern: filePaths.unitTestFiles},
+      {pattern: filePaths.browserifyTestFiles}
+    ],
+    frameworks: ['browserify', 'mocha', 'proclaim'],
+    preprocessors: {
+      './test/js/browserify/**/*.js': [ 'browserify' ]
+    },
+    browserify: {
+      debug: true
+    },
     singleRun: false
   }, done).start();
 });
@@ -140,10 +181,12 @@ gulp.task('test-release', ['jshint', 'build-production'], function(done) {
     configFile: __dirname + '/karma.conf.js',
     files: [
       {pattern: filePaths.releaseBuild, served: true},
-      {pattern: filePaths.testFiles}
+      {pattern: filePaths.helperTestFiles},
+      {pattern: filePaths.unitTestFiles},
+      {pattern: filePaths.integrationTestFiles},
     ],
     exclude: [
-      './test/remoteConfig.js'
+      './test/js/**/remoteConfig.js'
     ],
     singleRun: true
   }, done).start();
@@ -154,10 +197,12 @@ gulp.task('test-ugly', ['jshint', 'build-ugly'], function(done) {
     configFile: __dirname + '/karma.conf.js',
     files: [
       {pattern: filePaths.releaseBuildMin, served: true},
-      {pattern: filePaths.testFiles}
+      {pattern: filePaths.helperTestFiles},
+      {pattern: filePaths.unitTestFiles},
+      {pattern: filePaths.integrationTestFiles},
     ],
     exclude: [
-      './test/remoteConfig.js'
+      './test/js/**/remoteConfig.js'
     ],
     singleRun: true
   }, done).start();

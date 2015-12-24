@@ -1,55 +1,6 @@
 /* global describe, it, assert, serverData, h54s, proclaim */
-describe('h54s', function() {
-  describe('utils test:', function() {
-
-    it('Strings in returned object should be decoded', function(done) {
-      this.timeout(6000);
-      var sasAdapter = new h54s({
-        hostUrl: serverData.url
-      });
-      var str = 'Is it escaped? Yeah!';
-
-      var table = new h54s.Tables([
-        {
-          data: str,
-        }
-      ], 'data');
-
-      sasAdapter.login(serverData.user, serverData.pass, function(status) {
-        if(status === 200) {
-          sasAdapter.call('/AJAX/h54s_test/bounceData', table, function(err, res) {
-            assert.isUndefined(err, 'We got error on sas program ajax call');
-            assert.equal(res.outputdata[0].DATA, decodeURIComponent(str), 'String not escaped');
-            done();
-          });
-        }
-      });
-    });
-
-    it('Strings in returned object with debug=true should be decoded', function(done) {
-      this.timeout(4000);
-      var sasAdapter = new h54s({
-        hostUrl: serverData.url,
-        debug: true
-      });
-      var str = 'Is it escaped? Yeah!';
-
-      var table = new h54s.Tables([
-        {
-          data: str,
-        }
-      ], 'data');
-
-      sasAdapter.login(serverData.user, serverData.pass, function(status) {
-        if(status === 200) {
-          sasAdapter.call('/AJAX/h54s_test/bounceData', table, function(err, res) {
-            assert.isUndefined(err, 'We got error on sas program ajax call');
-            assert.equal(res.outputdata[0].DATA, decodeURIComponent(str), 'String not escaped');
-            done();
-          });
-        }
-      });
-    });
+describe('h54s integration -', function() {
+  describe('Utils test:', function() {
 
     it('Server response with errors', function(done) {
       this.timeout(10000);
@@ -204,40 +155,6 @@ describe('h54s', function() {
           assert.fail(status, 200, 'Wrong status code on login');
         }
       });
-    });
-
-    it('Exceptions in tables', function(done) {
-      proclaim.throws(function() {
-        new h54s.Tables([
-          {a: "Dummy Name", specialNumberVal :NaN}
-        ], 'data');
-      }, 'NaN value in one of the values (columns) is not allowed');
-
-      proclaim.throws(function() {
-        new h54s.Tables([
-          {b: "Dummy Name", specialNumberVal: Infinity}
-        ], 'data');
-      }, 'Infinity value in one of the values (columns) is not allowed');
-
-      proclaim.throws(function() {
-        new h54s.Tables([
-          {c: "Dummy Name", specialNumberVal: -Infinity}
-        ], 'data');
-      }, '-Infinity value in one of the values (columns) is not allowed');
-
-      proclaim.throws(function() {
-        new h54s.Tables([
-          {d: "Dummy Name", boolVal: true}
-        ], 'data');
-      }, 'Boolean value in one of the values (columns) is not allowed');
-
-      proclaim.throws(function() {
-        new h54s.Tables([
-          {e: "Dummy Name", boolVal: false}
-        ], 'data');
-      }, 'Boolean value in one of the values (columns) is not allowed');
-
-      done();
     });
 
   });

@@ -1,6 +1,5 @@
-/* global describe, it, assert, serverData, h54s, setTimeout */
-describe('h54s', function() {
-  describe('Remote config tests', function() {
+describe('h54s unit -', function() {
+  describe('Remote config tests:', function() {
 
     it('Test remote config', function(done) {
       var sasAdapter = new h54s({
@@ -17,19 +16,6 @@ describe('h54s', function() {
         assert.isFalse(sasAdapter.debug, 'Constructor config is not overriding the remote config');
         done();
       }, 100);
-    });
-
-    it('Test config override with call', function(done) {
-      this.timeout(4000);
-      var sasAdapter = new h54s({
-        hostUrl: serverData.url,
-        isRemoteConfig: true
-      });
-
-      sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err) {
-        assert.isUndefined(err, 'We got error on sas program ajax call');
-        done();
-      });
     });
 
     it('Test remote config load event', function(done) {

@@ -1,8 +1,8 @@
 /* global describe, it, assert, serverData, h54s, proclaim */
-describe('h54s', function() {
-  describe('init:', function() {
+describe('h54s unit -', function() {
+  describe('Config:', function() {
 
-    it('should throw error if config data is missing or empty', function(done) {
+    it('Should throw error if config data is missing or empty', function(done) {
       proclaim.doesNotThrow(function() {
         var sasAdapter = new h54s(); // jshint ignore:line
       });
@@ -12,7 +12,7 @@ describe('h54s', function() {
       done();
     });
 
-    it('test config settings', function(done) {
+    it('Test config settings', function(done) {
       var sasAdapter;
       sasAdapter = new h54s({
         url: '/SASStoredProcess/someValue'

@@ -1,6 +1,6 @@
 /* global describe, it, assert, serverData, h54s, getRandomAsciiChars, proclaim */
-describe('h54s', function() {
-  describe('Character tests:', function() {
+describe('h54s integration -', function() {
+  describe('Characters and tables tests:', function() {
 
     it('Test json character escape', function(done) {
       this.timeout(10000);
@@ -130,7 +130,7 @@ describe('h54s', function() {
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
-//      var str = "CC$bV0A0/?Mt[%#QPirc:Xb62?pO&1X;OaUV#5cd/OOjD.rq9hQ+zw1b)chA$tYF\~+gvz,5@HU,'lSS-(Q~oX9S%l(!oX8=)hM";
+
       var str = getRandomAsciiChars(1000);
       var rows = [];
 
