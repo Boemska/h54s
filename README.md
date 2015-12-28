@@ -374,16 +374,16 @@ Adds additional tables to a Tables object:
 
 ```js
 var tables = new h54s.Tables([
-      { name: 'Allan', sex: 'M', weight: 101.1 },
-      { name: 'Abdul', sex: 'M', weight: 133.7 }
-    ], 'datain');
+  { name: 'Allan', sex: 'M', weight: 101.1 },
+  { name: 'Abdul', sex: 'M', weight: 133.7 }
+], 'datain');
 
-    tables.add([
-      {
-        someNumber: 42.0,
-        someString: 'Stuff'
-      }
-    ], 'moredata');
+tables.add([
+  {
+    someNumber: 42.0,
+    someString: 'Stuff'
+  }
+], 'moredata');
 ```
 
 
