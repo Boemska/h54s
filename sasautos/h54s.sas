@@ -460,8 +460,8 @@ options NOQUOTELENMAX LRECL=32000 spool;
 * keep quiet in the log;
   %hfsQuietenDown;
 
-  * check if the specified dataset exists and if not then gracefully quit this macro ;
-  %if (%sysfunc(exist(&libn..&dsn)) = 0) %then %do;
+  * check if the specified dataset / view exists and if not then gracefully quit this macro ;
+  %if (%sysfunc(exist(&libn..&dsn))=0 and %sysfunc(exist(&libn..&dsn,VIEW))=0) %then %do;
     *abort macro execution but first make sure there is a message;
     %global logmessage h54src;
     %let logmessage=ERROR - Output table &libn..&dsn was not found;
@@ -477,24 +477,21 @@ options NOQUOTELENMAX LRECL=32000 spool;
 
 
   data _null_;
-    qc = '"';
-    call symput('qc', qc);
-    prefix = upcase("&dsn.");
-    call symput('pf', prefix);
-    dc='$';
-    call symput('dc', dc);
-    dt_='dt_';
-    call symput('dt_', dt_);
+    call symput('qc', '"');
+    call symput('pf', "%upcase(&dsn)");
+    call symput('dc', '$');
+    call symput('dt_', 'dt_');
   run;
 
-  proc sql;
+  proc sql noprint;
     create table tempCols as
-    select upcase(name) as name, type, length from dictionary.columns where upcase(memname)=upcase("&dsn.") and libname = upcase("&libn.");
+    select upcase(name) as name, type, length from dictionary.columns 
+    where upcase(memname)="%upcase(&dsn)" and libname="%upcase(&libn)";
   quit;
 
   %let totalCols = &sqlObs;
 
-  proc sql;
+  proc sql noprint;
     select trim(name), trim(type), length into :name1-:name999, :type1-:type999, :length1-:length999
     from tempCols;
   quit;
@@ -513,7 +510,7 @@ options NOQUOTELENMAX LRECL=32000 spool;
 
 
   *create the urlencoded view here;
-  proc sql;
+  proc sql noprint;
     create view tempOutputView as 
   select
   %do colNo= 1 %to &totalCols;
@@ -544,14 +541,14 @@ options NOQUOTELENMAX LRECL=32000 spool;
           so that there is an faster option for servers with many preassigned
           DBMS libs etc 
   ; 
-  proc sql;
+  proc sql noprint;
     create table tempCols as
     select name, type, length from dictionary.columns where memname="TEMPOUTPUTVIEW" and libname = "WORK";
   quit;
 
   %let totalCols = &sqlObs;
 
-  proc sql;
+  proc sql noprint;
     select trim(name), trim(type), length into :name1-:name999, :type1-:type999, :length1-:length999
     from tempCols;
   quit;
