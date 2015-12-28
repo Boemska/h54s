@@ -483,7 +483,7 @@ options NOQUOTELENMAX LRECL=32000 spool;
     call symput('dt_', 'dt_');
   run;
 
-  proc sql;
+  proc sql noprint;
     create table tempCols as
     select upcase(name) as name, type, length from dictionary.columns 
     where upcase(memname)="%upcase(&dsn)" and libname="%upcase(&libn)";
@@ -491,7 +491,7 @@ options NOQUOTELENMAX LRECL=32000 spool;
 
   %let totalCols = &sqlObs;
 
-  proc sql;
+  proc sql noprint;
     select trim(name), trim(type), length into :name1-:name999, :type1-:type999, :length1-:length999
     from tempCols;
   quit;
@@ -510,7 +510,7 @@ options NOQUOTELENMAX LRECL=32000 spool;
 
 
   *create the urlencoded view here;
-  proc sql;
+  proc sql noprint;
     create view tempOutputView as 
   select
   %do colNo= 1 %to &totalCols;
@@ -541,14 +541,14 @@ options NOQUOTELENMAX LRECL=32000 spool;
           so that there is an faster option for servers with many preassigned
           DBMS libs etc 
   ; 
-  proc sql;
+  proc sql noprint;
     create table tempCols as
     select name, type, length from dictionary.columns where memname="TEMPOUTPUTVIEW" and libname = "WORK";
   quit;
 
   %let totalCols = &sqlObs;
 
-  proc sql;
+  proc sql noprint;
     select trim(name), trim(type), length into :name1-:name999, :type1-:type999, :length1-:length999
     from tempCols;
   quit;
