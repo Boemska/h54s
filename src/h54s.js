@@ -77,6 +77,7 @@ var h54s = module.exports = function(config) {
     this._utils.ajax = require('./methods/ajax.js')();
 
     if(!config) {
+      this._utils.ajax.setTimeout(this.ajaxTimeout);
       return;
     } else if(typeof config !== 'object') {
       throw new h54sError('argumentError', 'First parameter should be config object');
