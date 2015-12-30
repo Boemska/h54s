@@ -499,25 +499,26 @@ options NOQUOTELENMAX LRECL=32000 spool;
     end;
   run;
   
-
   *create the urlencoded view here;
-  proc sql;
-  create view tempOutputView as 
-    select
+  data tempOutputView /view=tempOutputView;
+  /* preserve variable order whilst lengthening character vars */
   %do colNo= 1 %to &totalCols;
-    /* type 1=numeric, type 2=character in proc contents */
-    %if &&&type&colNo = 2 %then %do;
-      urlencode(strip(&&&name&colNo)) as &&&name&colNo length=30000
+    /* type 1= numeric, type 2=character in proc contents */
+    %if &&&type&colNo = 1 %then %do;
+      attrib &&&name&colNo label='';
     %end;
     %else %do;
-      &&&name&colNo as &&&name&colNo
-    %end;
-    %if &&&name&colNo ne &lastCol %then %do;
-      ,
+      length &&&name&colNo $30000;
     %end;
   %end;
-    from &libn..&dsn.
-  quit;
+    set &libn..&dsn;
+  /* urlencode the character vars */
+  %do colNo= 1 %to &totalCols;
+    %if &&&type&colNo = 2 %then %do;
+      &&&name&colNo=urlencode(strip(&&&name&colNo));
+    %end;
+  %end;
+  run;
 
   *output to webout ;
   data _null_;
