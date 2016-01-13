@@ -1,0 +1,19 @@
+{
+  "name": "h54s-sas-test",
+  "version": "0.0.1",
+  "description": "Test h54s.sas parser with generated data",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "boemskats"
+  ],
+  "author": "Boemska",
+  "license": "GPL V3",
+  "dependencies": {
+    "chance": "^0.8.0",
+    "inquirer": "^0.11.0",
+    "minimist": "^1.2.0"
+  }
+}
