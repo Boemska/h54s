@@ -32,18 +32,20 @@ try {
     name: 'useSettings',
     message: 'Use settings.json - previous values',
     default: true
-  }, {
-    type: 'confirm',
-    name: 'useOldGeneratedFile',
-    message: 'Use old generated.sas (do not create new)',
-    default: true
-  }], (answers) => {
+  }], answers => {
     if(answers.useSettings) {
-      var values = require(__dirname + '/settings.json');
-      suspend(run(values, answers.useOldGeneratedFile))();
+      inquirer.prompt([{
+        type: 'confirm',
+        name: 'useOldGeneratedFile',
+        message: 'Use old generated.sas (do not create new)',
+        default: true
+      }], answers => {
+        var values = require(__dirname + '/settings.json');
+        suspend(run(values, answers.useOldGeneratedFile))();
+      });
     } else {
       getUserInput().then((values) => {
-        suspend(run(values, answers.useOldGeneratedFile))();
+        suspend(run(values))();
       }).catch(handleError);
     }
   });
