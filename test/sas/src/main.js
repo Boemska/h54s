@@ -11,7 +11,7 @@ var rl = readline.createInterface({
   input: process.stdin
 });
 var chance = require('chance').Chance();
-var methodUtils = require('../../src/methods/utils.js');
+var methodUtils = require('../../../src/methods/utils.js');
 
 var inputValidators = require('./inputValidators.js');
 var generator = require('./generator.js');
@@ -20,13 +20,13 @@ var sasReader = require('./sasReader.js');
 
 var argv = require('minimist')(process.argv.slice(2));
 if(argv.log) {
-  fs.mkdir('log', () => {
-    fs.writeFile('log/compare.log', '');
+  fs.mkdir('../log', () => {
+    fs.writeFile('../log/compare.log', '');
   });
 }
 
 try {
-  fs.statSync(__dirname + '/settings.json'); //throws an error if the file does not exist
+  fs.statSync('../settings.json'); //throws an error if the file does not exist
   inquirer.prompt([{
     type: 'confirm',
     name: 'useSettings',
@@ -40,7 +40,7 @@ try {
         message: 'Use old generated.sas (do not create new)',
         default: true
       }], answers => {
-        var values = require(__dirname + '/settings.json');
+        var values = require('../settings.json');
         suspend(run(values, answers.useOldGeneratedFile))();
       });
     } else {
@@ -68,19 +68,20 @@ function run(values, useOldGeneratedFile) {
   return function*() {
     var gt;
 
-    if(useOldGeneratedFile) {
-      gt = yield sasReader();
-    } else {
-      gt = yield generator(values);
-    }
-
-    var data = yield executor(values.execFile);
-
-    if(argv.log) {
-      fs.writeFile('log/sas-out.log', data.out);
-      fs.writeFile('log/sas-err.log', data.err);
-    }
     try {
+      if(useOldGeneratedFile) {
+        gt = yield sasReader();
+      } else {
+        gt = yield generator(values);
+      }
+
+      var data = yield executor(values.execFile);
+
+      if(argv.log) {
+        fs.writeFile('../log/sas-out.log', data.out);
+        fs.writeFile('../log/sas-err.log', data.err);
+      }
+
       var resObj = JSON.parse(data.out.replace(/(\r\n|\r|\n)/g, ''));
       resObj = methodUtils.convertDates(resObj);
       resObj = methodUtils.unescapeValues(resObj);
@@ -95,7 +96,7 @@ function run(values, useOldGeneratedFile) {
 
         if(compareRes.diff === true) {
           if(argv.log) {
-            fs.appendFile('log/compare.log', compareRes.message + '\n\n');
+            fs.appendFile('../log/compare.log', compareRes.message + '\n\n');
           }
           lineStr += ` ${clc.red(values.columns[compareRes.col])}`;
         } else {

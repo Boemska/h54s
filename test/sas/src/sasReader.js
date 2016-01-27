@@ -1,9 +1,9 @@
 var fs = require('fs');
-var methodUtils = require('../../src/methods/utils.js');
+var methodUtils = require('../../../src/methods/utils.js');
 
 module.exports = function() {
   return new Promise((resolve, reject) => {
-    fs.readFile('generated.sas', (err, data) => {
+    fs.readFile('../generated.sas', (err, data) => {
       if(err) {
         return reject(err);
       }

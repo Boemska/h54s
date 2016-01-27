@@ -32,14 +32,14 @@ module.exports = function (execFile) {
         //done loading?
         if(chunk.toString().indexOf('processing completed') !== -1) {
           child.stdin.write(`%include '${__dirname}/generated.sas';\n`);
-          fs.readFile(`${__dirname}/../../sasautos/h54s.sas`, (err, data) => {
+          fs.readFile('../../../sasautos/h54s.sas', (err, data) => {
             if(err) {
               console.log(err);
               return;
             }
             var h54sSasContent = data.toString().replace(/%let\sbatchOutFile.+;/g, '%let batchOutFile=STDOUT;');
             child.stdin.write(h54sSasContent);
-            child.stdin.write(`%include '${__dirname}/h54sTest.sas';\n`);
+            child.stdin.write(`%include '${__dirname}/../h54sTest.sas';\n`);
             child.stdin.write('%put --codeend--;\n');
           });
         }
