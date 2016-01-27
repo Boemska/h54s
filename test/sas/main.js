@@ -3,12 +3,13 @@
 
 var inquirer = require('inquirer');
 var fs = require('fs');
-var os = require('os');
+var suspend = require('suspend');
 var methodUtils = require('../../src/methods/utils.js');
 
 var inputValidators = require('./inputValidators.js');
 var generator = require('./generator.js');
 var executor = require('./executor.js');
+var sasReader = require('./sasReader.js');
 
 var argv = require('minimist')(process.argv.slice(2));
 if(argv.log) {
@@ -24,46 +25,59 @@ try {
     name: 'useSettings',
     message: 'Use settings.json - previous values',
     default: true
+  }, {
+    type: 'confirm',
+    name: 'useOldGeneratedFile',
+    message: 'Use old generated.sas (do not create new)',
+    default: true
   }], (answers) => {
     if(answers.useSettings) {
       var values = require(__dirname + '/settings.json');
-      run(values);
+      suspend(run(values, answers.useOldGeneratedFile))();
     } else {
       getUserInput().then((values) => {
-        run(values);
+        suspend(run(values, answers.useOldGeneratedFile))();
       }).catch(handleError);
     }
   });
 } catch(e) {
   getUserInput().then((values) => {
-    run(values);
+    suspend(run(values))();
   }).catch(handleError);
 }
 
-function run(values) {
-  generator(values).then((generatedTable) => {
-    executor(values.execFile).then(data => {
-      if(argv.log) {
-        fs.writeFile('log/sas-out.log', data.out);
-        fs.writeFile('log/sas-err.log', data.err);
-      }
-      try {
-        var resObj = JSON.parse(data.out.replace(/(\r\n|\r|\n)/g, ''));
-        resObj = methodUtils.convertDates(resObj);
-        resObj = methodUtils.unescapeValues(resObj);
+function run(values, useOldGeneratedFile) {
+  return function*() {
+    var gt;
 
-        var uniform = compare(resObj.bounced, generatedTable);
-        if(uniform === true) {
-          console.log('Whoohooo - SAS returned the same data');
-        } else {
-          //it's objectx
-          console.log(uniform);
-        }
-      } catch(e) {
-        console.log(e.stack);
+    if(useOldGeneratedFile) {
+      gt = yield sasReader();
+    } else {
+      gt = yield generator(values);
+    }
+
+    var data = yield executor(values.execFile);
+
+    if(argv.log) {
+      fs.writeFile('log/sas-out.log', data.out);
+      fs.writeFile('log/sas-err.log', data.err);
+    }
+    try {
+      var resObj = JSON.parse(data.out.replace(/(\r\n|\r|\n)/g, ''));
+      resObj = methodUtils.convertDates(resObj);
+      resObj = methodUtils.unescapeValues(resObj);
+
+      var uniform = compare(resObj.bounced, gt);
+      if(uniform === true) {
+        console.log('Whoohooo - SAS returned the same data');
+      } else {
+        //it's objectx
+        console.log(uniform);
       }
-    }).catch(handleError);
-  }).catch(handleError);
+    } catch(e) {
+      console.log(e.stack);
+    }
+  }
 }
 
 function compare(response, generated) {

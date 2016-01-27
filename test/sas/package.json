@@ -14,6 +14,7 @@
   "dependencies": {
     "chance": "^0.8.0",
     "inquirer": "^0.11.0",
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.0",
+    "suspend": "^0.7.0"
   }
 }
