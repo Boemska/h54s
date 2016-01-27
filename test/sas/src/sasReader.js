@@ -1,9 +1,11 @@
 var fs = require('fs');
-var methodUtils = require('../../../src/methods/utils.js');
+var path = require('path');
+
+var methodUtils = require(path.join(__dirname, '../../..', 'src/methods/utils.js'));
 
 module.exports = function() {
   return new Promise((resolve, reject) => {
-    fs.readFile('../generated.sas', (err, data) => {
+    fs.readFile(path.join(__dirname, '..', 'generated.sas'), (err, data) => {
       if(err) {
         return reject(err);
       }

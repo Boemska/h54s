@@ -2,6 +2,7 @@
 
 var childProcess = require('child_process');
 var fs = require('fs');
+var path = require('path');
 
 module.exports = function (execFile) {
   var child = childProcess.execFile(execFile, ['-stdio']);
@@ -32,15 +33,15 @@ module.exports = function (execFile) {
 
         //done loading?
         if(chunk.toString().indexOf('processing completed') !== -1) {
-          child.stdin.write(`%include '${__dirname}/../generated.sas';\n`);
-          fs.readFile('../../../sasautos/h54s.sas', (err, data) => {
+          child.stdin.write(`%include '${path.join(__dirname, '..', 'generated.sas')}';\n`);
+          fs.readFile(path.join(__dirname, '../../../', 'sasautos', 'h54s.sas'), (err, data) => {
             if(err) {
               console.log(err);
               return;
             }
             var h54sSasContent = data.toString().replace(/%let\sbatchOutFile.+;/g, '%let batchOutFile=STDOUT;');
             child.stdin.write(h54sSasContent);
-            child.stdin.write(`%include '${__dirname}/../h54sTest.sas';\n`);
+            child.stdin.write(`%include '${path.join(__dirname, '..', 'h54sTest.sas')}';\n`);
             child.stdin.write('%put --codeend--;\n');
           });
         }

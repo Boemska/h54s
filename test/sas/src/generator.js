@@ -2,8 +2,9 @@
 
 var chance = require('chance').Chance();
 var fs = require('fs');
+var path = require('path');
 
-var tableUtils = require('../../../src/tables/utils.js');
+var tableUtils = require(path.join(__dirname, '../../../', 'src/tables/utils.js'));
 
 module.exports = function (settings) {
   return new Promise((resolve, reject) => {
@@ -40,9 +41,9 @@ module.exports = function (settings) {
     }
 
     var written = 0;
-    fs.writeFile('../generated.sas', `%LET DATA0=${tableArray.length};\n`);
+    fs.writeFile(path.join(__dirname, '..', 'generated.sas'), `%LET DATA0=${tableArray.length};\n`);
     for(let i = 0; i < tableArray.length; i++) {
-      fs.appendFile('../generated.sas', `%LET DATA${i+1}=${tableArray[i]};\n`, (err) => {
+      fs.appendFile(path.join(__dirname, '..', 'generated.sas'), `%LET DATA${i+1}=${tableArray[i]};\n`, (err) => {
         if(err) {
           reject(err);
         } else {
@@ -53,6 +54,6 @@ module.exports = function (settings) {
       });
     }
 
-    fs.writeFile('../settings.json', JSON.stringify(settings));
+    fs.writeFile(path.join(__dirname, '..', 'settings.json'), JSON.stringify(settings));
   });
 }

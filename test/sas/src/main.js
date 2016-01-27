@@ -11,6 +11,7 @@ var rl = readline.createInterface({
   input: process.stdin
 });
 var chance = require('chance').Chance();
+var path = require('path');
 var methodUtils = require('../../../src/methods/utils.js');
 
 var inputValidators = require('./inputValidators.js');
@@ -20,13 +21,13 @@ var sasReader = require('./sasReader.js');
 
 var argv = require('minimist')(process.argv.slice(2));
 if(argv.log) {
-  fs.mkdir('../log', () => {
-    fs.writeFile('../log/compare.log', '');
+  fs.mkdir(path.join(__dirname, '..', 'log'), () => {
+    fs.writeFile(path.join(__dirname, '..', 'log', 'compare.log'), '');
   });
 }
 
 try {
-  fs.statSync('../settings.json'); //throws an error if the file does not exist
+  fs.statSync(path.join(__dirname, '..', 'settings.json')); //throws an error if the file does not exist
   inquirer.prompt([{
     type: 'confirm',
     name: 'useSettings',
@@ -40,7 +41,7 @@ try {
         message: 'Use old generated.sas (do not create new)',
         default: true
       }], answers => {
-        var values = require('../settings.json');
+        var values = require(path.join(__dirname, '..', 'settings.json'));
         suspend(run(values, answers.useOldGeneratedFile))();
       });
     } else {
@@ -78,8 +79,8 @@ function run(values, useOldGeneratedFile) {
       var data = yield executor(values.execFile);
 
       if(argv.log) {
-        fs.writeFile('../log/sas-out.log', data.out);
-        fs.writeFile('../log/sas-err.log', data.err);
+        fs.writeFile(path.join(__dirname, '..', 'log', 'sas-out.log'), data.out);
+        fs.writeFile(path.join(__dirname, '..', 'log', 'sas-err.log'), data.err);
       }
 
       var resObj = JSON.parse(data.out.replace(/(\r\n|\r|\n)/g, ''));
@@ -96,7 +97,7 @@ function run(values, useOldGeneratedFile) {
 
         if(compareRes.diff === true) {
           if(argv.log) {
-            fs.appendFile('../log/compare.log', compareRes.message + '\n\n');
+            fs.appendFile(path.join(__dirname, '..', 'log', 'compare.log'), compareRes.message + '\n\n');
           }
           lineStr += ` ${clc.red(values.columns[compareRes.col])}`;
         } else {
