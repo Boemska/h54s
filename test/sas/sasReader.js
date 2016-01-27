@@ -1,4 +1,5 @@
 var fs = require('fs');
+var methodUtils = require('../../src/methods/utils.js');
 
 module.exports = function() {
   return new Promise((resolve, reject) => {
@@ -12,7 +13,7 @@ module.exports = function() {
       matches.shift();
 
       resolve(matches.map(val => {
-        return JSON.parse(val);
+        return methodUtils.unescapeValues(methodUtils.convertDates(JSON.parse(val)));
       }).reduce((prev, cur) => {
         return prev.concat(cur);
       }));

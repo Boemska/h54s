@@ -26,10 +26,6 @@ module.exports = function (settings) {
           row['PROP'+i] = chance.string({length: settings.varLength});
         }
       }
-    } else {
-      for(let i = 0; i < settings.columns; i++) {
-        row['PROP'+i] = chance.string({length: settings.varLength});
-      }
     }
 
     for(let i = 0; i < settings.rows; i++) {

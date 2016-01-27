@@ -4,6 +4,13 @@
 var inquirer = require('inquirer');
 var fs = require('fs');
 var suspend = require('suspend');
+var readline = require('readline');
+var clc = require('cli-color');
+var rl = readline.createInterface({
+  output: process.stdout,
+  input: process.stdin
+});
+var chance = require('chance').Chance();
 var methodUtils = require('../../src/methods/utils.js');
 
 var inputValidators = require('./inputValidators.js');
@@ -47,6 +54,15 @@ try {
 }
 
 function run(values, useOldGeneratedFile) {
+  //convert number of columns to string of column types
+  if(!isNaN(values.columns)) {
+    let columns = '';
+    for(let i = 0; i < values.columns; i++) {
+      columns += chance.character({pool: 'NDS'});
+    }
+    values.columns = columns;
+  }
+
   return function*() {
     var gt;
 
@@ -67,20 +83,37 @@ function run(values, useOldGeneratedFile) {
       resObj = methodUtils.convertDates(resObj);
       resObj = methodUtils.unescapeValues(resObj);
 
-      var uniform = compare(resObj.bounced, gt);
-      if(uniform === true) {
-        console.log('Whoohooo - SAS returned the same data');
-      } else {
-        //it's objectx
-        console.log(uniform);
+      var lineStr = '';
+      for(let compareRes of compare(resObj.bounced, gt)) {
+        //new row
+        if(compareRes.col === 0 && compareRes.row !== 0) {
+          rl.write('\n');
+          lineStr = '';
+        }
+
+        if(compareRes.diff === true) {
+          if(argv.log) {
+            fs.appendFile('log/compare.log', compareRes.message + '\n\n');
+          }
+          lineStr += ` ${clc.red(values.columns[compareRes.col])}`;
+        } else {
+          lineStr += ` ${values.columns[compareRes.col]}`;
+        }
+
+        readline.clearLine(process.stdout, 0);
+        readline.cursorTo(process.stdout, 0);
+        rl.write(lineStr);
       }
+      rl.write('\n');
+      rl.close();
+
     } catch(e) {
       console.log(e.stack);
     }
   }
 }
 
-function compare(response, generated) {
+function* compare(response, generated) {
   if(response.length !== generated.length) {
     return 'Number of rows is not the same';
   }
@@ -89,28 +122,43 @@ function compare(response, generated) {
     return 'Number of columns is not the same';
   }
   for(let i = 0; i < response.length; i++) {
+    var j = 0;
     for(let key in response[i]) {
       if(generated[i][key] instanceof Date) {
         //check if milliseconds difference is greater than 1000 because sas is rounding the value to seconds
-        if(argv.log) {
-          fs.appendFile('log/compare.log', `row ${i}, column ${key}\ngenerated: ${generated[i][key].getTime()}, response: ${response[i][key].getTime()}\n\n`);
-        }
-
         if(Math.abs(generated[i][key].getTime() - response[i][key].getTime()) > 1000) {
-          return `Value is different in row ${i}\ncolumn ${key}\n\ngenerated: ${generated[i][key].getTime()}\nresponse: ${response[i][key].getTime()}\n`;
+          yield {
+            diff: true,
+            message: `row ${i}, column ${key}(${j})\ngenerated: ${generated[i][key].getTime()}, response: ${response[i][key].getTime()}`,
+            row: i,
+            col: j
+          };
+        } else {
+          yield {
+            diff: false,
+            row: i,
+            col: j
+          };
         }
       } else {
-        if(argv.log) {
-          fs.appendFile('log/compare.log', `row ${i}, column ${key}\ngenerated: ${generated[i][key]}, response: ${response[i][key]}\n\n`);
-        }
-
         if(response[i][key] !== generated[i][key]) {
-          return `Value is different in row ${i}\ncolumn ${key}\n\ngenerated: ${generated[i][key]}\nresponse: ${response[i][key]}\n`;
+          yield {
+            diff: true,
+            message: `row ${i}, column ${key}(${j})\ngenerated: ${generated[i][key]}, response: ${response[i][key]}`,
+            row: i,
+            col: j
+          };
+        } else {
+          yield {
+            diff: false,
+            row: i,
+            col: j
+          };
         }
       }
+      j++;
     }
   }
-  return true;
 }
 
 function handleError(err) {
