@@ -26,12 +26,13 @@ module.exports = function (execFile) {
       } else {
         errData += chunk.toString();
         if(errData.indexOf('ERROR') !== -1) {
-          reject(errData);
+          //throw new error with message from sas
+          reject(new Error(errData.match(/ERROR:[^\n]*/)[0]));
         }
 
         //done loading?
         if(chunk.toString().indexOf('processing completed') !== -1) {
-          child.stdin.write(`%include '${__dirname}/generated.sas';\n`);
+          child.stdin.write(`%include '${__dirname}/../generated.sas';\n`);
           fs.readFile('../../../sasautos/h54s.sas', (err, data) => {
             if(err) {
               console.log(err);
