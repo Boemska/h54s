@@ -76,14 +76,10 @@ function run(values, useOldGeneratedFile) {
         gt = yield generator(values);
       }
 
-      var data = yield executor(values.execFile);
+      var data = yield executor(values.execFile, argv.log);
 
-      if(argv.log) {
-        fs.writeFile(path.join(__dirname, '..', 'log', 'sas-out.log'), data.out);
-        fs.writeFile(path.join(__dirname, '..', 'log', 'sas-err.log'), data.err);
-      }
-
-      var resObj = JSON.parse(data.out.replace(/(\r\n|\r|\n)/g, ''));
+      var resJson = /--h54s-data-start--([\S\s]*)--h54s-data-end--/.exec(data.out.replace(/(\r\n|\r|\n)/g, ''));
+      var resObj = JSON.parse(resJson[1]);
       resObj = methodUtils.convertDates(resObj);
       resObj = methodUtils.unescapeValues(resObj);
 
@@ -108,7 +104,11 @@ function run(values, useOldGeneratedFile) {
         readline.cursorTo(process.stdout, 0);
         rl.write(lineStr);
       }
-      rl.write('\n');
+      rl.write('\n\n');
+
+      rl.write(`Read Time: ${data.readTime}ms\n`);
+      rl.write(`Parse Time: ${data.parseTime}ms\n`);
+      rl.write(`Output Time: ${data.outputTime}ms\n`);
       rl.close();
 
     } catch(e) {
