@@ -41,9 +41,10 @@ module.exports = function (settings) {
     }
 
     var written = 0;
-    fs.writeFile(path.join(__dirname, '..', 'generated.sas'), `%LET DATA0=${tableArray.length};\n`);
+    var stream = fs.createWriteStream(path.join(__dirname, '..', 'generated.sas'));
+    stream.write(`%LET DATA0=${tableArray.length};\n`);
     for(let i = 0; i < tableArray.length; i++) {
-      fs.appendFile(path.join(__dirname, '..', 'generated.sas'), `%LET DATA${i+1}=${tableArray[i]};\n`, (err) => {
+      stream.write(`%LET DATA${i+1}=${tableArray[i]};\n`, (err) => {
         if(err) {
           reject(err);
         } else {
@@ -53,6 +54,8 @@ module.exports = function (settings) {
         }
       });
     }
+
+    stream.end();
 
     fs.writeFile(path.join(__dirname, '..', 'settings.json'), JSON.stringify(settings));
   });
