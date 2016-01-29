@@ -21,9 +21,10 @@ var sasReader = require('./sasReader.js');
 
 var argv = require('minimist')(process.argv.slice(2));
 if(argv.log) {
-  fs.mkdir(path.join(__dirname, '..', 'log'), () => {
-    fs.writeFile(path.join(__dirname, '..', 'log', 'compare.log'), '');
-  });
+  let logDir = path.join(__dirname, '..', 'log');
+  if(!fs.existsSync(logDir)) {
+    fs.mkdir(logDir);
+  }
 }
 
 try {
@@ -66,6 +67,10 @@ function run(values, useOldGeneratedFile) {
     values.columns = columns;
   }
 
+  if(argv.log) {
+    var compareStream = fs.createWriteStream(path.join(__dirname, '..', 'log', 'compare.log'));
+  }
+
   return function*() {
     var gt;
 
@@ -93,7 +98,7 @@ function run(values, useOldGeneratedFile) {
 
         if(compareRes.diff === true) {
           if(argv.log) {
-            fs.appendFile(path.join(__dirname, '..', 'log', 'compare.log'), compareRes.message + '\n\n');
+            compareStream.write(compareRes.message + '\n\n');
           }
           lineStr += ` ${clc.red(values.columns[compareRes.col])}`;
         } else {

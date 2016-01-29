@@ -1,6 +1,6 @@
 {
   "name": "h54s-sas-test",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Test h54s.sas parser with generated data",
   "main": "main.js",
   "scripts": {

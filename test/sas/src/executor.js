@@ -5,12 +5,11 @@ var fs = require('fs');
 var path = require('path');
 
 module.exports = function (execFile, log) {
-  var child = childProcess.execFile(execFile, ['-stdio']);
+  var child = childProcess.spawn(execFile, ['-stdio']);
 
-  //create files, or remove data if they exist
   if(log) {
-    fs.writeFile(path.join(__dirname, '..', 'log', 'sas-out.log'), '');
-    fs.writeFile(path.join(__dirname, '..', 'log', 'sas-err.log'), '');
+    var outStream = fs.createWriteStream(path.join(__dirname, '..', 'log', 'sas-out.log'));
+    var errStream = fs.createWriteStream(path.join(__dirname, '..', 'log', 'sas-err.log'));
   }
 
   return new Promise((fulfill, reject) => {
@@ -21,11 +20,18 @@ module.exports = function (execFile, log) {
         parseTime,
         outputTime;
 
+    child.on('disconect', () => {
+      reject(new Error('Child disconected'));
+    });
+    child.on('error', err => {
+      reject(err);
+    });
+
     function stdoutCallback(chunk) {
       outData += chunk.toString();
 
       if(log) {
-        fs.appendFile(path.join(__dirname, '..', 'log', 'sas-out.log'), chunk.toString());
+        outStream.write(chunk);
       }
 
       if(chunk.toString().indexOf('--h54s-read-end--') === 0) {
@@ -47,19 +53,22 @@ module.exports = function (execFile, log) {
       var scriptEnded = patt.test(chunk.toString());
 
       if(log) {
-        fs.appendFile(path.join(__dirname, '..', 'log', 'sas-err.log'), chunk.toString());
+        errStream.write(chunk);
       }
 
       if(scriptEnded) {
+        child.stdout.removeListener('data', stdoutCallback);
+        child.stderr.removeListener('data', stderrCallback);
+        outStream.end();
+        errStream.end();
+        child.kill();
+
         fulfill({
           out: outData,
           readTime: readTime,
           parseTime: parseTime,
           outputTime: outputTime
         });
-        child.stdout.removeListener('data', stdoutCallback);
-        child.stderr.removeListener('data', stderrCallback);
-        child.kill();
       } else {
         errData += chunk.toString();
         if(errData.indexOf('ERROR') !== -1) {
@@ -73,27 +82,19 @@ module.exports = function (execFile, log) {
 
           startTime = Date.now();
 
-          child.stdin.write(`%include '${path.join(__dirname, '..', 'generated.sas')}';\n`);
+          child.stdin.write(`%include '${path.join(__dirname, '..', 'generated.sas')}';\n\n\n\n\n\n`);
+          child.stdin.write(`%include '${path.join(__dirname, '../../../', 'sasautos', 'h54s.sas')}';\n\n\n`);
 
-          fs.readFile(path.join(__dirname, '../../../', 'sasautos', 'h54s.sas'), (err, data) => {
-            if(err) {
-              console.log(err);
-              return;
-            }
-            var h54sSasContent = data.toString().replace(/%let\sbatchOutFile.+;/g, '%let batchOutFile=STDOUT;');
-            child.stdin.write(h54sSasContent);
+          //flag for time measure
+          child.stdin.write(`
+            data _null_;
+            file &h54starget.;
+            put "--h54s-read-end--";
+            run;
+          `);
 
-            //flag for time measure
-            child.stdin.write(`
-              data _null_;
-                file &h54starget.;
-                put "--h54s-read-end--";
-              run;
-            `);
-
-            child.stdin.write(`%include '${path.join(__dirname, '..', 'h54sTest.sas')}';\n`);
-            child.stdin.write('%put --codeend--;\n');
-          });
+          child.stdin.write(`%include '${path.join(__dirname, '..', 'h54sTest.sas')}';\n`);
+          child.stdin.write('%put --codeend--;\n');
         }
       }
     }
