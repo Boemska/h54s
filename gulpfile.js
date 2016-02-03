@@ -40,7 +40,7 @@ var production = false,
 
 function bundle() {
   var b = browserify({
-    debug: !production,
+    debug: true,
     entries: [filePaths.srcEntryfile],
     standalone: 'h54s',
     cache: {},
