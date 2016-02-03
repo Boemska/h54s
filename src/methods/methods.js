@@ -84,20 +84,22 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
           resObj          = JSON.parse(res.responseText.replace(/(\r\n|\r|\n)/g, ''));
           resObj          = self._utils.convertDates(resObj);
           unescapedResObj = self._utils.unescapeValues(resObj);
+          
+          logs.addApplicationLog(resObj.logmessage, sasProgram);
+          callback(undefined, unescapedResObj);
         } catch(e) {
-          if(retryCount < self.maxXhrRetries) {
-            self._utils.ajax.post(self.url, params).success(this.success).error(this.error);
-            retryCount++;
-            logs.addApplicationLog("Retrying #" + retryCount, sasProgram);
+          if(e instanceof SyntaxError) {
+            if(retryCount < self.maxXhrRetries) {
+              self._utils.ajax.post(self.url, params).success(this.success).error(this.error);
+              retryCount++;
+              logs.addApplicationLog("Retrying #" + retryCount, sasProgram);
+            } else {
+              self._utils.parseErrorResponse(res.responseText, sasProgram);
+              self._utils.addFailedResponse(res.responseText, sasProgram);
+              callback(new h54sError('parseError', 'Unable to parse response json'));
+            }
           } else {
-            self._utils.parseErrorResponse(res.responseText, sasProgram);
-            self._utils.addFailedResponse(res.responseText, sasProgram);
-            callback(new h54sError('parseError', 'Unable to parse response json'));
-          }
-        } finally {
-          if(unescapedResObj) {
-            logs.addApplicationLog(resObj.logmessage, sasProgram);
-            callback(undefined, unescapedResObj);
+            throw e;
           }
         }
       } else {
@@ -105,17 +107,19 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
           resObj          = self._utils.parseDebugRes(res.responseText, sasProgram, params);
           resObj          = self._utils.convertDates(resObj);
           unescapedResObj = self._utils.unescapeValues(resObj);
+
+          logs.addApplicationLog(resObj.logmessage);
+          if(resObj.hasErrors) {
+            callback(new h54sError('sasError', 'Sas program completed with errors'), unescapedResObj);
+          } else {
+            callback(undefined, unescapedResObj);
+          }
         } catch(e) {
-          self._utils.parseErrorResponse(res.responseText, sasProgram);
-          callback(new h54sError('parseError', e.message));
-        } finally {
-          if(unescapedResObj) {
-            logs.addApplicationLog(resObj.logmessage);
-            if(resObj.hasErrors) {
-              callback(new h54sError('sasError', 'Sas program completed with errors'), unescapedResObj);
-            } else {
-              callback(undefined, unescapedResObj);
-            }
+          if(e instanceof SyntaxError) {
+            self._utils.parseErrorResponse(res.responseText, sasProgram);
+            callback(new h54sError('parseError', e.message));
+          } else {
+            throw e;
           }
         }
       }
