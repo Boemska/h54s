@@ -339,6 +339,7 @@ adapter.call('/BIP_Tree/test', tablesObj, function(err, res){
 - "parseError" is returned if the adapter can't parse json response from server.
 - "sasError" is returned only if debug mode is set (`debug: true` in config object). It indicates that SAS program has some errors.
 - "httpError" if http request failed returning status code other than 200.
+- "unknownError" if data is returned, and it's valid json, but dates could not be converted or string values could not be decoded
 
 
 ### login(user, pass, callback)
