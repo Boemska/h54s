@@ -84,7 +84,7 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
           resObj          = JSON.parse(res.responseText.replace(/(\r\n|\r|\n)/g, ''));
           resObj          = self._utils.convertDates(resObj);
           unescapedResObj = self._utils.unescapeValues(resObj);
-          
+
           logs.addApplicationLog(resObj.logmessage, sasProgram);
           callback(undefined, unescapedResObj);
         } catch(e) {
@@ -99,7 +99,9 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
               callback(new h54sError('parseError', 'Unable to parse response json'));
             }
           } else {
-            throw e;
+            var err = new h54sError('unknownError', e.message);
+            err.stack = e.stack;
+            callback(err);
           }
         }
       } else {
@@ -119,7 +121,9 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
             self._utils.parseErrorResponse(res.responseText, sasProgram);
             callback(new h54sError('parseError', e.message));
           } else {
-            throw e;
+            var err = new h54sError('unknownError', e.message);
+            err.stack = e.stack;
+            callback(err);
           }
         }
       }
