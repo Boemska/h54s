@@ -214,28 +214,28 @@ gulp.task('release', gulpsync.sync(['set-production', 'clean', 'test-release', '
 });
 
 gulp.task('serveAngular', function() {
-  return gulp.src(['./examples/angular/', './dist/', './test/'])
+  return gulp.src(['./examples/angular/', './dist/', './test/js/'])
     .pipe(webserver({
       port: 1337
     }));
 });
 
 gulp.task('serveExtjs', function() {
-  return gulp.src(['./examples/extjs/', './dist/', './test/'])
+  return gulp.src(['./examples/extjs/', './dist/', './test/js/'])
     .pipe(webserver({
       port: 1337
     }));
 });
 
 gulp.task('serveExtjs2', function() {
-  return gulp.src(['./examples/extjs2/', './dist/', './test/'])
+  return gulp.src(['./examples/extjs2/', './dist/', './test/js/'])
     .pipe(webserver({
       port: 1337
     }));
 });
 
 gulp.task('serveW2UI', function() {
-  return gulp.src(['./examples/w2ui/', './dist/', './test/'])
+  return gulp.src(['./examples/w2ui/', './dist/', './test/js/'])
     .pipe(webserver({
       port: 1337
     }));
