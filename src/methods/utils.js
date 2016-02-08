@@ -1,4 +1,5 @@
 var logs = require('../logs.js');
+var h54sError = require('../error.js');
 
 /*
 * Parse response from server in debug mode
@@ -10,7 +11,7 @@ var logs = require('../logs.js');
 */
 module.exports.parseDebugRes = function(responseText, sasProgram, params) {
   //find json
-  var patt          = /^(.?--h54s-data-start--)([\S\s]*)(--h54s-data-end--)/m;
+  var patt          = /^(.?--h54s-data-start--)([\S\s]*?)(--h54s-data-end--)/m;
   var matches       = responseText.match(patt);
 
   var page          = responseText.replace(patt, '');
@@ -23,13 +24,15 @@ module.exports.parseDebugRes = function(responseText, sasProgram, params) {
 
   logs.addDebugData(bodyMatches[1], debugText, sasProgram, params);
 
-  this.parseErrorResponse(responseText, sasProgram);
+  if(this.parseErrorResponse(responseText, sasProgram)) {
+    throw new h54sError('sasError', 'Sas program completed with errors');
+  }
 
+  if(!matches) {
+    throw new h54sError('parseError', 'Unable to parse response json');
+  }
   //remove new lines in json response
   var jsonObj = JSON.parse(matches[2].replace(/(\r\n|\r|\n)/g, ''));
-  if(debugText.indexOf('ERROR:') !== -1) {
-    jsonObj.hasErrors = true;
-  }
 
   return jsonObj;
 };
@@ -77,7 +80,8 @@ module.exports.unescapeValues = function(obj) {
 *
 */
 module.exports.parseErrorResponse = function(res, sasProgram) {
-  var patt    = /ERROR(.*\.|.*\n.*\.)/g;
+  //capture 'ERROR: [text].' or 'ERROR xx [text].'
+  var patt    = /ERROR(:\s|\s\d\d)(.*\.|.*\n.*\.)/gm;
   var errors  = res.match(patt);
   if(!errors) {
     return;
@@ -95,6 +99,8 @@ module.exports.parseErrorResponse = function(res, sasProgram) {
   }
 
   logs.addSasErrors(errors);
+
+  return true;
 };
 
 /*

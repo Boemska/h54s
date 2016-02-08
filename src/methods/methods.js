@@ -82,10 +82,11 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
         try {
           //remove new lines in json response
           resObj          = JSON.parse(res.responseText.replace(/(\r\n|\r|\n)/g, ''));
+          logs.addApplicationLog(resObj.logmessage, sasProgram);
+
           resObj          = self._utils.convertDates(resObj);
           unescapedResObj = self._utils.unescapeValues(resObj);
 
-          logs.addApplicationLog(resObj.logmessage, sasProgram);
           callback(undefined, unescapedResObj);
         } catch(e) {
           if(e instanceof SyntaxError) {
@@ -107,19 +108,17 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
       } else {
         try {
           resObj          = self._utils.parseDebugRes(res.responseText, sasProgram, params);
+          logs.addApplicationLog(resObj.logmessage, sasProgram);
+
           resObj          = self._utils.convertDates(resObj);
           unescapedResObj = self._utils.unescapeValues(resObj);
 
-          logs.addApplicationLog(resObj.logmessage);
-          if(resObj.hasErrors) {
-            callback(new h54sError('sasError', 'Sas program completed with errors'), unescapedResObj);
-          } else {
-            callback(undefined, unescapedResObj);
-          }
+          callback(undefined, unescapedResObj);
         } catch(e) {
           if(e instanceof SyntaxError) {
-            self._utils.parseErrorResponse(res.responseText, sasProgram);
             callback(new h54sError('parseError', e.message));
+          } else if(e instanceof h54sError) {
+            callback(e);
           } else {
             var err = new h54sError('unknownError', e.message);
             err.stack = e.stack;
