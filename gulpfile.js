@@ -240,3 +240,10 @@ gulp.task('serveW2UI', function() {
       port: 1337
     }));
 });
+
+gulp.task('serveOpenUI5', function() {
+  return gulp.src(['./examples/openui5/', './dist/', './test/js/'])
+    .pipe(webserver({
+      port: 1337
+    }));
+});
