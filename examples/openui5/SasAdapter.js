@@ -40,6 +40,14 @@ sap.ui.define([
       }
     },
 
+    setDebugMode: function() {
+      this._adapter.setDebugMode();
+    },
+
+    unsetDebugMode: function() {
+      this._adapter.unsetDebugMode();
+    },
+
     getSasErrors: function() {
       return this._adapter.getSasErrors();
     },

@@ -1,6 +1,7 @@
 sap.ui.define([
-  'h54s/view/DebugDialog'
-], function(DebugDialog) {
+  'h54s/view/DebugDialog',
+  'h54s/SasAdapter'
+], function(DebugDialog, sasAdapter) {
   sap.ui.jsview('h54s.view.Main', {
 
     getControllerName: function() {
@@ -58,6 +59,27 @@ sap.ui.define([
       });
       table.bindRows('/');
 
+      var debugBtn = new sap.m.Button({
+        text: 'Show debug data and logs',
+        visible: false,
+        press: function() {
+          DebugDialog.open();
+        }
+      });
+
+      $(document).keydown(function(evt){
+        if (evt.keyCode === 68 && evt.ctrlKey && evt.altKey) {
+          evt.preventDefault();
+          if(debugBtn.getVisible()) {
+            debugBtn.setVisible(false);
+            sasAdapter.getInstance().unsetDebugMode();
+          } else {
+            debugBtn.setVisible(true);
+            sasAdapter.getInstance().setDebugMode();
+          }
+        }
+      });
+
       return new sap.m.Page({
         title: 'Main',
         hAlign: 'Center',
@@ -78,12 +100,7 @@ sap.ui.define([
                         alignItems: 'End',
                         height: '100%',
                         items: [
-                          new sap.m.Button({
-                            text: 'Show debug data and logs',
-                            press: function() {
-                              DebugDialog.open();
-                            }
-                          })
+                          debugBtn
                         ]
                       })
                     ]
