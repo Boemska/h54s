@@ -119,8 +119,37 @@ sap.ui.define([
             ]
           }));
         });
-
-      }
+      },
+      beginButton: new sap.m.Button({
+        text: 'Clear',
+        press: function () {
+          switch(tabBar.getSelectedKey()) {
+            case 'appLogs':
+              sasAdapter.getInstance().clearApplicationLogs();
+              break;
+            case 'debugData':
+              sasAdapter.getInstance().clearDebugData();
+              break;
+            case 'sasErrors':
+              sasAdapter.getInstance().clearSasErrors();
+              break;
+            case 'failedReqs':
+              sasAdapter.getInstance().clearFailedRequests();
+              break;
+          }
+          tabBar.getItems().forEach(function(item) {
+            if(item.getKey() === tabBar.getSelectedKey()) {
+              item.destroyContent();
+            }
+          });
+        }
+      }),
+      endButton: new sap.m.Button({
+        text: 'Close',
+        press: function () {
+          dialog.close();
+        }
+      })
     });
   }
 
