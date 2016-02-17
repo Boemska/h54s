@@ -9,15 +9,27 @@ sap.ui.define([
 
     call: function(sasProgram, tables, callback) {
       var self = this;
+
+      sap.m.MessageToast.show('Loading ' + sasProgram);
+
       try {
         this._adapter.call(sasProgram, tables, function(err, res) {
           if(err && (err.type === 'notLoggedinError' || err.type === 'loginError')) {
             LoginDialog.open();
           } else {
+            if(err) {
+              sap.m.MessageToast.show('Error loading ' + sasProgram);
+            } else {
+              sap.m.MessageToast.show('Loaded ' + sasProgram);
+            }
+            if (res && res.usermessage && res.usermessage !== 'blank') {
+              sap.m.MessageToast.show(res.usermessage);
+            }
             callback(err, res);
           }
         });
       } catch(e) {
+        sap.m.MessageToast.show('Error loading ' + sasProgram);
         callback(e);
       }
     },
