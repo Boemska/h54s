@@ -52,7 +52,7 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
     return;
   }
 
-  this._utils.ajax.post(this.url, params).success(function(res) {
+  this._ajax.post(this.url, params).success(function(res) {
     if(self._utils.needToLogin.call(self, res)) {
       //remember the call for latter use
       self._pendingCalls.push({
@@ -91,7 +91,7 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
         } catch(e) {
           if(e instanceof SyntaxError) {
             if(retryCount < self.maxXhrRetries) {
-              self._utils.ajax.post(self.url, params).success(this.success).error(this.error);
+              self._ajax.post(self.url, params).success(this.success).error(this.error);
               retryCount++;
               logs.addApplicationLog("Retrying #" + retryCount, sasProgram);
             } else {
@@ -173,7 +173,7 @@ module.exports.login = function(user, pass, callback) {
     loginParams[key] = this._aditionalLoginParams[key];
   }
 
-  this._utils.ajax.post(this.loginUrl, loginParams).success(function(res) {
+  this._ajax.post(this.loginUrl, loginParams).success(function(res) {
     if(self._utils.needToLogin.call(self, res)) {
       //we are getting form again after redirect
       //and need to login again using the new url
@@ -190,7 +190,7 @@ module.exports.login = function(user, pass, callback) {
           });
         }
 
-        self._utils.ajax.post(self.loginUrl, loginParams).success(this.success).error(this.error);
+        self._ajax.post(self.loginUrl, loginParams).success(this.success).error(this.error);
       } else {
         //getting form again, but it wasn't a redirect
         logs.addApplicationLog('Wrong username or password');

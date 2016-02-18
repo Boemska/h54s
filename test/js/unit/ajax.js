@@ -4,11 +4,11 @@ describe('h54s unit -', function() {
 
     it('Ajax object', function(done) {
       var sasAdapter = new h54s();
-      assert.isDefined(sasAdapter._utils.ajax, 'Ajax is not defined');
-      assert.isFunction(sasAdapter._utils.ajax.setTimeout, 'Ajax setTimeout method is not defined');
+      assert.isDefined(sasAdapter._ajax, 'Ajax is not defined');
+      assert.isFunction(sasAdapter._ajax.setTimeout, 'Ajax setTimeout method is not defined');
 
-      assert.isFunction(sasAdapter._utils.ajax.get, 'Ajax get method is not defined');
-      assert.isFunction(sasAdapter._utils.ajax.post, 'Ajax post method is not defined');
+      assert.isFunction(sasAdapter._ajax.get, 'Ajax get method is not defined');
+      assert.isFunction(sasAdapter._ajax.post, 'Ajax post method is not defined');
       done();
     });
 
@@ -17,7 +17,7 @@ describe('h54s unit -', function() {
         ajaxTimeout: 1 //1ms
       });
 
-      sasAdapter._utils.ajax.get(serverData.url).success(function(res) {
+      sasAdapter._ajax.get(serverData.url).success(function(res) {
         assert.notOk(res, 'Ajax response is undefined');
         done();
       }).error(function() {
@@ -29,7 +29,7 @@ describe('h54s unit -', function() {
     it('Test get', function(done) {
       var sasAdapter = new h54s();
 
-      sasAdapter._utils.ajax.get(serverData.url, {
+      sasAdapter._ajax.get(serverData.url, {
         testParameter: 'test'
       }).success(function(res) {
         done();
@@ -42,7 +42,7 @@ describe('h54s unit -', function() {
     it('Test post', function(done) {
       var sasAdapter = new h54s();
 
-      sasAdapter._utils.ajax.post(serverData.url, {
+      sasAdapter._ajax.post(serverData.url, {
         testParameter: 'test'
       }).success(function(res) {
         done();

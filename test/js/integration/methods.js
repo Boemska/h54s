@@ -7,7 +7,7 @@ describe('h54s integration -', function() {
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
-      sasAdapter._utils.ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
+      sasAdapter._ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
         assert.equal(res.status, 200, 'Log out is not successful');
 
         sasAdapter.login(serverData.user, serverData.pass, function(status) {
@@ -23,7 +23,7 @@ describe('h54s integration -', function() {
         hostUrl: serverData.url
       });
       //logout because we are already logged in in previeous tests
-      sasAdapter._utils.ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
+      sasAdapter._ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
         assert.equal(res.status, 200, 'Log out is not successful');
         sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err, res) {
           assert.equal(err.message, 'You are not logged in', 'Should throw error because user is not logged in');
@@ -112,7 +112,7 @@ describe('h54s integration -', function() {
 
       var counter = 0;
 
-      sasAdapter._utils.ajax.get(serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function() {
+      sasAdapter._ajax.get(serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function() {
         sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err) {
           if(!err) {
             counter++;

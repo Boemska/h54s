@@ -22,6 +22,8 @@ var h54s = module.exports = function(config) {
 
   this._pendingCalls    = [];
 
+  this._ajax = require('./methods/ajax.js')();
+
   if(config && config.isRemoteConfig) {
     var self = this;
 
@@ -29,7 +31,7 @@ var h54s = module.exports = function(config) {
 
     // '/base/test/h54sConfig.json' is for the testing with karma
     //replaced with gulp in dev build
-    this._utils.ajax.get('/base/test/h54sConfig.json').success(function(res) {
+    this._ajax.get('/base/test/h54sConfig.json').success(function(res) {
       var remoteConfig = JSON.parse(res.responseText);
 
       for(var key in remoteConfig) {
@@ -74,10 +76,8 @@ var h54s = module.exports = function(config) {
 
   // private function to set h54s instance properties
   function _setConfig(config) {
-    this._utils.ajax = require('./methods/ajax.js')();
-
     if(!config) {
-      this._utils.ajax.setTimeout(this.ajaxTimeout);
+      this._ajax.setTimeout(this.ajaxTimeout);
       return;
     } else if(typeof config !== 'object') {
       throw new h54sError('argumentError', 'First parameter should be config object');
@@ -104,7 +104,7 @@ var h54s = module.exports = function(config) {
       this.loginUrl = config.hostUrl + this.loginUrl;
     }
 
-    this._utils.ajax.setTimeout(this.ajaxTimeout);
+    this._ajax.setTimeout(this.ajaxTimeout);
   }
 };
 
