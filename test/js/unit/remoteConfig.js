@@ -33,5 +33,14 @@ describe('h54s unit -', function() {
       });
     });
 
+    it('Test config settings before remote config is loaded', function(done) {
+      var sasAdapter = new h54s({
+        debug: true,
+        isRemoteConfig: true
+      });
+      assert.isTrue(sasAdapter.debug, 'Debug option is not set');
+      done();
+    });
+
   });
 });

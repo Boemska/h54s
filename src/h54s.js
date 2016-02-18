@@ -24,6 +24,9 @@ var h54s = module.exports = function(config) {
 
   this._ajax = require('./methods/ajax.js')();
 
+  _setConfig.call(this, config);
+
+  //override with remote if set
   if(config && config.isRemoteConfig) {
     var self = this;
 
@@ -70,8 +73,6 @@ var h54s = module.exports = function(config) {
     }).error(function (err) {
       throw new h54sError('ajaxError', 'Remote config file cannot be loaded. Http status code: ' + err.status);
     });
-  } else {
-    _setConfig.call(this, config);
   }
 
   // private function to set h54s instance properties
