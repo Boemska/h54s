@@ -80,8 +80,7 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
       var resObj, unescapedResObj;
       if(!dbg) {
         try {
-          //remove new lines in json response
-          resObj          = JSON.parse(res.responseText.replace(/(\r\n|\r|\n)/g, ''));
+          resObj = self._utils.parseRes(res.responseText, sasProgram, params);
           logs.addApplicationLog(resObj.logmessage, sasProgram);
 
           resObj          = self._utils.convertDates(resObj);
@@ -99,6 +98,8 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
               self._utils.addFailedResponse(res.responseText, sasProgram);
               callback(new h54sError('parseError', 'Unable to parse response json'));
             }
+          } else if(e instanceof h54sError) {
+            callback(e);
           } else {
             var err = new h54sError('unknownError', e.message);
             err.stack = e.stack;

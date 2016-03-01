@@ -1,6 +1,25 @@
 var logs = require('../logs.js');
 var h54sError = require('../error.js');
 
+var programNotFoundPatt = /<title>(Stored Process Error|SASStoredProcess)<\/title>[\s\S]*<h2>Stored process not found:.*<\/h2>/;
+
+/*
+* Parse response from server
+*
+* @param {object} responseText - response html from the server
+* @param {string} sasProgram - sas program path
+* @param {object} params - params sent to sas program with addTable
+*
+*/
+module.exports.parseRes = function(responseText, sasProgram, params) {
+  var matches = responseText.match(programNotFoundPatt);
+  if(matches) {
+    throw new h54sError('programNotFound', 'Sas program completed with errors');
+  }
+  //remove new lines in json response
+  return JSON.parse(responseText.replace(/(\r\n|\r|\n)/g, ''));
+};
+
 /*
 * Parse response from server in debug mode
 *
@@ -10,9 +29,14 @@ var h54sError = require('../error.js');
 *
 */
 module.exports.parseDebugRes = function(responseText, sasProgram, params) {
+  var matches = responseText.match(programNotFoundPatt);
+  if(matches) {
+    throw new h54sError('programNotFound', 'Sas program completed with errors');
+  }
+
   //find json
-  var patt          = /^(.?--h54s-data-start--)([\S\s]*?)(--h54s-data-end--)/m;
-  var matches       = responseText.match(patt);
+  patt              = /^(.?--h54s-data-start--)([\S\s]*?)(--h54s-data-end--)/m;
+  matches           = responseText.match(patt);
 
   var page          = responseText.replace(patt, '');
   var htmlBodyPatt  = /<body.*>([\s\S]*)<\/body>/;

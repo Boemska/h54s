@@ -143,6 +143,33 @@ describe('h54s integration -', function() {
       });
     });
 
+    it('Missing SAS program', function(done) {
+      this.timeout(4000);
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url
+      });
+
+      sasAdapter.call('/AJAX/h54s_test/missingProgram', null, function(err, res) {
+        assert.isDefined(err);
+        assert.equal(err.type, 'programNotFound', 'We got wrong error type');
+        done();
+      });
+    });
+
+    it('Missing SAS program with debug set', function(done) {
+      this.timeout(4000);
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url,
+        debug: true
+      });
+
+      sasAdapter.call('/AJAX/h54s_test/missingProgram', null, function(err, res) {
+        assert.isDefined(err);
+        assert.equal(err.type, 'programNotFound', 'We got wrong error type');
+        done();
+      });
+    });
+
     it('Log out', function(done) {
       this.timeout(10000);
       var sasAdapter = new h54s({
