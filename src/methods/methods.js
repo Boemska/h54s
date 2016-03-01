@@ -223,6 +223,22 @@ module.exports.login = function(user, pass, callback) {
 };
 
 /*
+* Logout method
+*
+* @param {function} callback - Callback function called when ajax call is finished
+*
+*/
+
+module.exports.logout = function(callback) {
+  this._ajax.get(this.url, {_action: 'logoff'}).success(function(res) {
+    callback();
+  }).error(function(res) {
+    logs.addApplicationLog('Logout failed with status code: ' + res.status);
+    callback(res.status);
+  });
+};
+
+/*
 * Enter debug mode
 *
 */

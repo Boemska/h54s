@@ -143,5 +143,23 @@ describe('h54s integration -', function() {
       });
     });
 
+    it('Log out', function(done) {
+      this.timeout(10000);
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url
+      });
+
+      sasAdapter.login(serverData.user, serverData.pass, function(status) {
+        assert.equal(status, 200, 'We got wrong status code');
+        sasAdapter.logout(function() {
+          sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err, res) {
+            assert.isDefined(err);
+            assert.equal(err.type, 'notLoggedinError', 'We got wrong error type');
+            done();
+          });
+        });
+      });
+    });
+
   });
 });

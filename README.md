@@ -358,6 +358,17 @@ adapter.login('username', 'password', function(status) {
 });
 ```
 
+### logout(callback)
+Example:
+```js
+adapter.logout(function(err) {
+  if(err !== undefined) {
+    //http request failed
+    //err is status code number
+  }
+})
+```
+
 ### h54s.Tables(tableArray, macroName)
 Creates an object which stores Tables, which are then sent back to SAS via the `call` method.
 
