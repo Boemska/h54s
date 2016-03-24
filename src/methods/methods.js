@@ -99,8 +99,12 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
               callback(new h54sError('parseError', 'Unable to parse response json'));
             }
           } else if(e instanceof h54sError) {
+            self._utils.parseErrorResponse(res.responseText, sasProgram);
+            self._utils.addFailedResponse(res.responseText, sasProgram);
             callback(e);
           } else {
+            self._utils.parseErrorResponse(res.responseText, sasProgram);
+            self._utils.addFailedResponse(res.responseText, sasProgram);
             var err = new h54sError('unknownError', e.message);
             err.stack = e.stack;
             callback(err);
