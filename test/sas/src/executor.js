@@ -59,8 +59,10 @@ module.exports = function (execFile, log) {
       if(scriptEnded) {
         child.stdout.removeListener('data', stdoutCallback);
         child.stderr.removeListener('data', stderrCallback);
-        outStream.end();
-        errStream.end();
+        if(log) {
+          outStream.end();
+          errStream.end();
+        }
         child.kill();
 
         fulfill({
