@@ -10,28 +10,28 @@ module.exports = function (settings) {
   return new Promise((resolve, reject) => {
     var tableArray = [];
     var table = [];
-    var row = {};
 
     if(isNaN(settings.columns)) {
-      for(let i = 0; i < settings.columns.length; i++) {
-        if(settings.columns[i].toLowerCase() === 'n') {
-          //random int or float
-          if(chance.bool()) {
-            row['PROP'+i] = chance.integer();
-          } else {
-            row['PROP'+i] = chance.floating();
+      for(let i = 0; i < settings.rows; i++) {
+        let row = {};
+        for(let i = 0; i < settings.columns.length; i++) {
+          if(settings.columns[i].toLowerCase() === 'n') {
+            //random int or float
+            if(chance.bool()) {
+              row['PROP'+i] = chance.integer();
+            } else {
+              row['PROP'+i] = chance.floating();
+            }
+          } else if(settings.columns[i].toLowerCase() === 'd') {
+            row['DT_PROP'+i] = chance.date();
+          } else if(settings.columns[i].toLowerCase() === 's') {
+            row['PROP'+i] = chance.string({length: settings.varLength});
           }
-        } else if(settings.columns[i].toLowerCase() === 'd') {
-          row['DT_PROP'+i] = chance.date();
-        } else if(settings.columns[i].toLowerCase() === 's') {
-          row['PROP'+i] = chance.string({length: settings.varLength});
         }
+        table.push(row);
       }
     }
 
-    for(let i = 0; i < settings.rows; i++) {
-      table.push(row);
-    }
 
     var converted = tableUtils.convertTableObject(table);
     tableArray.push(JSON.stringify(converted.spec));
