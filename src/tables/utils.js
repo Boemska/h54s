@@ -49,6 +49,12 @@ module.exports.convertTableObject = function(inObject) {
   targetArray[currentTarget]  = [];
   var j                       = 0;
   for (var i = 0; i < inObject.length; i++) {
+    //remove empty table row
+    if(Object.keys(inObject[i]).length === 0) {
+      inObject.splice(i--, 1);
+      continue;
+    }
+
     targetArray[currentTarget][j] = {};
     var chunkRowCount             = 0;
 

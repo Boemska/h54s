@@ -43,5 +43,15 @@ describe('h54s unit -', function() {
       done();
     });
 
+    it('Remove empty table row', function(done) {
+      var table = new h54s.Tables([
+        {prop: 'test'},
+        {},
+        {prop: 'test2'}
+      ], 'data');
+      assert.deepEqual(JSON.parse(table._tables.data[1]), [{prop: 'test'}, {prop: 'test2'}], 'Table data is wrong after removing empty row');
+      done();
+    });
+
   });
 });
