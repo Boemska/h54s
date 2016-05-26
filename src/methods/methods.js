@@ -125,9 +125,9 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
           } else if(e instanceof h54sError) {
             callback(e);
           } else {
-            var err = new h54sError('unknownError', e.message);
-            err.stack = e.stack;
-            callback(err);
+            var error = new h54sError('unknownError', e.message);
+            error.stack = e.stack;
+            callback(error);
           }
         }
       }
