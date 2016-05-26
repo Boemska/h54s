@@ -47,7 +47,8 @@ describe('h54s unit -', function() {
       var table = new h54s.Tables([
         {prop: 'test'},
         {},
-        {prop: 'test2'}
+        {prop: 'test2'},
+        {prop1: null, prop2: undefined}
       ], 'data');
       assert.deepEqual(JSON.parse(table._tables.data[1]), [{prop: 'test'}, {prop: 'test2'}], 'Table data is wrong after removing empty row');
       done();

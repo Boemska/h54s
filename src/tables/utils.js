@@ -49,12 +49,6 @@ module.exports.convertTableObject = function(inObject) {
   targetArray[currentTarget]  = [];
   var j                       = 0;
   for (var i = 0; i < inObject.length; i++) {
-    //remove empty table row
-    if(Object.keys(inObject[i]).length === 0) {
-      inObject.splice(i--, 1);
-      continue;
-    }
-
     targetArray[currentTarget][j] = {};
     var chunkRowCount             = 0;
 
@@ -122,6 +116,12 @@ module.exports.convertTableObject = function(inObject) {
       if (checkAndIncrement(thisSpec) == -1) {
         throw new h54sError('typeError', 'There is a type mismatch in the array between values (columns) of the same name.');
       }
+    }
+
+    //remove last added row if it's empty
+    if(Object.keys(targetArray[currentTarget][j]).length === 0) {
+      targetArray[currentTarget].splice(j, 1);
+      continue;
     }
 
     if (chunkRowCount > chunkThreshold) {
