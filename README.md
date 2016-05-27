@@ -192,7 +192,7 @@ Data Types between the front-end and back-end are mapped as follows:
 | String   | String     | NewLine characters are stripped.                                                                    |
 | Numeric  | Numeric    | Same precision in both SAS and JS.                                                                  |
 | Datetime | Date()     | SAS Datetime columns are converted to Date() objects if their column name is prefixed with 'DT_'    |
-| Date     |            | Unsupported. You won't be able to transmit data as SAS Dates. Convert, use output views and DHS()   |
+| Date     |            | Unsupported. You won't be able to transmit data as SAS Dates. Convert, use output views and DHMS()   |
 
 
 ### But what about Parameters? I'm used to Parameters
