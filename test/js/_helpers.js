@@ -9,3 +9,13 @@ function getRandomAsciiChars(count) {
   }
   return str;
 }
+
+function getRandomAsciiLettersAndNumbers(count) {
+  var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var str = '';
+
+  for(var i = 0; i < count; i++) {
+    str += possible[Math.floor((Math.random() * possible.length))];
+  }
+  return str;
+}

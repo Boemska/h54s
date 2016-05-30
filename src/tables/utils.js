@@ -7,9 +7,12 @@ var logs = require('../logs.js');
 * @param {object} inObject - Object to convert
 *
 */
-module.exports.convertTableObject = function(inObject) {
+module.exports.convertTableObject = function(inObject, chunkThreshold) {
   var self            = this;
-  var chunkThreshold  = 30000; // this goes to 30k for SAS
+
+  if(chunkThreshold > 30000) {
+    console.warn('You should not set threshold larger than 30kb because of the SAS limitations');
+  }
 
   // first check that the object is an array
   if (typeof (inObject) !== 'object') {

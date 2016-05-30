@@ -8,8 +8,9 @@ var h54sError = require('../error.js');
 *@param {string} message - macro name
 *
 */
-function Tables(table, macroName) {
+function Tables(table, macroName, parameterThreshold) {
   this._tables = {};
+  this._parameterThreshold = parameterThreshold || 30000;
 
   this.add(table, macroName);
 }
@@ -35,7 +36,7 @@ Tables.prototype.add = function(table, macroName) {
     throw new h54sError('argumentError', 'Missing arguments');
   }
 
-  var result = this._utils.convertTableObject(table);
+  var result = this._utils.convertTableObject(table, this._parameterThreshold);
 
   var tableArray = [];
   tableArray.push(JSON.stringify(result.spec));

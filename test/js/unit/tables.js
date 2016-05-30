@@ -54,5 +54,43 @@ describe('h54s unit -', function() {
       done();
     });
 
+    it('Test parameter threshold', function(done) {
+      var rows = [];
+
+      //around 30kb after json stringivy
+      for(var i = 0; i < 260; i++) {
+        rows.push({
+          data: getRandomAsciiLettersAndNumbers(100)
+        });
+      }
+
+      var table = new h54s.Tables(rows, 'data');
+      assert.equal(table._parameterThreshold, 30000, 'Threshold default value incorrect');
+      assert.equal(table._tables.data.length, 2, 'Tables length not correct');
+
+      table = new h54s.Tables(rows, 'data', 10000);
+      assert.equal(table._tables.data.length, 4, 'Tables length not correct');
+
+      table = new h54s.Tables(rows, 'data', 5000);
+      assert.equal(table._tables.data.length, 7, 'Tables length not correct');
+
+      table = new h54s.Tables(rows, 'data', 50000);
+      assert.equal(table._tables.data.length, 2, 'Tables length not correct');
+
+      done();
+    });
+
   });
 });
+
+function byteLength(str) {
+  // returns the byte length of an utf8 string
+  var s = str.length;
+  for (var i=str.length-1; i>=0; i--) {
+    var code = str.charCodeAt(i);
+    if (code > 0x7f && code <= 0x7ff) s++;
+    else if (code > 0x7ff && code <= 0xffff) s+=2;
+    if (code >= 0xDC00 && code <= 0xDFFF) i--; //trail surrogate
+  }
+  return s;
+}
