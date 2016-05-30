@@ -370,7 +370,7 @@ adapter.logout(function(err) {
 })
 ```
 
-### h54s.Tables(tableArray, macroName)
+### h54s.Tables(tableArray, macroName, parameterThreshold)
 Creates an object which stores Tables, which are then sent back to SAS via the `call` method.
 
 ```js
@@ -379,8 +379,9 @@ var tables = new h54s.Tables([
     libname: 'WORK',
     memname: 'CHOSENLIB'
   }
-], 'data');
+], 'data', 10000);
 ```
+`parameterThreshold` - default value is 30000 bytes and it shouldn't be larger
 
 ### h54s.Tables.prototype.add(tableArray, macroName)
 Adds additional tables to a Tables object:

@@ -5,7 +5,8 @@ var h54sError = require('../error.js');
 * @constructor
 *
 *@param {array} table - Table added when object is created
-*@param {string} message - macro name
+*@param {string} macroName - macro name
+*@param {number} parameterThreshold - size of data objects sent to SAS
 *
 */
 function Tables(table, macroName, parameterThreshold) {
