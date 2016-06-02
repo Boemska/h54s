@@ -73,7 +73,9 @@ describe('h54s integration -', function() {
 
       proclaim.throws(function() {
         new h54s.Tables([
-          {}, {
+          {
+            data1: data
+          }, {
             data1: data,
             data2: data,
             data3: data,

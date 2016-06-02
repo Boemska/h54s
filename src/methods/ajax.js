@@ -2,7 +2,7 @@ module.exports = function() {
   var timeout = 30000;
   var timeoutHandle;
 
-  var xhr = function(type, url, data) {
+  var xhr = function(type, url, data, multipartFormData) {
     var methods = {
       success: function() {},
       error:   function() {}
@@ -11,7 +11,11 @@ module.exports = function() {
     var request = new XHR('MSXML2.XMLHTTP.3.0');
 
     request.open(type, url, true);
-    request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+    //multipart/form-data is set automatically so no need for else block
+    if(!multipartFormData) {
+      request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    }
     request.onreadystatechange = function () {
       if (request.readyState === 4) {
         clearTimeout(timeoutHandle);
@@ -45,7 +49,7 @@ module.exports = function() {
 
   var serialize = function(obj) {
     var str = [];
-    for(var p in obj)
+    for(var p in obj) {
       if (obj.hasOwnProperty(p)) {
         if(obj[p] instanceof Array) {
           for(var i = 0, n = obj[p].length; i < n; i++) {
@@ -55,7 +59,24 @@ module.exports = function() {
           str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
         }
       }
+    }
     return str.join("&");
+  };
+
+  var createMultipartFormDataPayload = function(obj) {
+    var data = new FormData();
+    for(var p in obj) {
+      if(obj.hasOwnProperty(p)) {
+        if(obj[p] instanceof Array) {
+          for(var i = 0, n = obj[p].length; i < n; i++) {
+            data.append(p, obj[p][i]);
+          }
+        } else {
+          data.append(p, obj[p]);
+        }
+      }
+    }
+    return data;
   };
 
   return {
@@ -67,12 +88,16 @@ module.exports = function() {
       var urlWithParams = dataStr ? (url + '?' + dataStr) : url;
       return xhr('GET', urlWithParams);
     },
-    post: function(url, data) {
-      var dataStr;
+    post: function(url, data, multipartFormData) {
+      var payload;
       if(typeof data === 'object') {
-        dataStr = serialize(data);
+        if(multipartFormData) {
+          payload = createMultipartFormDataPayload(data);
+        } else {
+          payload = serialize(data);
+        }
       }
-      return xhr('POST', url, dataStr);
+      return xhr('POST', url, payload, multipartFormData);
     },
     setTimeout: function(t) {
       timeout = t;

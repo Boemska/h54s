@@ -52,7 +52,7 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
     return;
   }
 
-  this._ajax.post(this.url, params).success(function(res) {
+  this._ajax.post(this.url, params, true).success(function(res) {
     if(self._utils.needToLogin.call(self, res)) {
       //remember the call for latter use
       self._pendingCalls.push({
@@ -90,7 +90,7 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
         } catch(e) {
           if(e instanceof SyntaxError) {
             if(retryCount < self.maxXhrRetries) {
-              self._ajax.post(self.url, params).success(this.success).error(this.error);
+              self._ajax.post(self.url, params, true).success(this.success).error(this.error);
               retryCount++;
               logs.addApplicationLog("Retrying #" + retryCount, sasProgram);
             } else {
@@ -195,7 +195,11 @@ module.exports.login = function(user, pass, callback) {
           });
         }
 
-        self._ajax.post(self.loginUrl, loginParams).success(this.success).error(this.error);
+        var success = this.success, error = this.error;
+        self._ajax.post(self.loginUrl, loginParams).success(function() {
+          //we need this get request because of the sas 9.4 security checks
+          self._ajax.get(self.url).success(success).error(error);
+        }).error(this.error);
       } else {
         //getting form again, but it wasn't a redirect
         logs.addApplicationLog('Wrong username or password');
