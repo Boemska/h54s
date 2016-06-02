@@ -213,35 +213,35 @@ gulp.task('release', gulpsync.sync(['set-production', 'clean', 'test-release', '
   process.exit();
 });
 
-gulp.task('serveAngular', function() {
+gulp.task('serveAngular', ['build-dev'], function() {
   return gulp.src(['./examples/angular/', './dev/', './test/js/'])
     .pipe(webserver({
       port: 1337
     }));
 });
 
-gulp.task('serveExtjs', function() {
+gulp.task('serveExtjs', ['build-dev'], function() {
   return gulp.src(['./examples/extjs/', './dev/', './test/js/'])
     .pipe(webserver({
       port: 1337
     }));
 });
 
-gulp.task('serveExtjs2', function() {
+gulp.task('serveExtjs2', ['build-dev'], function() {
   return gulp.src(['./examples/extjs2/', './dev/', './test/js/'])
     .pipe(webserver({
       port: 1337
     }));
 });
 
-gulp.task('serveW2UI', function() {
+gulp.task('serveW2UI', ['build-dev'], function() {
   return gulp.src(['./examples/w2ui/', './dev/', './test/js/'])
     .pipe(webserver({
       port: 1337
     }));
 });
 
-gulp.task('serveOpenUI5', function() {
+gulp.task('serveOpenUI5', ['build-dev'], function() {
   return gulp.src(['./examples/openui5/', './dev/', './test/js/'])
     .pipe(webserver({
       port: 1337
