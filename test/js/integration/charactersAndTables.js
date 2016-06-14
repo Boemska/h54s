@@ -54,7 +54,7 @@ describe('h54s integration -', function() {
     });
 
     it('Test big ascii string', function(done) {
-      this.timeout(20000);
+      this.timeout(30000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
@@ -128,7 +128,7 @@ describe('h54s integration -', function() {
     });
 
     it('Test big table', function(done) {
-      this.timeout(20000);
+      this.timeout(30000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
