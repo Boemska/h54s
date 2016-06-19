@@ -376,12 +376,12 @@ Creates an object which stores Tables, which are then sent back to SAS via the `
 ```js
 var tables = new h54s.Tables([
   {
-    libname: 'WORK',
-    memname: 'CHOSENLIB'
+    someNumber: 42.0,
+    someString: 'Stuff'
   }
 ], 'data', 10000);
 ```
-`parameterThreshold` - default value is 30000 bytes and it shouldn't be larger
+`parameterThreshold` - The maximum length of a single parameter string, and therefore the maximum length of any single row of data. Default value is 30000 characters. Can go up to 32767 but tweaking this is generally not neccessary unless you know what you're doing.
 
 ### h54s.Tables.prototype.add(tableArray, macroName)
 Adds additional tables to a Tables object:
