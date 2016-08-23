@@ -146,6 +146,18 @@ describe('h54s unit -', function() {
       done();
     });
 
+    it('Test SasData specs', function(done) {
+      var data = [{
+        data1   : 'test',
+        data2   : 1,
+        dt_data3: new Date()
+      }];
+
+      var table = new h54s.SasData(data, 'data');
+      assert.equal('data1,string,4|data2,num,8|dt_data3,date,8', table._files.data[0], 'Specs are not correct');
+      done();
+    });
+
   });
 });
 

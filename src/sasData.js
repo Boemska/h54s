@@ -113,8 +113,13 @@ SasData.prototype.addTable = function(table, macroName) {
     }
   }
 
+  //convert spec to csv with pipes
+  var specString = Object.keys(spec).map(function(key) {
+    return key + ',' + spec[key].colType + ',' + spec[key].colLength;
+  }).join('|');
+
   this._files[macroName] = [
-    spec, //convert to csv with pipes
+    specString,
     new File([JSON.stringify(table)], 'table.json', {type: 'text/plain;charset=UTF-8'})
   ];
 };
