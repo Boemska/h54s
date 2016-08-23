@@ -1,9 +1,12 @@
 describe('h54s unit -', function() {
-  describe('Tables test:', function() {
+  describe('SAS Data test:', function() {
 
     it('Exceptions in tables', function(done) {
       proclaim.throws(function() {
         new h54s.Tables([
+          {a: "Dummy Name", specialNumberVal :NaN}
+        ], 'data');
+        new h54s.SasData([
           {a: "Dummy Name", specialNumberVal :NaN}
         ], 'data');
       }, 'NaN value in one of the values (columns) is not allowed');
@@ -12,10 +15,16 @@ describe('h54s unit -', function() {
         new h54s.Tables([
           {b: "Dummy Name", specialNumberVal: Infinity}
         ], 'data');
+        new h54s.SasData([
+          {b: "Dummy Name", specialNumberVal: Infinity}
+        ], 'data');
       }, 'Infinity value in one of the values (columns) is not allowed');
 
       proclaim.throws(function() {
         new h54s.Tables([
+          {c: "Dummy Name", specialNumberVal: -Infinity}
+        ], 'data');
+        new h54s.SasData([
           {c: "Dummy Name", specialNumberVal: -Infinity}
         ], 'data');
       }, '-Infinity value in one of the values (columns) is not allowed');
@@ -28,6 +37,9 @@ describe('h54s unit -', function() {
 
       proclaim.throws(function() {
         new h54s.Tables([
+          {e: "Dummy Name", boolVal: false}
+        ], 'data');
+        new h54s.SasData([
           {e: "Dummy Name", boolVal: false}
         ], 'data');
       }, 'Boolean value in one of the values (columns) is not allowed');
@@ -51,7 +63,21 @@ describe('h54s unit -', function() {
         {prop1: null, prop2: undefined}
       ], 'data');
       assert.deepEqual(JSON.parse(table._tables.data[1]), [{prop: 'test'}, {prop: 'test2'}], 'Table data is wrong after removing empty row');
-      done();
+
+
+      table = new h54s.SasData([
+        {prop: 'test'},
+        {},
+        {prop: 'test2'},
+        {prop1: null, prop2: undefined}
+      ], 'data');
+
+      var reader = new FileReader();
+      reader.onload = function() {
+        assert.deepEqual(JSON.parse(reader.result), [{prop: 'test'}, {prop: 'test2'}], 'Table data is wrong after removing empty row');
+        done();
+      };
+      reader.readAsText(table._files.data[1]);
     });
 
     it('Test parameter threshold', function(done) {
@@ -77,6 +103,46 @@ describe('h54s unit -', function() {
       table = new h54s.Tables(rows, 'data', 50000);
       assert.equal(table._tables.data.length, 2, 'Tables length not correct');
 
+      done();
+    });
+
+    it('Test Files object', function(done) {
+      var file = new File(['test'], 'testName', {type: 'text/plain;charset=UTF-8'});
+      var files = new h54s.Files(file, 'macroName');
+
+      assert.isDefined(files._files.macroName, 'File not set');
+      done();
+    });
+
+    it('Test SasData object constructor with File', function(done) {
+      var file = new File(['test'], 'testName', {type: 'text/plain;charset=UTF-8'});
+      var sasData = new h54s.SasData(file, 'macroName');
+
+      assert.isDefined(sasData._files.macroName, 'File not set');
+      done();
+    });
+
+    it('Test SasData object constructor with Table', function(done) {
+      var sasData = new h54s.SasData([{test: 1}], 'macroName');
+
+      assert.isDefined(sasData._files.macroName, 'Table not set');
+      done();
+    });
+
+    it('Test both Files and Tables in SasData object', function(done) {
+      var sasData = new h54s.SasData([{test: 1}], 'macroName');
+
+      var file = new File(['test'], 'testName', {type: 'text/plain;charset=UTF-8'});
+      sasData.addFile(file, 'macroName');
+      sasData.addFile(file, 'macro2Name');
+
+      sasData.addTable([{test: 1}], 'macro2Name');
+
+      assert.isDefined(sasData._files.macroName, 'Table not set');
+      assert.isDefined(sasData._files.macro2Name, 'Table not set');
+
+      assert.isDefined(sasData._files.macroName, 'File not set');
+      assert.isDefined(sasData._files.macro2Name, 'File not set');
       done();
     });
 

@@ -153,5 +153,48 @@ describe('h54s integration -', function() {
       });
     });
 
+    it('Test call method with SasData table', function(done) {
+      this.timeout(10000);
+
+      var data = [
+        {
+          data: 'test'
+        }
+      ];
+
+      var table = new h54s.SasData(data, 'data');
+
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url
+      });
+
+      sasAdapter.login(serverData.user, serverData.pass, function(status) {
+        sasAdapter.call('/AJAX/h54s_test/bounceUploadData', table, function(err, res) {
+          assert.isUndefined(err, 'We got error on sas program ajax call');
+          assert.deepEqual(res.data, data, 'Bounce data is different');
+          done();
+        });
+      });
+    });
+
+    it('Test call methor with table and file in SasData object', function(done) {
+      this.timeout(10000);
+
+      var file = new File(['test file content, utf-8 content: ', 'ŠĐŽČĆšđžčć'], 'testName', {type: 'text/plain;charset=UTF-8'});
+      var sasData = new h54s.SasData(file, 'fileMacro');
+
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url
+      });
+
+      sasAdapter.call('/AJAX/h54s_test/bounceUploadFile', sasData, function(err, res) {
+        assert.isUndefined(err, 'We got error on sas program ajax call');
+        assert.equal(file.size, res.infoDataset[0].CONTENT_LENGTH, 'File length different');
+        assert.equal(file.name, res.infoDataset[0].FILENAME, 'File name different');
+        assert.equal('fileMacro', res.infoDataset[0].NAME, 'Macro different');
+        done();
+      });
+    });
+
   });
 });

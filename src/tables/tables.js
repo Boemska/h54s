@@ -13,7 +13,7 @@ function Tables(table, macroName, parameterThreshold) {
   this._tables = {};
   this._parameterThreshold = parameterThreshold || 30000;
 
-  this.add(table, macroName);
+  Tables.prototype.add.call(this, table, macroName);
 }
 
 /*

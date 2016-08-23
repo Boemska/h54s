@@ -8,7 +8,7 @@ var logs = require('../logs.js');
 * @param {function} callback - Callback function called when ajax call is finished
 *
 */
-module.exports.call = function(sasProgram, tablesObj, callback, params) {
+module.exports.call = function(sasProgram, dataObj, callback, params) {
   var self        = this;
   var retryCount  = 0;
   var dbg         = this.debug;
@@ -31,11 +31,29 @@ module.exports.call = function(sasProgram, tablesObj, callback, params) {
     };
   }
 
-  if(tablesObj) {
-    if(tablesObj instanceof h54s.Tables) {
-      for(var key in tablesObj._tables) {
-        if(tablesObj._tables.hasOwnProperty(key)) {
-          params[key] = tablesObj._tables[key];
+  if(dataObj) {
+    var key;
+    if(dataObj instanceof h54s.Tables) {
+      for(key in dataObj._tables) {
+        if(dataObj._tables.hasOwnProperty(key)) {
+          params[key] = dataObj._tables[key];
+        }
+      }
+    } else if(dataObj instanceof h54s.Files){
+      for(key in dataObj._files) {
+        if(dataObj._files.hasOwnProperty(key)) {
+          params[key] = dataObj._files[key];
+        }
+      }
+    } else if(dataObj instanceof h54s.SasData) {
+      for(key in dataObj._tables) {
+        if(dataObj._tables.hasOwnProperty(key)) {
+          params[key] = dataObj._tables[key];
+        }
+      }
+      for(key in dataObj._files) {
+        if(dataObj._files.hasOwnProperty(key)) {
+          params[key] = dataObj._files[key];
         }
       }
     } else {

@@ -116,6 +116,8 @@ h54s.version = '__version__';
 h54s.prototype = require('./methods/methods.js');
 
 h54s.Tables = require('./tables/tables.js');
+h54s.Files = require('./files/files.js');
+h54s.SasData = require('./sasData.js');
 
 //self invoked function module
 require('./ie_polyfills.js');
