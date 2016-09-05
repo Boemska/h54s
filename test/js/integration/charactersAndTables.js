@@ -5,7 +5,8 @@ describe('h54s integration -', function() {
     it('Test json character escape', function(done) {
       this.timeout(10000);
       var sasAdapter = new h54s({
-        hostUrl: serverData.url
+        hostUrl: serverData.url,
+        metadataRoot: serverData.metadataRoot
       });
 
       var data0 = "\\\"/\/\?''";
@@ -19,7 +20,7 @@ describe('h54s integration -', function() {
       ], 'data');
 
       sasAdapter.login(serverData.user, serverData.pass, function() {
-        sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
+        sasAdapter.call('BounceData', table, function(err, res) {
           assert.isUndefined(err, 'We got error on sas program ajax call');
           assert.isDefined(res, 'Response is undefined');
           assert.equal(res.outputdata[0].DATA0, data0, 'Bounce data is different - data0');
@@ -33,7 +34,8 @@ describe('h54s integration -', function() {
       this.timeout(10000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url,
-        debug: true
+        debug: true,
+        metadataRoot: serverData.metadataRoot
       });
 
       var chars = {};
@@ -43,7 +45,7 @@ describe('h54s integration -', function() {
 
       var table = new h54s.Tables([chars], 'data');
 
-      sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
+      sasAdapter.call('BounceData', table, function(err, res) {
         assert.isUndefined(err, 'We got error on sas program ajax call');
         assert.isDefined(res, 'Response is undefined');
         for(var i = 32; i < 128; i++) {
@@ -56,7 +58,8 @@ describe('h54s integration -', function() {
     it('Test big ascii string', function(done) {
       this.timeout(30000);
       var sasAdapter = new h54s({
-        hostUrl: serverData.url
+        hostUrl: serverData.url,
+        metadataRoot: serverData.metadataRoot
       });
       var data = getRandomAsciiChars(10000);
 
@@ -115,7 +118,7 @@ describe('h54s integration -', function() {
 
         var table = new h54s.Tables(rows, 'data');
 
-        sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
+        sasAdapter.call('BounceData', table, function(err, res) {
           assert.isUndefined(err, 'We got error on sas program ajax call');
           assert.isDefined(res, 'Response is undefined');
           assert.equal(res.outputdata.length, 12, 'Received less rows than sent');
@@ -130,7 +133,8 @@ describe('h54s integration -', function() {
     it('Test big table', function(done) {
       this.timeout(30000);
       var sasAdapter = new h54s({
-        hostUrl: serverData.url
+        hostUrl: serverData.url,
+        metadataRoot: serverData.metadataRoot
       });
 
       var str = getRandomAsciiChars(1000);
@@ -145,7 +149,7 @@ describe('h54s integration -', function() {
 
       var table = new h54s.Tables(rows, 'data');
 
-      sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
+      sasAdapter.call('BounceData', table, function(err, res) {
         assert.isUndefined(err, 'We got error on sas program ajax call');
         assert.isDefined(res, 'Response is undefined');
         assert.equal(res.outputdata.length, 700, 'Received less rows than sent');
@@ -165,11 +169,12 @@ describe('h54s integration -', function() {
       var table = new h54s.SasData(data, 'data');
 
       var sasAdapter = new h54s({
-        hostUrl: serverData.url
+        hostUrl: serverData.url,
+        metadataRoot: serverData.metadataRoot
       });
 
       sasAdapter.login(serverData.user, serverData.pass, function(status) {
-        sasAdapter.call('/AJAX/h54s_test/bounceUploadData', table, function(err, res) {
+        sasAdapter.call('bounceUploadData', table, function(err, res) {
           assert.isUndefined(err, 'We got error on sas program ajax call');
           assert.deepEqual(res.data, data, 'Bounce data is different');
           done();
@@ -184,10 +189,11 @@ describe('h54s integration -', function() {
       var sasData = new h54s.SasData(file, 'fileMacro');
 
       var sasAdapter = new h54s({
-        hostUrl: serverData.url
+        hostUrl: serverData.url,
+        metadataRoot: serverData.metadataRoot
       });
 
-      sasAdapter.call('/AJAX/h54s_test/bounceUploadFile', sasData, function(err, res) {
+      sasAdapter.call('bounceUploadFile', sasData, function(err, res) {
         assert.isUndefined(err, 'We got error on sas program ajax call');
         assert.equal(file.size, res.infoDataset[0].CONTENT_LENGTH, 'File length different');
         assert.equal(file.name, res.infoDataset[0].FILENAME, 'File name different');

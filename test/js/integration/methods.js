@@ -20,12 +20,13 @@ describe('h54s integration -', function() {
     it('Call sas program without logging in', function(done) {
       this.timeout(10000);
       var sasAdapter = new h54s({
-        hostUrl: serverData.url
+        hostUrl: serverData.url,
+        metadataRoot: serverData.metadataRoot
       });
       //logout because we are already logged in in previeous tests
       sasAdapter._ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
         assert.equal(res.status, 200, 'Log out is not successful');
-        sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err, res) {
+        sasAdapter.call('startupService', null, function(err, res) {
           assert.equal(err.message, 'You are not logged in', 'Should throw error because user is not logged in');
           assert.isUndefined(res, 'We got error, res should be undefined');
           done();
@@ -48,11 +49,12 @@ describe('h54s integration -', function() {
       this.timeout(6000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url,
-        debug: true
+        debug: true,
+        metadataRoot: serverData.metadataRoot
       });
       sasAdapter.login(serverData.user, serverData.pass, function(status) {
         if(status === 200) {
-          sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err) {
+          sasAdapter.call('startupService', null, function(err) {
             assert.isUndefined(err, 'We got error on sas program ajax call');
             done();
           });
@@ -63,7 +65,8 @@ describe('h54s integration -', function() {
     it('Test concurent calls', function(done) {
       this.timeout(10000);
       var sasAdapter = new h54s({
-        hostUrl: serverData.url
+        hostUrl: serverData.url,
+        metadataRoot: serverData.metadataRoot
       });
 
       var finishedRequests = 0;
@@ -77,7 +80,7 @@ describe('h54s integration -', function() {
         }
       ], 'data');
 
-      sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
+      sasAdapter.call('BounceData', table, function(err, res) {
         assert.isUndefined(err, 'We got error on sas program ajax call');
         assert.isDefined(res, 'Response is undefined');
         assert.equal(res.outputdata[0].DATA, data1, 'data1 is not the same in response');
@@ -93,7 +96,7 @@ describe('h54s integration -', function() {
         }
       ], 'data');
 
-      sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
+      sasAdapter.call('BounceData', table, function(err, res) {
         assert.isUndefined(err, 'We got error on sas program ajax call');
         assert.isDefined(res, 'Response is undefined');
         assert.equal(res.outputdata[0].DATA, data2, 'data2 is not the same in response');
@@ -107,23 +110,24 @@ describe('h54s integration -', function() {
     it('Test pending calls after login', function(done) {
       this.timeout(30000);
       var sasAdapter = new h54s({
-        hostUrl: serverData.url
+        hostUrl: serverData.url,
+        metadataRoot: serverData.metadataRoot
       });
 
       var counter = 0;
 
       sasAdapter._ajax.get(serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function() {
-        sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err) {
+        sasAdapter.call('startupService', null, function(err) {
           if(!err) {
             counter++;
           }
         });
-        sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err) {
+        sasAdapter.call('startupService', null, function(err) {
           if(!err) {
             counter++;
           }
         });
-        sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err) {
+        sasAdapter.call('startupService', null, function(err) {
           if(!err) {
             counter++;
           }
@@ -146,10 +150,11 @@ describe('h54s integration -', function() {
     it('Missing SAS program', function(done) {
       this.timeout(4000);
       var sasAdapter = new h54s({
-        hostUrl: serverData.url
+        hostUrl: serverData.url,
+        metadataRoot: serverData.metadataRoot
       });
 
-      sasAdapter.call('/AJAX/h54s_test/missingProgram', null, function(err, res) {
+      sasAdapter.call('missingProgram', null, function(err, res) {
         assert.isDefined(err);
         assert.equal(err.type, 'programNotFound', 'We got wrong error type');
         done();
@@ -160,10 +165,11 @@ describe('h54s integration -', function() {
       this.timeout(4000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url,
-        debug: true
+        debug: true,
+        metadataRoot: serverData.metadataRoot
       });
 
-      sasAdapter.call('/AJAX/h54s_test/missingProgram', null, function(err, res) {
+      sasAdapter.call('missingProgram', null, function(err, res) {
         assert.isDefined(err);
         assert.equal(err.type, 'programNotFound', 'We got wrong error type');
         done();
@@ -173,13 +179,14 @@ describe('h54s integration -', function() {
     it('Log out', function(done) {
       this.timeout(10000);
       var sasAdapter = new h54s({
-        hostUrl: serverData.url
+        hostUrl: serverData.url,
+        metadataRoot: serverData.metadataRoot
       });
 
       sasAdapter.login(serverData.user, serverData.pass, function(status) {
         assert.equal(status, 200, 'We got wrong status code');
         sasAdapter.logout(function() {
-          sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err, res) {
+          sasAdapter.call('startupService', null, function(err, res) {
             assert.isDefined(err);
             assert.equal(err.type, 'notLoggedinError', 'We got wrong error type');
             done();
