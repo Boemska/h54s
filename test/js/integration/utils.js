@@ -161,5 +161,18 @@ describe('h54s integration -', function() {
       });
     });
 
+    it('Program not found error', function(done) {
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url,
+        metadataRoot: serverData.metadataRoot
+      });
+
+      sasAdapter.call('notFoundProgram', null, function(err) {
+        assert.isDefined(err, 'We should get error object');
+        assert.equal(err.type, 'programNotFound', 'Wrong error type');
+        done();
+      });
+    });
+
   });
 });

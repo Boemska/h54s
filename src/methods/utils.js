@@ -14,7 +14,7 @@ var programNotFoundPatt = /<title>(Stored Process Error|SASStoredProcess)<\/titl
 module.exports.parseRes = function(responseText, sasProgram, params) {
   var matches = responseText.match(programNotFoundPatt);
   if(matches) {
-    throw new h54sError('programNotFound', 'Sas program completed with errors');
+    throw new h54sError('programNotFound', 'Program ' + sasProgram + ' not found');
   }
   //remove new lines in json response
   return JSON.parse(responseText.replace(/(\r\n|\r|\n)/g, ''));
@@ -31,7 +31,7 @@ module.exports.parseRes = function(responseText, sasProgram, params) {
 module.exports.parseDebugRes = function(responseText, sasProgram, params) {
   var matches = responseText.match(programNotFoundPatt);
   if(matches) {
-    throw new h54sError('programNotFound', 'Sas program completed with errors');
+    throw new h54sError('programNotFound', 'Program ' + sasProgram + ' not found');
   }
 
   //find json
