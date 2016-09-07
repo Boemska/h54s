@@ -127,11 +127,11 @@ var myFirstTable = [
   { name: 'Abdul', sex: 'M', weight: 133.7 }
 ];
 
-// add it to a h54s Tables object
-var tables = new h54s.Tables(myFirstTable, 'datain');
+// add it to a h54s SasData object
+var data = new h54s.SasData(myFirstTable, 'datain');
 
 // make your first call to SAS
-adapter.call('/Apps/myFirstService', tables, function(err, res) {
+adapter.call('/Apps/myFirstService', data, function(err, res) {
   if(err) {
     //Houston we have a problem     
     console.log(err);               
@@ -208,7 +208,7 @@ var paramsRow={};
 
 var paramTable = [paramsRow];
 
-    tables.add(paramTable,'controlTable');
+    data.add(paramTable,'controlTable');
 ```
 
 and the following SAS code would get you a table called `WORK.CONTROL` with three columns and one row:
@@ -228,7 +228,7 @@ Voila.
 
 This macro deserialises a JavaScript data object into a SAS table.
 
-`jsonvarname` is  the name given to the table array from the front end, corresponding to macroName in the `h54s.Tables(tableArray, macroName)` example
+`jsonvarname` is  the name given to the table array from the front end, corresponding to macroName in the `h54s.SasData(tableArray, macroName)` example
 
 `outdset` is the name of the target dataset that the tableArray is to be deserialised into
 
@@ -316,11 +316,11 @@ var adapter = new h54s({
 ```
 
 
-### call(sasProgram, tablesObj, callback)
+### call(sasProgram, dataObj, callback)
 
 Calls SAS program and returns data in a callback function. Example:
 ```js
-adapter.call('/BIP_Tree/test', tablesObj, function(err, res){
+adapter.call('/BIP_Tree/test', dataObj, function(err, res){
   if(err) {
     //Houston we have a problem
   } else {
@@ -329,7 +329,7 @@ adapter.call('/BIP_Tree/test', tablesObj, function(err, res){
   }
 });
 ```
-`tablesObj` is an instance of a h54s.Tables. Should be `null` if not sending any data.
+`dataObj` is an instance of a h54s.SasData. Should be `null` if not sending any data.
 
 `err` is a custom javascript Error object with one extra field, `type`.
 
@@ -370,29 +370,29 @@ adapter.logout(function(err) {
 })
 ```
 
-### h54s.Tables(tableArray, macroName, parameterThreshold)
-Creates an object which stores Tables, which are then sent back to SAS via the `call` method.
+### h54s.SasData(tableArray, macroName)
+Creates an object which stores tables, which are then sent back to SAS via the `call` method.
+This is equivalent to h54s.Tables constructor in pre v0.11.
 
 ```js
-var tables = new h54s.Tables([
+var data = new h54s.SasData([
   {
     libname: 'WORK',
     memname: 'CHOSENLIB'
   }
-], 'data', 10000);
+], 'data');
 ```
-`parameterThreshold` - default value is 30000 bytes and it shouldn't be larger
 
-### h54s.Tables.prototype.add(tableArray, macroName)
-Adds additional tables to a Tables object:
+### h54s.SasData.prototype.add(tableArray, macroName)
+Adds additional tables to a SasData object:
 
 ```js
-var tables = new h54s.Tables([
+var data = new h54s.SasData([
   { name: 'Allan', sex: 'M', weight: 101.1 },
   { name: 'Abdul', sex: 'M', weight: 133.7 }
 ], 'datain');
 
-tables.add([
+data.add([
   {
     someNumber: 42.0,
     someString: 'Stuff'
