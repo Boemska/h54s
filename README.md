@@ -377,8 +377,8 @@ This is equivalent to h54s.Tables constructor in pre v0.11.
 ```js
 var data = new h54s.SasData([
   {
-    libname: 'WORK',
-    memname: 'CHOSENLIB'
+    someNumber: 42.0,
+    someString: 'Stuff'
   }
 ], 'data');
 ```
