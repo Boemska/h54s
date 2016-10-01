@@ -33,7 +33,7 @@ module.exports = function (settings) {
     }
 
 
-    var converted = tableUtils.convertTableObject(table);
+    var converted = tableUtils.convertTableObject(table, settings.chunkSize);
     tableArray.push(JSON.stringify(converted.spec));
     for (var numberOfTables = 0; numberOfTables < converted.data.length; numberOfTables++) {
       var outString = JSON.stringify(converted.data[numberOfTables]);

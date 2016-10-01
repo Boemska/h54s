@@ -114,11 +114,9 @@ options NOQUOTELENMAX LRECL=32000 spool;
 
 %macro checkEnvironment;
   %hfsQuietenDown;
-  * set this to whatever your test harness is configured to ; 
-  %let batchOutFile='/tmp/h54sTest.out';
   * could do with a nicer way to check whether _WEBOUT is available ;
   %if (%symexist(_REPLAY) = 0) %then %do;
-    %let h54starget=&batchOutFile.;
+    %let h54starget=stdout;
   %end;
   %else %do;
     %let h54starget=_WEBOUT;
@@ -475,36 +473,30 @@ options NOQUOTELENMAX LRECL=32000 spool;
     %return;
   %end;
 
-
-  data _null_;
-    call symput('qc', '"');
-    call symput('pf', "%upcase(&dsn)");
-    call symput('dc', '$');
-    call symput('dt_', 'dt_');
+  * get the name type length and variable position for all vars ;
+  proc contents noprint data=&libn..&dsn 
+    out=tempCols(keep=name type length varnum);
+  run;
+  
+  * ensure they are in original order ;
+  proc sort data=tempCols; by varnum; 
   run;
 
-  proc sql noprint;
-    create table tempCols as
-    select upcase(name) as name, type, length from dictionary.columns 
-    where upcase(memname)="%upcase(&dsn)" and libname="%upcase(&libn)";
-  quit;
-
-  %let totalCols = &sqlObs;
-
-  proc sql noprint;
-    select trim(name), trim(type), length into :name1-:name999, :type1-:type999, :length1-:length999
-    from tempCols;
-  quit;
-
   * get first and last column names;
-
-  data tempCols;
+  data _null_;
     set tempCols end=lastcol;
+    name=upcase(name);
     if _n_ = 1 then do;
-      call symput('firstCol', strip(name));
+      call symputx('firstCol',name,'l');
     end;
+    call symputx(cats('name',_n_),name,'l');
+    call symputx(cats('type',_n_),type,'l');
+    /* char vars are urlencoded and lengthened to 30000 in next step */
+    if type=2 then call symputx(cats('length',_n_),30000,'l');
+    else call symputx(cats('length',_n_),length,'l');
     if lastcol then do;
-      call symput('lastCol', strip(name));
+      call symputx('lastCol',name,'l');
+      call symputx('totalCols',_n_,'l');
     end;
   run;
 
@@ -514,47 +506,22 @@ options NOQUOTELENMAX LRECL=32000 spool;
     create view tempOutputView as 
   select
   %do colNo= 1 %to &totalCols;
-    %if &&&name&colNo = &lastCol %then %do;
-      %if &&&type&colNo = char %then %do;
-        urlencode(strip(&&&name&colNo)) as &&&name&colNo length=30000
-      %end;
-      %else %do;
-        &&&name&colNo as &&&name&colNo
-      %end;
+    /* type 1=numeric, type 2=character in proc contents */
+    %if &&&type&colNo = 2 %then %do;
+      urlencode(strip(&&&name&colNo)) as &&&name&colNo length=30000
     %end;
     %else %do;
-      %if &&&type&colNo = char %then %do;
-        urlencode(strip(&&&name&colNo)) as &&&name&colNo length=30000,
-      %end;
-      %else %do;
-        &&&name&colNo as &&&name&colNo,
-      %end;
+      &&&name&colNo as &&&name&colNo
+    %end;
+    %if &&&name&colNo ne &lastCol %then %do;
+      ,
     %end;
   %end;
 
   from &libn..&dsn.
   quit;
 
-
-  *column types have changed so get metadata for output again;
-  * TODO: This needs to be changed from dictionary cols to proc datasets
-          so that there is an faster option for servers with many preassigned
-          DBMS libs etc 
-  ; 
-  proc sql noprint;
-    create table tempCols as
-    select name, type, length from dictionary.columns where memname="TEMPOUTPUTVIEW" and libname = "WORK";
-  quit;
-
-  %let totalCols = &sqlObs;
-
-  proc sql noprint;
-    select trim(name), trim(type), length into :name1-:name999, :type1-:type999, :length1-:length999
-    from tempCols;
-  quit;
-
-
-  *output to webout ;
+  *output to webout / target;
   data _null_;
     file &h54starget.;
     put '"' "&objectName." '" : [';
@@ -563,37 +530,37 @@ options NOQUOTELENMAX LRECL=32000 spool;
   data _null_;
     file &h54starget.;
     set tempOutputView end=lastrec;
-    format _all_;
-
+    /* strip SAS numeric formats whilst retaining precision */ 
+    format _numeric_ best32.;
     %do colNo= 1 %to &totalCols;
       %if &totalCols = 1 %then %do;
-        %if &&&type&colNo = char %then %do;
+        %if &&&type&colNo = 2 %then %do;
           put '{"' "&&&name&colNo" '":"' &&&name&colNo +(-1) '"}';
           if not lastrec then put ",";
         %end;
-      %if &&&type&colNo = num %then %do;
-        if &&&name&colNo = . then put '{"' "&&&name&colNo" '":' 'null ' +(-1) '}';
-        else put '{"' "&&&name&colNo" '":' &&&name&colNo +(-1) '}';
-        if not lastrec then put ",";
+        %else %if &&&type&colNo = 1 %then %do;
+          if &&&name&colNo = . then put '{"' "&&&name&colNo" '":' 'null ' +(-1) '}';
+          else put '{"' "&&&name&colNo" '":' &&&name&colNo +(-1) '}';
+          if not lastrec then put ",";
         %end;
       %end;
 
       %else %if &&&name&colNo = &firstCol %then %do;
-        %if &&&type&colNo = char %then %do;
+        %if &&&type&colNo = 2 %then %do;
           put '{"' "&&&name&colNo" '":"' &&&name&colNo +(-1) '",';
         %end;
-        %if &&&type&colNo = num %then %do;
+        %else %if &&&type&colNo = 1 %then %do;
           if &&&name&colNo = . then put '{"' "&&&name&colNo" '":' 'null ' +(-1) ',';
           else put '{"' "&&&name&colNo" '":' &&&name&colNo +(-1) ',';
         %end;
       %end;
 
       %else %if &&&name&colNo = &lastCol %then %do;
-        %if &&&type&colNo = char %then %do;
+        %if &&&type&colNo = 2 %then %do;
           put '"' "&&&name&colNo" '":"' &&&name&colNo +(-1) '"}';
           if not lastrec then put ",";
         %end;
-        %if &&&type&colNo = num %then %do;
+        %else %if &&&type&colNo = 1 %then %do;
           if &&&name&colNo = . then put '"' "&&&name&colNo" '":' 'null ' +(-1) '}';
           else put '"' "&&&name&colNo" '":' &&&name&colNo +(-1) '}';
           if not lastrec then put ",";
@@ -601,10 +568,10 @@ options NOQUOTELENMAX LRECL=32000 spool;
       %end;
 
       %else %do;
-        %if &&&type&colNo = char %then %do;
+        %if &&&type&colNo = 2 %then %do;
           put '"' "&&&name&colNo" '":"' &&&name&colNo +(-1) '",';
         %end;
-        %if &&&type&colNo = num %then %do;
+        %else %if &&&type&colNo = 1 %then %do;
           if &&&name&colNo = . then put '"' "&&&name&colNo" '":' 'null ' +(-1) ',';
           else put '"' "&&&name&colNo" '":' &&&name&colNo +(-1) ',';
         %end;
