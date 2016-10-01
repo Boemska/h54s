@@ -195,6 +195,11 @@ function getUserInput() {
         validate: inputValidators.numberValidator
       }, {
         type: 'input',
+        name: 'chunkSize',
+        message: 'Parameter Chunk Size (min 50, max 32767)',
+        validate: inputValidators.chunkValidator
+      }, {
+        type: 'input',
         name: 'execFile',
         message: 'Executable path',
         validate: inputValidators.pathValidator

@@ -114,11 +114,9 @@ options NOQUOTELENMAX LRECL=32000 spool;
 
 %macro checkEnvironment;
   %hfsQuietenDown;
-  * set this to whatever your test harness is configured to ; 
-  %let batchOutFile='/tmp/h54sTest.out';
   * could do with a nicer way to check whether _WEBOUT is available ;
   %if (%symexist(_REPLAY) = 0) %then %do;
-    %let h54starget=&batchOutFile.;
+    %let h54starget=STDOUT;
   %end;
   %else %do;
     %let h54starget=_WEBOUT;
