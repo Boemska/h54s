@@ -16,6 +16,7 @@ module.exports = function (execFile, log) {
     var outData = '',
         errData = '',
         startTime,
+        startupTime,
         readTime,
         parseTime,
         outputTime;
@@ -67,6 +68,7 @@ module.exports = function (execFile, log) {
 
         fulfill({
           out: outData,
+          startupTime: startupTime,
           readTime: readTime,
           parseTime: parseTime,
           outputTime: outputTime
@@ -82,6 +84,7 @@ module.exports = function (execFile, log) {
         if(chunk.toString().indexOf('processing completed') !== -1) {
           child.stdin.write('%let _debug=131;\n');
 
+          startupTime = Date.now() - startTime;
           startTime = Date.now();
 
           child.stdin.write(`%include '${path.join(__dirname, '..', 'generated.sas')}';\n\n\n\n\n\n`);

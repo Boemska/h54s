@@ -111,6 +111,7 @@ function run(values, useOldGeneratedFile) {
       }
       rl.write('\n\n');
 
+      rl.write(`Startup Time: ${data.startupTime}ms\n`);
       rl.write(`Read Time: ${data.readTime}ms\n`);
       rl.write(`Parse Time: ${data.parseTime}ms\n`);
       rl.write(`Output Time: ${data.outputTime}ms\n`);
