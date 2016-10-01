@@ -35,13 +35,13 @@ module.exports = function (execFile, log) {
       }
 
       if(chunk.toString().indexOf('--h54s-read-end--') === 0) {
-        startTime = Date.now();
         readTime = Date.now() - startTime;
+        startTime = Date.now();
       }
 
       if(chunk.toString().indexOf('--h54s-data-start--') === 0) {
-        startTime = Date.now();
         parseTime = Date.now() - startTime;
+        startTime = Date.now();
       }
 
       if(chunk.toString().indexOf('--h54s-data-end--') !== -1) {
@@ -101,6 +101,7 @@ module.exports = function (execFile, log) {
       }
     }
 
+    startTime = Date.now();
     child.stdout.on('data', stdoutCallback);
     child.stderr.on('data', stderrCallback);
   });
