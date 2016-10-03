@@ -29,3 +29,16 @@ module.exports.numberOrDataTypesValidator = function(input) {
     return /^(d|s|n)+$/.test(input.toLowerCase());
   }
 }
+
+module.exports.chunkValidator = function (input) {
+  if(isNaN(input)) {
+    return 'This value needs to be a number';
+  } 
+  if(input > 32767) {
+    return 'This number must be less than 32767';
+  } 
+  if(input < 50) {
+    return 'This number must be greater than 50';
+  }
+ return true;
+}

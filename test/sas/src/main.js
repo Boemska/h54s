@@ -111,6 +111,7 @@ function run(values, useOldGeneratedFile) {
       }
       rl.write('\n\n');
 
+      rl.write(`Startup Time: ${data.startupTime}ms\n`);
       rl.write(`Read Time: ${data.readTime}ms\n`);
       rl.write(`Parse Time: ${data.parseTime}ms\n`);
       rl.write(`Output Time: ${data.outputTime}ms\n`);
@@ -193,6 +194,11 @@ function getUserInput() {
         name: 'rows',
         message: 'Random table height (# of rows)',
         validate: inputValidators.numberValidator
+      }, {
+        type: 'input',
+        name: 'chunkSize',
+        message: 'Parameter Chunk Size (min 50, max 32767)',
+        validate: inputValidators.chunkValidator
       }, {
         type: 'input',
         name: 'execFile',
