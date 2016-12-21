@@ -1,7 +1,7 @@
 var logs = require('../logs.js');
 var h54sError = require('../error.js');
 
-var programNotFoundPatt = /<title>(Stored Process Error|SASStoredProcess)<\/title>[\s\S]*<h2>Stored process not found:.*<\/h2>/;
+var programNotFoundPatt = /<title>(Stored Process Error|SASStoredProcess)<\/title>[\s\S]*<h2>(Stored process not found:.*|.*not a valid stored process path.)<\/h2>/;
 
 /*
 * Parse response from server
