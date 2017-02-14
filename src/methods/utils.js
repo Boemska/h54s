@@ -2,6 +2,9 @@ var logs = require('../logs.js');
 var h54sError = require('../error.js');
 
 var programNotFoundPatt = /<title>(Stored Process Error|SASStoredProcess)<\/title>[\s\S]*<h2>(Stored process not found:.*|.*not a valid stored process path.)<\/h2>/;
+var responseReplace = function(res) {
+  return res.replace(/(\r\n|\r|\n)/g, '').replace(/\\\\(n|r|t|f|b)?/g, '\\$1');
+};
 
 /*
 * Parse response from server
@@ -18,7 +21,7 @@ module.exports.parseRes = function(responseText, sasProgram, params) {
   }
   //remove new lines in json response
   //replace \\(d) with \(d) - SAS json parser is escaping it
-  return JSON.parse(responseText.replace(/(\r\n|\r|\n)/g, '').replace(/\\\\(n|r|t|f|b)/g, '\\$1'));
+  return JSON.parse(responseReplace(responseText));
 };
 
 /*
@@ -58,7 +61,7 @@ module.exports.parseDebugRes = function(responseText, sasProgram, params) {
   }
   //remove new lines in json response
   //replace \\(d) with \(d) - SAS json parser is escaping it
-  var jsonObj = JSON.parse(matches[2].replace(/(\r\n|\r|\n)/g, '').replace(/\\\\(n|r|t|f|b)/g, '\\$1'));
+  var jsonObj = JSON.parse(responseReplace(matches[2]));
 
   return jsonObj;
 };

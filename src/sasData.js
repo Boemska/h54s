@@ -48,10 +48,12 @@ SasData.prototype.addTable = function(table, macroName) {
     throw new h54sError('argumentError', 'Table argument is not an array');
   }
 
-  var spec = {};
+  var spec = {},
+      i, j, //counters used latter in code
+      specialChars = ['"', '\\', '/', '\n', '\t', '\f', '\r', '\b'];
 
   //going backwards and removing empty rows
-  for (var i = table.length - 1; i >= 0; i--) {
+  for (i = table.length - 1; i >= 0; i--) {
     var row = table[i];
 
     if(typeof row !== 'object') {
@@ -90,6 +92,11 @@ SasData.prototype.addTable = function(table, macroName) {
           } else if (type === 'string' && !(val instanceof Date)) { // straightforward string
             spec[key].colType    = 'string';
             spec[key].colLength  = val.length;
+            for(j = 0; j < val.length; j++) {
+              if(specialChars.indexOf(val[j]) !== -1) {
+                spec[key].colLength++;
+              }
+            }
           } else if(val instanceof Date) {
             spec[key].colType   = 'date';
             spec[key].colLength = 8;
@@ -118,7 +125,7 @@ SasData.prototype.addTable = function(table, macroName) {
     return key + ',' + spec[key].colType + ',' + spec[key].colLength;
   }).join('|');
 
-  var sasJson = JSON.stringify(table).replace('\\"', '""').replace('\\\\', '\\');
+  var sasJson = JSON.stringify(table);
   this._files[macroName] = [
     specString,
     new File([sasJson], 'table.json', {type: 'text/plain;charset=UTF-8'})

@@ -198,35 +198,45 @@ describe('h54s integration -', function() {
         metadataRoot: serverData.metadataRoot
       });
 
-      var data0 = '" \ / \n \t \f \r';
-      var data1 = "asd\nasd\tasd\r\nasdasd" + String.fromCharCode(10) + "asd";
+      var data = {
+        str: "asd\nasd\tasd\r\nasdasd" + String.fromCharCode(10) + "asd",
+        c0: '"',
+        c1: '\\',
+        c2: '/',
+        c3: '\n',
+        c4: '\t',
+        c5: '\f',
+        c6: '\r',
+        c7: '\b'
+      }
 
       var table = new h54s.SasData([
-        {
-          data0: data0,
-          data1: data1
-        }
+        data
       ], 'data');
 
       sasAdapter.call('bounceUploadData', table, function(err, res) {
         assert.isUndefined(err, 'We got error on sas program ajax call');
         assert.isDefined(res, 'Response is undefined');
         //TODO: res.data[0] should be changed to res.outputdata[0] to be consistent with other methods
-        assert.equal(res.data[0].data0, data0, 'Bounce data is different - data0');
-        assert.equal(res.data[0].data1, data1, 'Bounce data is different - data1');
+        assert.equal(res.data[0].c0, data.c0, 'Bounce data is different - c0');
+        assert.equal(res.data[0].c1, data.c1, 'Bounce data is different - c1');
+        assert.equal(res.data[0].c2, data.c2, 'Bounce data is different - c2');
+        assert.equal(res.data[0].c3, data.c3, 'Bounce data is different - c3');
+        assert.equal(res.data[0].c4, data.c4, 'Bounce data is different - c4');
+        assert.equal(res.data[0].c5, data.c5, 'Bounce data is different - c5');
+        assert.equal(res.data[0].c6, data.c6, 'Bounce data is different - c6');
+        assert.equal(res.data[0].c7, data.c7, 'Bounce data is different - c7');
+
+        assert.equal(res.data[0].str, data.str, 'Bounce data is different - str');
         done();
       });
     });
 
     it('Test old type of data transmission with application/x-www-form-urlencoded', function(done) {
       this.timeout(6000);
-      var data = [
-        {
-          data: 'test'
-        }
-      ];
-
-      var table = new h54s.Tables(data, 'data');
+      var table = new h54s.Tables([{
+        test: 'test'
+      }], 'data');
 
       var sasAdapter = new h54s({
         hostUrl: serverData.url,
@@ -237,7 +247,7 @@ describe('h54s integration -', function() {
 
       sasAdapter.call('BounceData', table, function(err, res) {
         assert.isUndefined(err, 'We got error on sas program ajax call');
-        assert.deepEqual(res.outputdata[0].DATA, data, 'Bounce data is different');
+        assert.deepEqual(res.outputdata[0].TEST, 'test', 'Bounce data is different');
         done();
       });
     });
