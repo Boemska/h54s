@@ -2,6 +2,19 @@
 describe('h54s integration -', function() {
   describe('Characters and tables tests:', function() {
 
+    before(function(done) {
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url,
+      });
+      sasAdapter.login(serverData.user, serverData.pass, function(status) {
+        if(status === 200) {
+          done();
+        } else {
+          done(new Error('Unable to login'));
+        }
+      })
+    });
+
     it('Test json character escape', function(done) {
       this.timeout(10000);
       var sasAdapter = new h54s({
@@ -19,14 +32,12 @@ describe('h54s integration -', function() {
         }
       ], 'data');
 
-      sasAdapter.login(serverData.user, serverData.pass, function() {
-        sasAdapter.call('BounceData', table, function(err, res) {
-          assert.isUndefined(err, 'We got error on sas program ajax call');
-          assert.isDefined(res, 'Response is undefined');
-          assert.equal(res.outputdata[0].DATA0, data0, 'Bounce data is different - data0');
-          assert.equal(res.outputdata[0].DATA1, data1, 'Bounce data is different - data1');
-          done();
-        });
+      sasAdapter.call('BounceData', table, function(err, res) {
+        assert.isUndefined(err, 'We got error on sas program ajax call');
+        assert.isDefined(res, 'Response is undefined');
+        assert.equal(res.outputdata[0].DATA0, data0, 'Bounce data is different - data0');
+        assert.equal(res.outputdata[0].DATA1, data1, 'Bounce data is different - data1');
+        done();
       });
     });
 
@@ -173,12 +184,10 @@ describe('h54s integration -', function() {
         metadataRoot: serverData.metadataRoot
       });
 
-      sasAdapter.login(serverData.user, serverData.pass, function(status) {
-        sasAdapter.call('bounceUploadData', table, function(err, res) {
-          assert.isUndefined(err, 'We got error on sas program ajax call');
-          assert.deepEqual(res.data, data, 'Bounce data is different');
-          done();
-        });
+      sasAdapter.call('bounceUploadData', table, function(err, res) {
+        assert.isUndefined(err, 'We got error on sas program ajax call');
+        assert.deepEqual(res.data, data, 'Bounce data is different');
+        done();
       });
     });
 
@@ -229,7 +238,6 @@ describe('h54s integration -', function() {
       });
 
       sasAdapter.call('bounceUploadFile', sasData, function(err, res) {
-        debugger;
         assert.isUndefined(err, 'We got error on sas program ajax call');
         assert.equal(file.size, res.infoDataset[0].CONTENT_LENGTH, 'File length different');
         assert.equal(file.name, res.infoDataset[0].FILENAME, 'File name different');

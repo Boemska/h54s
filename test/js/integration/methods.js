@@ -7,9 +7,7 @@ describe('h54s integration -', function() {
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
-      sasAdapter._ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
-        assert.equal(res.status, 200, 'Log out is not successful');
-
+      sasAdapter.logout(function() {
         sasAdapter.login(serverData.user, serverData.pass, function(status) {
           assert.equal(status, 200, "We got wrong status code");
           done();
@@ -24,8 +22,7 @@ describe('h54s integration -', function() {
         metadataRoot: serverData.metadataRoot
       });
       //logout because we are already logged in in previeous tests
-      sasAdapter._ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
-        assert.equal(res.status, 200, 'Log out is not successful');
+      sasAdapter.logout(function() {
         sasAdapter.call('startupService', null, function(err, res) {
           assert.equal(err.message, 'You are not logged in', 'Should throw error because user is not logged in');
           assert.isUndefined(res, 'We got error, res should be undefined');
