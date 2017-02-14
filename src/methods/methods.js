@@ -33,31 +33,18 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
 
   if(dataObj) {
     var key;
-    if(dataObj instanceof h54s.Tables) {
-      for(key in dataObj._tables) {
-        if(dataObj._tables.hasOwnProperty(key)) {
-          params[key] = dataObj._tables[key];
-        }
-      }
-    } else if(dataObj instanceof h54s.Files){
-      for(key in dataObj._files) {
-        if(dataObj._files.hasOwnProperty(key)) {
-          params[key] = dataObj._files[key];
-        }
-      }
-    } else if(dataObj instanceof h54s.SasData) {
-      for(key in dataObj._tables) {
-        if(dataObj._tables.hasOwnProperty(key)) {
-          params[key] = dataObj._tables[key];
-        }
-      }
-      for(key in dataObj._files) {
-        if(dataObj._files.hasOwnProperty(key)) {
-          params[key] = dataObj._files[key];
-        }
-      }
+    var dataProvider
+    if(dataObj instanceof h54s.Tables || dataObj instanceof h54s.SasData) {
+      dataProvider = dataObj._tables;
+    } else if(dataObj instanceof h54s.Files || dataObj instanceof h54s.SasData){
+      dataProvider = dataObj._files;
     } else {
       throw new h54sError('argumentError', 'Wrong type of tables object');
+    }
+    for(key in dataProvider) {
+      if(dataProvider.hasOwnProperty(key)) {
+        params[key] = dataProvider[key];
+      }
     }
   }
 
