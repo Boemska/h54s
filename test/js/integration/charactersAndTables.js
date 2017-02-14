@@ -191,58 +191,28 @@ describe('h54s integration -', function() {
       });
     });
 
-    it('Test call method with multiple SasData tables', function(done) {
+    it('Test json character escape in SasData', function(done) {
       this.timeout(10000);
-      var data1 = [
-        {
-          data: 'test1'
-        }
-      ];
-      var data2 = [
-        {
-          data: 'test2'
-        }
-      ];
-      var sasData = new h54s.SasData(data1, 'data1table');
-      sasData.addTable(data2, 'data2table');
-
       var sasAdapter = new h54s({
         hostUrl: serverData.url,
         metadataRoot: serverData.metadataRoot
       });
 
-      sasAdapter.call('bounceUploadData', sasData, function(err, res) {
-        assert.isUndefined(err, 'We got error on sas program ajax call');
-        assert.deepEqual(res.data1, data1, 'Bounce data is different');
-        assert.deepEqual(res.data2, data2, 'Bounce data is different');
-        done();
-      });
-    });
+      var data0 = '" \\ / \n \t \b \f \r';
+      var data1 = "asd\nasd\tasd\r\nasdasd" + String.fromCharCode(10) + "asd";
 
-    it('Test call methor with table and file in SasData object', function(done) {
-      this.timeout(10000);
-
-      var file = new File(['test file content, utf-8 content: ', 'ŠĐŽČĆšđžčć'], 'testName', {type: 'text/plain;charset=UTF-8'});
-      var sasData = new h54s.SasData(file, 'fileMacro');
-
-      var data = [
+      var table = new h54s.SasData([
         {
-          data: 'test'
+          data0: data0,
+          data1: data1
         }
-      ];
-      sasData.addTable(data, 'table');
+      ], 'data');
 
-      var sasAdapter = new h54s({
-        hostUrl: serverData.url,
-        metadataRoot: serverData.metadataRoot
-      });
-
-      sasAdapter.call('bounceUploadFile', sasData, function(err, res) {
+      sasAdapter.call('bounceUploadData', table, function(err, res) {
         assert.isUndefined(err, 'We got error on sas program ajax call');
-        assert.equal(file.size, res.infoDataset[0].CONTENT_LENGTH, 'File length different');
-        assert.equal(file.name, res.infoDataset[0].FILENAME, 'File name different');
-        assert.equal('fileMacro', res.infoDataset[0].NAME, 'Macro different');
-        assert.deepEqual(res.data, data, 'Bounce data is different');
+        assert.isDefined(res, 'Response is undefined');
+        assert.equal(res.data[0].data0, data0, 'Bounce data is different - data0');
+        assert.equal(res.data[0].data1, data1, 'Bounce data is different - data1');
         done();
       });
     });
