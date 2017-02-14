@@ -82,8 +82,9 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
 
       callback(new h54sError('notLoggedinError', 'You are not logged in'));
     } else {
-      var resObj, unescapedResObj;
+      var resObj, unescapedResObj, err;
       if(!dbg) {
+        var done = false;
         try {
           resObj = self._utils.parseRes(res.responseText, sasProgram, params);
           logs.addApplicationLog(resObj.logmessage, sasProgram);
@@ -91,28 +92,35 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
           resObj          = self._utils.convertDates(resObj);
           unescapedResObj = self._utils.unescapeValues(resObj);
 
-          callback(undefined, unescapedResObj);
+          done = true;
         } catch(e) {
           if(e instanceof SyntaxError) {
             if(retryCount < self.maxXhrRetries) {
+              done = false;
               self._ajax.post(self.url, params, true).success(this.success).error(this.error);
               retryCount++;
               logs.addApplicationLog("Retrying #" + retryCount, sasProgram);
             } else {
               self._utils.parseErrorResponse(res.responseText, sasProgram);
               self._utils.addFailedResponse(res.responseText, sasProgram);
-              callback(new h54sError('parseError', 'Unable to parse response json'));
+              err = new h54sError('parseError', 'Unable to parse response json');
+              done = true;
             }
           } else if(e instanceof h54sError) {
             self._utils.parseErrorResponse(res.responseText, sasProgram);
             self._utils.addFailedResponse(res.responseText, sasProgram);
-            callback(e);
+            err = e;
+            done = true;
           } else {
             self._utils.parseErrorResponse(res.responseText, sasProgram);
             self._utils.addFailedResponse(res.responseText, sasProgram);
-            var err = new h54sError('unknownError', e.message);
+            err = new h54sError('unknownError', e.message);
             err.stack = e.stack;
-            callback(err);
+            done = true;
+          }
+        } finally {
+          if(done) {
+            callback(err, unescapedResObj);
           }
         }
       } else {
@@ -122,18 +130,17 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
 
           resObj          = self._utils.convertDates(resObj);
           unescapedResObj = self._utils.unescapeValues(resObj);
-
-          callback(undefined, unescapedResObj);
         } catch(e) {
           if(e instanceof SyntaxError) {
-            callback(new h54sError('parseError', e.message));
+            err = new h54sError('parseError', e.message);
           } else if(e instanceof h54sError) {
-            callback(e);
+            err = e;
           } else {
-            var error = new h54sError('unknownError', e.message);
-            error.stack = e.stack;
-            callback(error);
+            err = new h54sError('unknownError', e.message);
+            err.stack = e.stack;
           }
+        } finally {
+          callback(err, unescapedResObj);
         }
       }
     }
