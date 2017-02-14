@@ -125,7 +125,7 @@ SasData.prototype.addTable = function(table, macroName) {
     return key + ',' + spec[key].colType + ',' + spec[key].colLength;
   }).join('|');
 
-  var sasJson = JSON.stringify(table);
+  var sasJson = JSON.stringify(table).replace('\\"', '""');
   this._files[macroName] = [
     specString,
     new File([sasJson], 'table.json', {type: 'text/plain;charset=UTF-8'})
