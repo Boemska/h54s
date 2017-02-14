@@ -277,7 +277,8 @@ The default configuration looks like this:
   sasApp: 'Stored Process Web App 9.3',
   ajaxTimeout: 30000,
   isRemoteConfig: false,
-  metadataRoot: undefined
+  metadataRoot: undefined,
+  useMultipartFormData: true
 }
 ```
 `url` is the URI of the SAS Stored Process Web Application (SPWA), as configured on your SAS server.
@@ -297,6 +298,8 @@ Paused calls will be executed automatically after login if `retryAfterLogin` is 
 `isRemoteConfig` should be set to true if you want the adapter to use a config object specified in a file called `h54sConfig.json` at the root of your web application. Config properties in the constructor will override the remote properties. You can register functions which are automatically executed when a remote config is loaded using `adapter.onRemoteConfigUpdate(callbackFn)`
 
 `metadataRoot` is the root metadata directory where your SAS programs for this application reside. With this set, the _program parameter passed to SAS will be `metadataRoot + sasProgram` for all calls made by that adapter instance.
+
+`useMultipartFormData` - default is `false`. Set to `true` if you want to send data using `application/x-www-form-urlencoded` type of form. In case it's true, data should be passed to `adapter.call` method as instance of `h54s.Tables` (deprecated) object. Otherwise, it will throw an error.
 
 If your SAS instance is on another domain to the one you are developing on, you can provide the SAS `hostUrl`:
 ```js
@@ -372,7 +375,7 @@ adapter.logout(function(err) {
 
 ### h54s.SasData(tableArray, macroName)
 Creates an object which stores tables, which are then sent back to SAS via the `call` method.
-This is equivalent to h54s.Tables constructor in pre v0.11.
+This is equivalent to `h54s.Tables` constructor deprecated in v0.11.
 
 ```js
 var data = new h54s.SasData([
