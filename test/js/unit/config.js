@@ -105,5 +105,40 @@ describe('h54s unit -', function() {
       done();
     });
 
+    it('Test useMultipartFormData with SasData', function(done) {
+      var table = new h54s.Tables([{}], 'data');
+      var sasData = new h54s.SasData([{}], 'data');
+      var file = new h54s.Files(new File([''], 'test'), 'data');
+      var callback = function() {};
+
+      proclaim.doesNotThrow(function() {
+        var sasAdapter = new h54s({
+          useMultipartFormData: false
+        });
+        sasAdapter.call('...', table, callback);
+      });
+      proclaim.doesNotThrow(function() {
+        var sasAdapter = new h54s();
+        sasAdapter.call('...', sasData, callback);
+      });
+      proclaim.doesNotThrow(function() {
+        var sasAdapter = new h54s();
+        sasAdapter.call('...', table, callback);
+      });
+      proclaim.throws(function() {
+        var sasAdapter = new h54s({
+          useMultipartFormData: false
+        });
+        sasAdapter.call('...', sasData, callback);
+      });
+      proclaim.throws(function() {
+        var sasAdapter = new h54s({
+          useMultipartFormData: false
+        });
+        sasAdapter.call('...', file, callback);
+      });
+      done();
+    });
+
   });
 });

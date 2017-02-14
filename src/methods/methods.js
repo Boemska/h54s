@@ -22,6 +22,9 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
   if(typeof sasProgram !== 'string') {
     throw new h54sError('argumentError', 'First parameter should be string');
   }
+  if(this.useMultipartFormData === false && !(dataObj instanceof h54s.Tables)) {
+    throw new h54sError('argumentError', 'Cannot send files using application/x-www-form-urlencoded. Please use h54s.Tables or default value for useMultipartFormData');
+  }
 
   if(!params) {
     params = {
@@ -34,7 +37,7 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
   if(dataObj) {
     var key;
     var dataProvider
-    if(dataObj instanceof h54s.Tables || dataObj instanceof h54s.SasData) {
+    if(dataObj instanceof h54s.Tables) {
       dataProvider = dataObj._tables;
     } else if(dataObj instanceof h54s.Files || dataObj instanceof h54s.SasData){
       dataProvider = dataObj._files;
@@ -57,7 +60,7 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
     return;
   }
 
-  this._ajax.post(this.url, params, true).success(function(res) {
+  this._ajax.post(this.url, params, this.useMultipartFormData).success(function(res) {
     if(self._utils.needToLogin.call(self, res)) {
       //remember the call for latter use
       self._pendingCalls.push({
@@ -97,7 +100,7 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
           if(e instanceof SyntaxError) {
             if(retryCount < self.maxXhrRetries) {
               done = false;
-              self._ajax.post(self.url, params, true).success(this.success).error(this.error);
+              self._ajax.post(self.url, params, self.useMultipartFormData).success(this.success).error(this.error);
               retryCount++;
               logs.addApplicationLog("Retrying #" + retryCount, sasProgram);
             } else {

@@ -17,6 +17,7 @@ var h54s = module.exports = function(config) {
   this.retryAfterLogin  = true;
   this.sasApp           = 'Stored Process Web App 9.3';
   this.ajaxTimeout      = 30000;
+  this.useMultipartFormData = true;
 
   this.remoteConfigUpdateCallbacks = [];
 

@@ -247,5 +247,29 @@ describe('h54s integration -', function() {
       });
     });
 
+    it('Test old type of data transmission with application/x-www-form-urlencoded', function(done) {
+      this.timeout(6000);
+      var data = [
+        {
+          data: 'test'
+        }
+      ];
+
+      var table = new h54s.Tables(data, 'data');
+
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url,
+        metadataRoot: serverData.metadataRoot,
+        useMultipartFormData: false,
+        debug: true
+      });
+
+      sasAdapter.call('BounceData', table, function(err, res) {
+        assert.isUndefined(err, 'We got error on sas program ajax call');
+        assert.deepEqual(res.data, data, 'Bounce data is different');
+        done();
+      });
+    });
+
   });
 });
