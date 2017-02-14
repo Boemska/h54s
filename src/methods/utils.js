@@ -17,7 +17,8 @@ module.exports.parseRes = function(responseText, sasProgram, params) {
     throw new h54sError('programNotFound', 'You have not been granted permission to perform this action, or the STP is missing.');
   }
   //remove new lines in json response
-  return JSON.parse(responseText.replace(/(\r\n|\r|\n)/g, ''));
+  //replace \\(d) with \(d) - SAS json parser is escaping it
+  return JSON.parse(responseText.replace(/(\r\n|\r|\n)/g, '').replace(/\\\\(n|r|t|f|b)/g, '\\$1'));
 };
 
 /*
@@ -56,7 +57,8 @@ module.exports.parseDebugRes = function(responseText, sasProgram, params) {
     throw new h54sError('parseError', 'Unable to parse response json');
   }
   //remove new lines in json response
-  var jsonObj = JSON.parse(matches[2].replace(/(\r\n|\r|\n)/g, ''));
+  //replace \\(d) with \(d) - SAS json parser is escaping it
+  var jsonObj = JSON.parse(matches[2].replace(/(\r\n|\r|\n)/g, '').replace(/\\\\(n|r|t|f|b)/g, '\\$1'));
 
   return jsonObj;
 };
