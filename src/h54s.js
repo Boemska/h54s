@@ -10,19 +10,17 @@ var h54sError = require('./error.js');
 var h54s = module.exports = function(config) {
 
   //default config values
-  this.maxXhrRetries    = 5;
-  this.url              = "/SASStoredProcess/do";
-  this.debug            = false;
-  this.loginUrl         = '/SASLogon/Logon.do';
-  this.retryAfterLogin  = true;
-  this.sasApp           = 'Stored Process Web App 9.3';
-  this.ajaxTimeout      = 30000;
+  this.maxXhrRetries        = 5;
+  this.url                  = "/SASStoredProcess/do";
+  this.debug                = false;
+  this.loginUrl             = '/SASLogon/Logon.do';
+  this.retryAfterLogin      = true;
+  this.sasApp               = 'Stored Process Web App 9.3';
+  this.ajaxTimeout          = 30000;
   this.useMultipartFormData = true;
 
   this.remoteConfigUpdateCallbacks = [];
-
-  this._pendingCalls    = [];
-
+  this._pendingCalls = [];
   this._ajax = require('./methods/ajax.js')();
 
   _setConfig.call(this, config);

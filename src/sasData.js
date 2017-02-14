@@ -98,9 +98,9 @@ SasData.prototype.addTable = function(table, macroName) {
             spec[key].colLength = JSON.stringify(val).length;
           }
         } else if ((type === 'number' && spec[key].colType !== 'num') ||
-        (type === 'string' && !(val instanceof Date) && spec[key].colType !== 'string') ||
-        (val instanceof Date && spec[key].colType !== 'date') ||
-        (type === 'object' && spec[key].colType !== 'json'))
+          (type === 'string' && !(val instanceof Date) && spec[key].colType !== 'string') ||
+          (val instanceof Date && spec[key].colType !== 'date') ||
+          (type === 'object' && spec[key].colType !== 'json'))
         {
           throw new h54sError('typeError', 'There is a type mismatch in the array between values (columns) of the same name.');
         }
