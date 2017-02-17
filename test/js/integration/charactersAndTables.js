@@ -252,5 +252,27 @@ describe('h54s integration -', function() {
       });
     });
 
+    it('Test UTF-8 characters', function(done) {
+      this.timeout(10000);
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url,
+        metadataRoot: serverData.metadataRoot
+      });
+
+      var data = {};
+      // 2047
+      for(var i = 0; i <= 0x07FF; i++) {
+        data['c' + 1] = String.fromCharCode(i);
+      }
+
+      var table = new h54s.SasData([
+        data
+      ], 'data');
+
+      sasAdapter.call('bounceUploadData', table, function(err, res) {
+        assert.isUndefined(err, 'We got error on sas program ajax call');
+      });
+    });
+
   });
 });
