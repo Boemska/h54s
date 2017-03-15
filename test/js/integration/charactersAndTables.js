@@ -259,10 +259,19 @@ describe('h54s integration -', function() {
         metadataRoot: serverData.metadataRoot
       });
 
-      var data = {};
-      // 2047
+      var data = {},
+          key = 'c0',
+          j = 0;
+      data[key] = '';
+
+      // 2047 characters - 200 in each column
+      // characters within 2 bytes
       for(var i = 0; i <= 0x07FF; i++) {
-        data['c' + 1] = String.fromCharCode(i);
+        if(data[key].length === 200) {
+          key = 'c' + ++j;
+          data[key] = '';
+        }
+        data[key] += String.fromCharCode(i);
       }
 
       var table = new h54s.SasData([
