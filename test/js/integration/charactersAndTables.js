@@ -264,9 +264,9 @@ describe('h54s integration -', function() {
           j = 0;
       data[key] = '';
 
-      // 2047 characters - 200 in each column
+      // 30-2047 characters - 200 in each column
       // characters within 2 bytes
-      for(var i = 0; i <= 0x07FF; i++) {
+      for(var i = 32; i <= 0x07FF; i++) {
         if(data[key].length === 200) {
           key = 'c' + ++j;
           data[key] = '';
