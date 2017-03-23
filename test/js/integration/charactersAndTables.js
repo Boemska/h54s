@@ -266,12 +266,20 @@ describe('h54s integration -', function() {
 
       // 30-2047 characters - 200 in each column
       // characters within 2 bytes
-      for(var i = 32; i <= 0x07FF; i++) {
+      // we are ignoring C1 and C2 control characters
+      var i = 32;
+      while(i <= 0x07FF) {
         if(data[key].length === 200) {
           key = 'c' + ++j;
           data[key] = '';
         }
         data[key] += String.fromCharCode(i);
+        i++;
+
+        // jump over C2 characters
+        if(i === 0x7F) {
+          i = 0xA0;
+        }
       }
 
       var table = new h54s.SasData([
