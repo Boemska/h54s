@@ -93,7 +93,11 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
           logs.addApplicationLog(resObj.logmessage, sasProgram);
 
           resObj          = self._utils.convertDates(resObj);
-          unescapedResObj = self._utils.unescapeValues(resObj);
+          if(dataObj instanceof h54s.Tables) {
+            unescapedResObj = self._utils.unescapeValues(resObj);
+          } else {
+            unescapedResObj = resObj;
+          }
 
           done = true;
         } catch(e) {
@@ -132,7 +136,11 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
           logs.addApplicationLog(resObj.logmessage, sasProgram);
 
           resObj          = self._utils.convertDates(resObj);
-          unescapedResObj = self._utils.unescapeValues(resObj);
+          if(dataObj instanceof h54s.Tables) {
+            unescapedResObj = self._utils.unescapeValues(resObj);
+          } else {
+            unescapedResObj = resObj;
+          }
         } catch(e) {
           if(e instanceof SyntaxError) {
             err = new h54sError('parseError', e.message);

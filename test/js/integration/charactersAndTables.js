@@ -256,19 +256,31 @@ describe('h54s integration -', function() {
       this.timeout(10000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url,
-        metadataRoot: serverData.metadataRoot
+        metadataRoot: serverData.metadataRoot,
+        debug: true
       });
 
       var data = {},
           key = 'c0',
           j = 0;
       data[key] = '';
+      var skip = [0x0378, 0x0379, 0x0380, 0x0381, 0x0382, 0x0383, 0x038B, 0x038D, 0x03A2,
+                  0x0530, 0x0557, 0x0558, 0x0560, 0x0588, 0x058B, 0x058C, 0x0590, 0x05C8,
+                  0x05C9, 0x05CA, 0x05CB, 0x05CC, 0x05CD, 0x05CF, 0x05EB, 0x05EC, 0x05ED,
+                  0x05EE, 0x05EF, 0x05F5, 0x05F6, 0x05F7, 0x05F8, 0x05F9, 0x05FA, 0x05FB,
+                  0x05FC, 0x05FD, 0x05FE, 0x05FF, 0x061D, 0x070E, 0x074B, 0x074C, 0x07B2,
+                  0x07B3, 0x07B4, 0x07B5, 0x07B6, 0x07B7, 0x07B8, 0x07B9, 0x07BA, 0x07BB,
+                  0x07BC, 0x07BD, 0x07BE, 0x07BF, 0x07FB, 0x07FC, 0x07FD, 0x07FE, 0x07FF];
 
       // 30-2047 characters - 200 in each column
       // characters within 2 bytes
-      // we are ignoring C1 and C2 control characters
+      // we are ignoring C0 and C1 control characters
       var i = 32;
       while(i <= 0x07FF) {
+        if(skip.indexOf(i) !== -1) {
+          i++;
+          continue;
+        }
         if(data[key].length === 200) {
           key = 'c' + ++j;
           data[key] = '';
@@ -276,9 +288,9 @@ describe('h54s integration -', function() {
         data[key] += String.fromCharCode(i);
         i++;
 
-        // jump over C2 characters
+        // jump over C1 characters
         if(i === 0x7F) {
-          i = 0xA0;
+          i = 0xC2;
         }
       }
 
@@ -288,6 +300,10 @@ describe('h54s integration -', function() {
 
       sasAdapter.call('bounceUploadData', table, function(err, res) {
         assert.isUndefined(err, 'We got error on sas program ajax call');
+        for(key in data) {
+          assert.equal(res.data[0][key], data[key], 'Bounce upload data is different for key: ' + key);
+        }
+        done();
       });
     });
 
