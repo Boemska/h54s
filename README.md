@@ -43,7 +43,7 @@ Then put your SAS hat on.
 
 ```sas
 * get H54s (from wherever you placed it in step 1) ;
-%include '/pub/sasautos/h54s.sas';                
+%include '/pub/sasautos/h54s.sas';
 
 * Process and receive dataset from the client ;
 %hfsGetDataset(datain,work.additions);
@@ -74,6 +74,7 @@ run;
 {
   "usermessage" : "blank",
   "logmessage" : "H54S Exception - Input object datain was not found",
+  "errormessage" : "blank",
   "executingUser" : "sasdemo",
   "executingPerson" : "SAS Demo User",
   "executingPid" : 1337,
@@ -133,8 +134,8 @@ var tables = new h54s.Tables(myFirstTable, 'datain');
 // make your first call to SAS
 adapter.call('/Apps/myFirstService', tables, function(err, res) {
   if(err) {
-    //Houston we have a problem     
-    console.log(err);               
+    //Houston we have a problem
+    console.log(err);
   } else {
     //res is an object returned from the server
     console.log(res);
