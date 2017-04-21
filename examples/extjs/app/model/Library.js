@@ -9,7 +9,7 @@ Ext.define('h54sExample.model.Library', {
   fields: [
     {
       type: 'string',
-      name: 'libname'
+      name: 'LIBNAME'
     }
   ]
 });

@@ -17,7 +17,7 @@ Ext.define('h54sExample.Application', {
         alert(err.message);
       } else {
         Ext.getCmp('mainPanel').setLoading(false);
-        Ext.getStore('LibraryListStore').loadData(res.librarylist);
+        Ext.getStore('LibraryListStore').loadData(res.libraryList);
       }
     });
 

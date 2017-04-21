@@ -1,62 +1,13 @@
 /* global describe, it, assert, serverData, h54s, proclaim, getRandomAsciiChars, setTimeout */
-describe('h54s', function() {
-  describe('methods test:', function() {
-
-    it('Should throw error if arguments are not provided', function(done) {
-      var sasAdapter = new h54s();
-      proclaim.throws(function() {
-        sasAdapter.call();
-      });
-      proclaim.throws(function() {
-        sasAdapter.call({});
-      });
-      proclaim.throws(function() {
-        sasAdapter.call({
-          sasProgram: 'test'
-        });
-      });
-      proclaim.throws(function() {
-        sasAdapter.call('test');
-      });
-      proclaim.throws(function() {
-        new h54s.Tables([]);
-      });
-      sasAdapter.call('test', null, function() {});
-      done();
-    });
-
-    it('Should throw error if credentials are missing', function(done) {
-      var sasAdapter = new h54s({
-        hostUrl: serverData.url
-      });
-      proclaim.throws(function() {
-        sasAdapter.login();
-      });
-      proclaim.throws(function() {
-        sasAdapter.login('username');
-      });
-      proclaim.throws(function() {
-        sasAdapter.login('username', {}, function() {});
-      });
-      done();
-    });
-
-    it('Try to log in on wrong url without credentials', function(done) {
-      var sasAdapter = new h54s({
-        hostUrl: serverData.url
-      });
-      proclaim.throws(function() {
-        sasAdapter.login();
-      });
-      done();
-    });
+describe('h54s integration -', function() {
+  describe('Methods test:', function() {
 
     it('Try to log in with credentials and callback', function(done) {
       this.timeout(10000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url
       });
-      sasAdapter._utils.ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
+      sasAdapter._ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
         assert.equal(res.status, 200, 'Log out is not successful');
 
         sasAdapter.login(serverData.user, serverData.pass, function(status) {
@@ -72,7 +23,7 @@ describe('h54s', function() {
         hostUrl: serverData.url
       });
       //logout because we are already logged in in previeous tests
-      sasAdapter._utils.ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
+      sasAdapter._ajax.get( serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
         assert.equal(res.status, 200, 'Log out is not successful');
         sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err, res) {
           assert.equal(err.message, 'You are not logged in', 'Should throw error because user is not logged in');
@@ -161,7 +112,7 @@ describe('h54s', function() {
 
       var counter = 0;
 
-      sasAdapter._utils.ajax.get(serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function() {
+      sasAdapter._ajax.get(serverData.url + 'SASStoredProcess/do', {_action: 'logoff'}).success(function() {
         sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err) {
           if(!err) {
             counter++;
@@ -189,6 +140,51 @@ describe('h54s', function() {
             }, 4000);
           });
         }, 1000);
+      });
+    });
+
+    it('Missing SAS program', function(done) {
+      this.timeout(4000);
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url
+      });
+
+      sasAdapter.call('/AJAX/h54s_test/missingProgram', null, function(err, res) {
+        assert.isDefined(err);
+        assert.equal(err.type, 'programNotFound', 'We got wrong error type');
+        done();
+      });
+    });
+
+    it('Missing SAS program with debug set', function(done) {
+      this.timeout(4000);
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url,
+        debug: true
+      });
+
+      sasAdapter.call('/AJAX/h54s_test/missingProgram', null, function(err, res) {
+        assert.isDefined(err);
+        assert.equal(err.type, 'programNotFound', 'We got wrong error type');
+        done();
+      });
+    });
+
+    it('Log out', function(done) {
+      this.timeout(10000);
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url
+      });
+
+      sasAdapter.login(serverData.user, serverData.pass, function(status) {
+        assert.equal(status, 200, 'We got wrong status code');
+        sasAdapter.logout(function() {
+          sasAdapter.call('/AJAX/h54s_test/startupService', null, function(err, res) {
+            assert.isDefined(err);
+            assert.equal(err.type, 'notLoggedinError', 'We got wrong error type');
+            done();
+          });
+        });
       });
     });
 

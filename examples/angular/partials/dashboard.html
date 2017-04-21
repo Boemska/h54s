@@ -8,31 +8,31 @@
         <thead>
           <tr>
             <th>
-              <input ng-show="rowCollection" st-search="'memname'" placeholder="Search" class="input-sm form-control" type="search"/>
+              <input ng-show="rowCollection" st-search="'MEMNAME'" placeholder="Search" class="input-sm form-control" type="search"/>
             </th>
             <th>
               <div class="dropdown pull-right">
                 <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
-                  {{libname || 'Library'}}
+                  {{LIBNAME || 'Library'}}
                   <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
                   <li ng-repeat="lib in libraryList" role="presentation">
-                    <a ng-click="loadLib(lib)" role="menuitem" tabindex="-1" href="">{{lib.libname}}</a>
+                    <a ng-click="loadLib(lib)" role="menuitem" tabindex="-1" href="">{{lib.LIBNAME}}</a>
                   </li>
                 </ul>
               </div>
             </th>
           </tr>
           <tr>
-            <th st-ratio="20" st-sort="libname">Library Name</th>
-            <th st-ratio="20" st-sort="memname">Memory Name</th>
+            <th st-ratio="20" st-sort="LIBNAME">Library Name</th>
+            <th st-ratio="20" st-sort="MEMNAME">Memory Name</th>
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="item in displayedCollection" ng-click="go(item.libname, item.memname)">
-            <td st-ratio="20">{{item.libname}}</td>
-            <td st-ratio="20">{{item.memname}}</td>
+          <tr ng-repeat="item in displayedCollection" ng-click="go(item.LIBNAME, item.MEMNAME)">
+            <td st-ratio="20">{{item.LIBNAME}}</td>
+            <td st-ratio="20">{{item.MEMNAME}}</td>
           </tr>
         </tbody>
         <tfoot>

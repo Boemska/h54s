@@ -1,4 +1,4 @@
-/* global h54s: true */
+var h54sError = require('./error.js');
 
 /*
 * Represents html5 for sas adapter
@@ -7,7 +7,7 @@
 *@param {object} config - adapter config object, with keys like url, debug, etc.
 *
 */
-var h54s = function(config) {
+var h54s = module.exports = function(config) {
 
   //default config values
   this.maxXhrRetries    = 5;
@@ -22,14 +22,19 @@ var h54s = function(config) {
 
   this._pendingCalls    = [];
 
+  this._ajax = require('./methods/ajax.js')();
+
+  _setConfig.call(this, config);
+
+  //override with remote if set
   if(config && config.isRemoteConfig) {
     var self = this;
 
     this._disableCalls = true;
 
     // '/base/test/h54sConfig.json' is for the testing with karma
-    //replaced with grunt concat in build
-    this._utils.ajax.get('/base/test/h54sConfig.json').success(function(res) {
+    //replaced with gulp in dev build
+    this._ajax.get('/base/test/h54sConfig.json').success(function(res) {
       var remoteConfig = JSON.parse(res.responseText);
 
       for(var key in remoteConfig) {
@@ -66,18 +71,17 @@ var h54s = function(config) {
         self.call(sasProgram, null, callback, params);
       }
     }).error(function (err) {
-      throw new h54s.Error('ajaxError', 'Remote config file cannot be loaded. Http status code: ' + err.status);
+      throw new h54sError('ajaxError', 'Remote config file cannot be loaded. Http status code: ' + err.status);
     });
-  } else {
-    _setConfig.call(this, config);
   }
 
   // private function to set h54s instance properties
   function _setConfig(config) {
     if(!config) {
+      this._ajax.setTimeout(this.ajaxTimeout);
       return;
     } else if(typeof config !== 'object') {
-      throw new h54s.Error('argumentError', 'First parameter should be config object');
+      throw new h54sError('argumentError', 'First parameter should be config object');
     }
 
     //merge config object from parameter with this
@@ -101,51 +105,17 @@ var h54s = function(config) {
       this.loginUrl = config.hostUrl + this.loginUrl;
     }
 
-    this._utils.ajax.setTimeout(this.ajaxTimeout);
+    this._ajax.setTimeout(this.ajaxTimeout);
   }
 };
 
-/*
-* Add callback functions executed when properties are updated with remote config
-*
-*@callback - callback pushed to array
-*
-*/
-h54s.prototype.onRemoteConfigUpdate = function(callback) {
-  this.remoteConfigUpdateCallbacks.push(callback);
-};
-
-/*
-* h54s error constructor
-* @constructor
-*
-*@param {string} type - Error type
-*@param {string} message - Error message
-*
-*/
-h54s.Error = function(type, message) {
-  if(Error.captureStackTrace) {
-    Error.captureStackTrace(this);
-  }
-  this.message  = message;
-  this.type     = type;
-};
-
-h54s.Error.prototype = Object.create(Error.prototype);
-
-/*
-* h54s tables object constructor
-* @constructor
-*
-*@param {array} table - Table added when object is created
-*@param {string} message - macro name
-*
-*/
-h54s.Tables = function(table, macroName) {
-  this._tables = {};
-
-  this.add(table, macroName);
-};
-
-//replaced in concat and uglify-replace tasks
+//replaced with gulp
 h54s.version = '__version__';
+
+
+h54s.prototype = require('./methods/methods.js');
+
+h54s.Tables = require('./tables/tables.js');
+
+//self invoked function module
+require('./ie_polyfills.js');

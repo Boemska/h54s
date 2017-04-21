@@ -67,7 +67,7 @@ Ext.define('h54sExample.view.Dashboard', {
               change: function (e) {
                 var store = Ext.getStore('TableStore');
                 store.filterBy(function (record) {
-                  var recValue = record.get('memname').toLowerCase();
+                  var recValue = record.get('MEMNAME').toLowerCase();
                   var value = e.getValue().toLowerCase();
                   if (!e.getValue() || recValue.indexOf(value) !== -1)
                     return true;
@@ -80,7 +80,7 @@ Ext.define('h54sExample.view.Dashboard', {
             xtype: 'combobox',
             emptyText: 'Library',
             store: 'LibraryListStore',
-            displayField: 'libname',
+            displayField: 'LIBNAME',
             queryMode: 'local',
             labelWidth: 75,
             listeners: {
@@ -95,7 +95,7 @@ Ext.define('h54sExample.view.Dashboard', {
                     alert(err.message);
                   } else {
                     var store = Ext.getStore('TableStore');
-                    store.getProxy().setData(res.tablelist);
+                    store.getProxy().setData(res.tableList);
                     Ext.getCmp('tableGridPaging').setStore(store);
                     store.loadPage(1);
                   }
@@ -113,14 +113,14 @@ Ext.define('h54sExample.view.Dashboard', {
         columns: [
           {
             xtype: 'gridcolumn',
-            dataIndex: 'libname',
+            dataIndex: 'LIBNAME',
             text: 'Library Name',
             flex: 1,
             menuDisabled: true
           },
           {
             xtype: 'gridcolumn',
-            dataIndex: 'memname',
+            dataIndex: 'MEMNAME',
             text: 'Memory Name',
             flex: 1,
             menuDisabled: true
@@ -134,8 +134,8 @@ Ext.define('h54sExample.view.Dashboard', {
             var detailWindow = Ext.create('h54sExample.view.TableWindow');
             var table = sasAdapter.createTable([
               {
-                libname: row.data.libname,
-                memname: row.data.memname
+                libname: row.data.LIBNAME,
+                memname: row.data.MEMNAME
               }
             ], 'data');
             detailWindow.setTable(table);

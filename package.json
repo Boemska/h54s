@@ -1,26 +1,37 @@
 {
   "name": "h54s",
-  "version": "0.7.3",
+  "version": "0.11.0",
   "description": "HTML5 Data Adapter for SAS",
-  "main": "index.js",
+  "main": "./src/h54s.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test-sas": "node test/sas/src/main.js"
   },
   "author": "Boemska",
   "license": "GPL V3",
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-connect": "^0.2.0",
-    "grunt-contrib-concat": "^0.5.1",
-    "grunt-contrib-jshint": "^0.10.0",
-    "grunt-contrib-uglify": "^0.6.0",
-    "grunt-karma": "^0.12.0",
-    "grunt-string-replace": "^1.2.0",
-    "karma": "^0.13.9",
+    "browserify": "^12.0.1",
+    "gulp": "^3.9.1",
+    "gulp-clean": "^0.3.1",
+    "gulp-flatten": "^0.2.0",
+    "gulp-if": "^2.0.0",
+    "gulp-jshint": "^2.0.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.5.4",
+    "gulp-sync": "^0.1.4",
+    "gulp-uglify": "^1.5.1",
+    "gulp-util": "^3.0.7",
+    "gulp-webserver": "^0.9.1",
+    "jshint": "^2.8.0",
+    "jshint-stylish": "^2.1.0",
+    "karma": "^0.13.15",
+    "karma-browserify": "^4.4.2",
     "karma-chrome-launcher": "^0.2.0",
     "karma-mocha": "^0.1.9",
     "karma-proclaim": "^1.0.0",
     "mocha": "^2.3.1",
-    "proclaim": "^2.0.0"
+    "proclaim": "^2.0.0",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.6.1"
   }
 }

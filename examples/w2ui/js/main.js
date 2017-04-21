@@ -94,8 +94,8 @@ $(document).ready(function () {
       return;
     }
 
-    var listItems = res.librarylist.map(function (item) {
-      return item.libname;
+    var listItems = res.libraryList.map(function (item) {
+      return item.LIBNAME;
     });
     var liblist = $('input[name="libname"]').w2field('list', {
       items: listItems
@@ -120,11 +120,11 @@ $(document).ready(function () {
           return;
         }
 
-        var memListItems = res.tablelist.map(function (item, ind) {
+        var memListItems = res.tableList.map(function (item, ind) {
           return {
             recid: ind,
-            libname: item.libname,
-            memname: item.memname
+            libname: item.LIBNAME,
+            memname: item.MEMNAME
           };
         });
         w2ui.libGrid.clear(true);

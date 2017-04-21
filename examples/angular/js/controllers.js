@@ -1,14 +1,14 @@
 /* global app, alert, $, window */
 app.controller('dashboardCtrl', ['$scope', '$location', 'sasAdapter', '$rootScope', 'stateData', function($scope, $location, sasAdapter, $rootScope, stateData) {
   $scope.loaded = false;
-  if(stateData.librarylist) {
-    $scope.libraryList = stateData.librarylist;
+  if(stateData.libraryList) {
+    $scope.libraryList = stateData.libraryList;
     $scope.loaded = true;
   } else {
     sasAdapter.call('/AJAX/h54s_test/libraryList').then(function(res) {
-      $scope.libraryList = res.librarylist;
+      $scope.libraryList = res.libraryList;
       $scope.loaded = true;
-      stateData.librarylist = res.librarylist;
+      stateData.libraryList = res.libraryList;
     }, function(err) {
       if(err.type === 'notLoggedinError' || err.type === 'loginError') {
         $location.path('/login');
@@ -19,21 +19,21 @@ app.controller('dashboardCtrl', ['$scope', '$location', 'sasAdapter', '$rootScop
   $scope.rowCollection = [];
   $scope.displayedCollection = [].concat($scope.rowCollection);
 
-  $scope.libname = stateData.current.name;
+  $scope.LIBNAME = stateData.current.name;
   $scope.rowCollection = stateData.current.rows;
 
   $scope.loadLib = function(lib) {
-    $scope.libname = lib.libname;
+    $scope.LIBNAME = lib.LIBNAME;
     var table = sasAdapter.createTable([
       {
-        libraryName: lib.libname
+        libraryName: lib.LIBNAME
       }
     ], 'lib');
-    stateData.current.name = lib.libname;
+    stateData.current.name = lib.LIBNAME;
 
     sasAdapter.call('/AJAX/h54s_test/datasetList', table).then(function(res) {
-      $scope.rowCollection = res.tablelist;
-      stateData.current.rows = res.tablelist;
+      $scope.rowCollection = res.tableList;
+      stateData.current.rows = res.tableList;
     }, function(err) {
       if(err.type === 'notLoggedinError' || err.type === 'loginError') {
         $location.path('/login');

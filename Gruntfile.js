@@ -1,165 +1,25 @@
 module.exports = function (grunt) {
-  var bannerContent = '/*! <%= pkg.name %> v<%= pkg.version %> - ' +
-      '<%= grunt.template.today("yyyy-mm-dd") %> \n' +
-      ' *  License: <%= pkg.license %> \n' +
-      ' *  Author: <%= pkg.author %> \n*/\n';
-
-  var name        = '<%= pkg.name %>';
-  var devRelease  = 'dist/'+name+'.js';
-  var minRelease  = 'dist/'+name+'.min.js';
-
-  var srcFiles    = ['src/ie_polyfills.js', 'src/h54s.js', 'src/methods.js', 'src/utils.js'];
-
-  grunt.initConfig({
-    pkg: grunt.file.readJSON('package.json'),
-    jshint: {
-      options: {
-        trailing: true,
-        unused: true,
-        undef: true,
-        camelcase: true
-      },
-      target: {
-        src: [
-          'src/**/*.js',
-          'test/**/*.js',
-          'examples/**/*.js',
-          '!examples/extjs2/lib/*',
-          '!examples/angular/js/libs/*',
-          '!examples/w2ui/lib/*'
-        ]
-      }
-    },
-    concat: {
-      options: {
-        banner: bannerContent,
-        process: function(src, filepath) {
-          var pkg = require('./package.json');
-          return src.replace("('/base/test/h54sConfig.json')", "('h54sConfig.json')")
-                    .replace('__version__', pkg.version);
-        }
-      },
-      target: {
-        src: srcFiles,
-        dest: devRelease
-      }
-    },
-    uglify: {
-      options: {
-        banner: bannerContent,
-        sourceMapRoot: '../',
-        sourceMap: 'dist/'+name+'.min.js.map',
-        sourceMapUrl: name+'.min.js.map'
-      },
-      target : {
-        src : srcFiles,
-        dest : 'dist/' + name + '.min.js'
-      }
-    },
-    'string-replace': {
-      dist: {
-        files: {
-          'dist/h54s.min.js': 'dist/h54s.min.js'
-        },
-        options: {
-          replacements: [{
-            pattern: '__version__',
-            replacement: '<%= pkg.version %>'
-          }, {
-            pattern: '/base/test/h54sConfig.json',
-            replacement: 'h54sConfig.json'
-          }]
-        }
-      }
-    },
-    karma: {
-      options: {
-        configFile: 'karma.conf.js',
-        singleRun: true,
-        files: [
-          {pattern: 'test/**/*.json', served: true, included: false}
-        ]
-      },
-      dev: {
-        files: [
-          {src: srcFiles, served: true},
-          {src: 'test/**/*.js'}
-        ],
-        autoWatch: true,
-        singleRun: false
-      },
-      methods: {
-        files: [
-          {src: srcFiles, served: true},
-          {src: ['test/methods.js', 'test/_server_data.js', 'test/_helpers.js']}
-        ],
-        autoWatch: true,
-        singleRun: false
-      },
-      run: {
-        files: [
-          {src: srcFiles},
-          {src: 'test/**/*.js'},
-          {src: 'test/**/*.json', served: true, included: false}
-        ]
-      },
-      release: {
-        files: [
-          {src: 'test/**/*.js'},
-          {src: 'dist/h54s.js', served: true}
-        ],
-        exclude: [
-          'test/remoteConfig.js'
-        ]
-      },
-      ugly: {
-        files: [
-          {src: 'test/**/*.js'},
-          {src: 'dist/h54s.min.js', served: true}
-        ],
-        exclude: [
-          'test/remoteConfig.js'
-        ]
-      }
-    },
-    connect: {
-      angular: {
-        port: 1337,
-        combine: ['examples/angular', 'dist', 'test']
-      },
-      extjs: {
-        port: 1337,
-        combine: ['examples/extjs', 'dist', 'test']
-      },
-      extjs2: {
-        port: 1337,
-        combine: ['examples/extjs2', 'dist', 'test']
-      },
-      w2ui: {
-        port: 1337,
-        combine: ['examples/w2ui', 'dist', 'test']
-      }
-    }
+  grunt.registerTask('default', function() {
+    console.log('\nWe moved to gulp. Run "gulp"');
+  });
+  grunt.registerTask('release', function() {
+    console.log('\nWe moved to gulp. Run "gulp release"');
+  });
+  grunt.registerTask('watch', function () {
+    console.log('\nWe moved to gulp. Run "gulp watch"');
   });
 
-  // Always show stack traces when Grunt prints out an uncaught exception.
-  grunt.option('stack', true);
 
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-karma');
-  grunt.loadNpmTasks('grunt-connect');
-  grunt.loadNpmTasks('grunt-string-replace');
-
-  grunt.registerTask('uglify-replace', ['uglify', 'string-replace']);
-
-  grunt.registerTask('default', ['jshint', 'karma:run']);
-  grunt.registerTask('release', ['jshint', 'concat', 'karma:release', 'uglify-replace', 'karma:ugly']);
-  grunt.registerTask('watch', 'karma:dev');
-
-  grunt.registerTask('serveAngular', 'connect:angular');
-  grunt.registerTask('serveExtjs', 'connect:extjs');
-  grunt.registerTask('serveExtjs2', 'connect:extjs2');
-  grunt.registerTask('serveW2UI', 'connect:w2ui');
+  grunt.registerTask('serveAngular', function() {
+    console.log('\nWe moved to gulp. Run "gulp serveAngular"');
+  });
+  grunt.registerTask('serveExtjs', function() {
+    console.log('\nWe moved to gulp. Run "gulp serveExtjs"');
+  });
+  grunt.registerTask('serveExtjs2', function() {
+    console.log('\nWe moved to gulp. Run "gulp serveExtjs2"');
+  });
+  grunt.registerTask('serveW2UI', function() {
+    console.log('\nWe moved to gulp. Run "gulp serveW2UI"');
+  });
 };
