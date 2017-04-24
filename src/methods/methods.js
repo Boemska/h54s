@@ -28,7 +28,7 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
 
   if(!params) {
     params = {
-      _program: this.metadataRoot ? this.metadataRoot.replace(/\/?$/, '/') + sasProgram.replace(/^\//, '') : sasProgram,
+      _program: this._utils.getFullProgramPath(this.metadataRoot, sasProgram),
       _debug:   this.debug ? 131 : 0,
       _service: 'default',
     };

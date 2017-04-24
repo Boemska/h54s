@@ -238,3 +238,14 @@ module.exports.needToLogin = function(responseObj) {
     return true;
   }
 };
+
+/*
+* Get full program path from metadata root and relative path
+*
+* @param {string} metadataRoot - Metadata root (path where all programs for the project are located)
+* @param {string} sasProgramPath - Sas program path
+*
+*/
+module.exports.getFullProgramPath = function(metadataRoot, sasProgramPath) {
+  return metadataRoot ? metadataRoot.replace(/\/?$/, '/') + sasProgramPath.replace(/^\//, '') : sasProgramPath;
+};

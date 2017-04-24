@@ -2,6 +2,7 @@ var h54sError = require('./error.js');
 var logs      = require('./logs.js');
 var Tables    = require('./tables/tables.js');
 var Files     = require('./files/files.js');
+var toSasDateTime = require('./tables/utils.js').toSasDateTime;
 
 /*
 * h54s SAS data object constructor
@@ -110,6 +111,10 @@ SasData.prototype.addTable = function(table, macroName) {
           (type === 'object' && spec[key].colType !== 'json'))
         {
           throw new h54sError('typeError', 'There is a type mismatch in the array between values (columns) of the same name.');
+        }
+
+        if (val instanceof Date) {
+          table[i][key] = toSasDateTime(val);
         }
       }
     }
