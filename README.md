@@ -421,12 +421,12 @@ var errors = adapter.getSasErrors();
 
 ### getApplicationLogs()
 
-Array of log strings that kept by the Adapter. A 'log string' is added to this array by the adapter whenever the SAS macro variable of &logmessage. has been set, and therefore passed to the front end application log.
+Array of log objects that is kept by the Adapter. A log object with `message`, `time`, and `sasProgram` properties is added to this array by the adapter whenever the SAS macro variable of &logmessage. has been set, and therefore passed to the front end application log.
 ```js
 var appLogs = adapter.getApplicationLogs();
 ```
 
-`appLogs[i]` is a string, either returned from server, or added by the adapter
+`appLogs[i].message` is a string, either returned from server, or added by the adapter
 
 
 ### getDebugData()
