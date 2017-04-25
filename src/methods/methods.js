@@ -35,8 +35,7 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
   }
 
   if(dataObj) {
-    var key;
-    var dataProvider
+    var key, dataProvider;
     if(dataObj instanceof h54s.Tables) {
       dataProvider = dataObj._tables;
     } else if(dataObj instanceof h54s.Files || dataObj instanceof h54s.SasData){

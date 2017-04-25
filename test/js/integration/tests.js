@@ -12,7 +12,7 @@ describe('h54s integration -', function() {
         } else {
           done(new Error('Unable to login'));
         }
-      })
+      });
     });
 
     it('Missing SAS program', function(done) {
@@ -260,7 +260,7 @@ describe('h54s integration -', function() {
         c5: '\f',
         c6: '\r',
         c7: '\b'
-      }
+      };
 
       var table = new h54s.SasData([
         data
@@ -334,7 +334,7 @@ describe('h54s integration -', function() {
           continue;
         }
         if(data[key].length === 200) {
-          key = 'c' + ++j;
+          key = 'c' + (++j);
           data[key] = '';
         }
         data[key] += String.fromCharCode(i);

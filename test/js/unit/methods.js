@@ -85,7 +85,7 @@ describe('h54s unit -', function() {
           },
           error: function() {}
         };
-      }
+      };
       td.when(ajaxPostDouble(td.matchers.anything(), td.matchers.contains({username: '*'}))).thenReturn(getAjaxResponseObj('fail'));
       td.when(ajaxPostDouble(td.matchers.anything(), td.matchers.contains({username: '***'}))).thenReturn(getAjaxResponseObj('success'));
 
