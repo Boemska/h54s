@@ -50,6 +50,8 @@ describe('h54s integration -', function() {
     it('Application logs', function(done) {
       this.timeout(300);
       var sasAdapter = new h54s();
+      // logs are static for h54s object and shared across all instances
+      sasAdapter.clearAllLogs();
 
       var ajaxPostDouble = td.replace(sasAdapter._ajax, 'post');
       td.when(ajaxPostDouble(td.matchers.anything(), td.matchers.anything(), td.matchers.anything())).thenReturn({
@@ -76,7 +78,7 @@ describe('h54s integration -', function() {
           assert.equal(res.logmessage, logs[logs.length - 1].message, 'Last log message should be equal as logmessage from response');
           assert.isDefined(logs[0].time, 'Application log object should have time property');
         }
-        sasAdapter.call('*', table, function(err, res) {
+        sasAdapter.call('*', null, function(err, res) {
           assert.equal(sasAdapter.getApplicationLogs().length, 2, 'Wrong number of application logs');
           sasAdapter.clearApplicationLogs();
           assert.equal(sasAdapter.getApplicationLogs().length, 0, 'Wrong number of application logs');
