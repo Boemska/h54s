@@ -13,10 +13,10 @@ var toSasDateTime = require('./tables/utils.js').toSasDateTime;
 *@param {number} parameterThreshold - size of data objects sent to SAS
 *
 */
-function SasData(data, macroName) {
+function SasData(data, macroName, specs) {
   if(data instanceof Array) {
     this._files = {};
-    this.addTable(data, macroName);
+    this.addTable(data, macroName, specs);
   } else if(data instanceof File) {
     Files.call(this, data, macroName);
   } else {
@@ -30,7 +30,8 @@ function SasData(data, macroName) {
 * @param {string} macroName - Sas macro name
 *
 */
-SasData.prototype.addTable = function(table, macroName) {
+SasData.prototype.addTable = function(table, macroName, specs) {
+  var isSpecsProvided = !!specs;
   if(table && macroName) {
     if(!(table instanceof Array)) {
       throw new h54sError('argumentError', 'First argument must be array');
@@ -49,8 +50,30 @@ SasData.prototype.addTable = function(table, macroName) {
     throw new h54sError('argumentError', 'Table argument is not an array');
   }
 
-  var spec = {},
-      i, j, //counters used latter in code
+  if(specs) {
+    var key;
+    if(specs.constructor !== Object) {
+      throw new h54sError('argumentError', 'Specs data type wrong. Object expected.');
+    }
+    for(key in table[0]) {
+      if(!specs[key]) {
+        throw new h54sError('argumentError', 'Missing columns in specs data.');
+      }
+    }
+    for(key in specs) {
+      if(specs[key].constructor !== Object) {
+        throw new h54sError('argumentError', 'Wrong column descriptor in specs data.');
+      }
+      if(!specs[key].colType || !specs[key].colLength) {
+        throw new h54sError('argumentError', 'Missing columns in specs descriptor.');
+      }
+    }
+  }
+
+  if(!specs) {
+    var specs = {};
+  }
+  var i, j, //counters used latter in code
       specialChars = ['"', '\\', '/', '\n', '\t', '\f', '\r', '\b'];
 
   //going backwards and removing empty rows
@@ -81,36 +104,40 @@ SasData.prototype.addTable = function(table, macroName) {
           throw new h54sError('typeError', 'Boolean value in one of the values (columns) is not allowed');
         }
 
-        if(spec[key] === undefined) {
-          spec[key] = {};
+        if(specs[key] === undefined) {
+          specs[key] = {};
 
           if (type === 'number') {
             if(val < Number.MIN_SAFE_INTEGER || val > Number.MAX_SAFE_INTEGER) {
               logs.addApplicationLog('Object[' + i + '].' + key + ' - This value exceeds expected numeric precision.');
             }
-            spec[key].colType   = 'num';
-            spec[key].colLength = 8;
+            specs[key].colType   = 'num';
+            specs[key].colLength = 8;
           } else if (type === 'string' && !(val instanceof Date)) { // straightforward string
-            spec[key].colType    = 'string';
-            spec[key].colLength  = val.length;
+            specs[key].colType    = 'string';
+            specs[key].colLength  = val.length;
             for(j = 0; j < val.length; j++) {
               if(specialChars.indexOf(val[j]) !== -1) {
-                spec[key].colLength++;
+                specs[key].colLength++;
               }
             }
           } else if(val instanceof Date) {
-            spec[key].colType   = 'date';
-            spec[key].colLength = 8;
+            specs[key].colType   = 'date';
+            specs[key].colLength = 8;
           } else if (type === 'object') {
-            spec[key].colType   = 'json';
-            spec[key].colLength = JSON.stringify(val).length;
+            specs[key].colType   = 'json';
+            specs[key].colLength = JSON.stringify(val).length;
           }
-        } else if ((type === 'number' && spec[key].colType !== 'num') ||
-          (type === 'string' && !(val instanceof Date) && spec[key].colType !== 'string') ||
-          (val instanceof Date && spec[key].colType !== 'date') ||
-          (type === 'object' && spec[key].colType !== 'json'))
+        } else if ((type === 'number' && specs[key].colType !== 'num') ||
+          (type === 'string' && !(val instanceof Date) && specs[key].colType !== 'string') ||
+          (val instanceof Date && specs[key].colType !== 'date') ||
+          ((type === 'object' && val.constructor !== Date) && specs[key].colType !== 'json'))
         {
-          throw new h54sError('typeError', 'There is a type mismatch in the array between values (columns) of the same name.');
+          throw new h54sError('typeError', 'There is a specs mismatch in the array between values (columns) of the same name.');
+        } else if(!isSpecsProvided && type === 'string' && specs[key].colLength < val.length) {
+          specs[key].colLength = val.length;
+        } else if((type === 'string' && specs[key].colLength < val.length) || (type !== 'string' && specs[key].colLength !== 8)) {
+          throw new h54sError('typeError', 'There is a specs mismatch in the array between values (columns) of the same name.');
         }
 
         if (val instanceof Date) {
@@ -125,9 +152,9 @@ SasData.prototype.addTable = function(table, macroName) {
     }
   }
 
-  //convert spec to csv with pipes
-  var specString = Object.keys(spec).map(function(key) {
-    return key + ',' + spec[key].colType + ',' + spec[key].colLength;
+  //convert specs to csv with pipes
+  var specString = Object.keys(specs).map(function(key) {
+    return key + ',' + specs[key].colType + ',' + specs[key].colLength;
   }).join('|');
 
   var sasJson = JSON.stringify(table).replace('\\"', '""');

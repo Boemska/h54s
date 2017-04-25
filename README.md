@@ -373,20 +373,28 @@ adapter.logout(function(err) {
 })
 ```
 
-### h54s.SasData(tableArray, macroName)
+### h54s.SasData(tableArray, macroName [, specs])
 Creates an object which stores tables, which are then sent back to SAS via the `call` method.
 This is equivalent to `h54s.Tables` constructor deprecated in v0.11.
 
 ```js
+var specs = {
+  someNumber: {colType: 'num', colLength: 8},
+  someString: {colType: 'string', colLength: 5},
+  someDate: {colType: 'date', colLength: 8}
+};
 var data = new h54s.SasData([
   {
     someNumber: 42.0,
-    someString: 'Stuff'
+    someString: 'Stuff',
+    someDate: new Date()
   }
-], 'data');
+], 'data', specs);
 ```
 
-### h54s.SasData.prototype.add(tableArray, macroName)
+### h54s.SasData.prototype.add(tableArray, macroName [, specs])
+For specs object check the previous description (h54s.SasData) - it accepts the same specs object.
+
 Adds additional tables to a SasData object:
 
 ```js

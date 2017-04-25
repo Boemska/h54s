@@ -154,7 +154,75 @@ describe('h54s unit -', function() {
       }];
 
       var table = new h54s.SasData(data, 'data');
-      assert.equal('data1,string,4|data2,num,8|dt_data3,date,8', table._files.data[0], 'Specs are not correct');
+      assert.equal(table._files.data[0], 'data1,string,4|data2,num,8|dt_data3,date,8', 'Specs are not correct');
+      done();
+    });
+
+    it('Test SasData custom specs', function(done) {
+      var data = [{
+        data1   : 'test',
+        data2   : 1,
+        dt_data3: new Date()
+      }];
+
+      var specs = {
+        data1: {
+          colType: 'string',
+          colLength: 4
+        },
+        data2: {
+          colType: 'num',
+          colLength: 8
+        },
+        dt_data3: {
+          colType: 'date',
+          colLength: 8
+        }
+      };
+
+      var table = new h54s.SasData(data, 'data', specs);
+      assert.equal(table._files.data[0], 'data1,string,4|data2,num,8|dt_data3,date,8', 'Specs are not correct');
+
+      proclaim.throws(function() {
+        new h54s.SasData(data, 'data', []);
+      }, 'Specs data type wrong. Object expected.', 'Wrong specs data type');
+      proclaim.throws(function() {
+        new h54s.SasData(data, 'data', {});
+      }, 'Missing columns in specs data.', 'Specs object length wrong');
+      proclaim.throws(function() {
+        new h54s.SasData(data, 'data', Object.assign({}, specs, {data1: []}));
+      }, 'Wrong column descriptor in specs data.', 'Column description wrong type');
+      proclaim.throws(function() {
+        new h54s.SasData(data, 'data', Object.assign({}, specs, {data1: 'wrong'}));
+      }, 'Wrong column descriptor in specs data.', 'Column description wrong type');
+      proclaim.throws(function() {
+        new h54s.SasData(data, 'data', Object.assign({}, specs, {data1: {}}));
+      }, 'Missing columns in specs descriptor.', 'Column description data missing');
+      proclaim.throws(function() {
+        specs.data1.colLength = 1;
+        new h54s.SasData(data, 'data', specs);
+      }, 'There is a specs mismatch in the array between values (columns) of the same name.', 'No error on wrong description colLength');
+      proclaim.throws(function() {
+        delete specs.data1.colLength;
+        new h54s.SasData(data, 'data', specs);
+      }, 'Missing columns in specs descriptor.', 'Column description data missing');
+      proclaim.doesNotThrow(function() {
+        new h54s.SasData(data, 'data');
+      });
+      proclaim.doesNotThrow(function() {
+        var specs = {
+          someNumber: {colType: 'num', colLength: 8},
+          someString: {colType: 'string', colLength: 5},
+          someDate: {colType: 'date', colLength: 8}
+        };
+        new h54s.SasData([
+          {
+            someNumber: 42.0,
+            someString: 'Stuff',
+            someDate: new Date()
+          }
+        ], 'data', specs);
+      });
       done();
     });
 
