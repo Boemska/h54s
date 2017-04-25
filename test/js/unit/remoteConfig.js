@@ -7,7 +7,7 @@ describe('h54s unit -', function() {
         debug: false
       });
       //wait for the file
-      setTimeout(function() {
+      sasAdapter.onRemoteConfigUpdate(function() {
         assert.equal(sasAdapter.url, '/SASStoredProcess/do', 'Url is not set with config');
         assert.equal(sasAdapter.metadataRoot, '/AJAX/', 'Metadata root has wrong value');
         assert.equal(sasAdapter.ajaxTimeout, 20000, 'Aajax timeout has wrong value');
@@ -15,7 +15,7 @@ describe('h54s unit -', function() {
         //so debug should be false from the constructor - override the remote config property
         assert.isFalse(sasAdapter.debug, 'Constructor config is not overriding the remote config');
         done();
-      }, 100);
+      });
     });
 
     it('Test remote config load event', function(done) {
@@ -40,6 +40,42 @@ describe('h54s unit -', function() {
       });
       assert.isTrue(sasAdapter.debug, 'Debug option is not set');
       done();
+    });
+
+    it('Test remote config in call', function(done) {
+      this.timeout(300);
+      var sasAdapter = new h54s({
+        isRemoteConfig: true
+      });
+
+      var loginDouble = td.replace(sasAdapter, 'login');
+      var callDouble = td.replace(sasAdapter, 'call');
+
+      var callDoFn = function(sasProgram) {
+        this.onRemoteConfigUpdate(function() {
+          var program = this._utils.getFullProgramPath(this.metadataRoot, sasProgram);
+          assert.equal(program, '/AJAX/relative/path', 'Full program path wrong');
+        }.bind(this));
+      }.bind(sasAdapter);
+
+      td.when(loginDouble('*', '*')).thenCallback(200);
+      td.when(callDouble('/relative/path', null)).thenDo(callDoFn);
+      td.when(callDouble('relative/path', null)).thenDo(callDoFn);
+      td.when(callDouble('/relative/path', null)).thenCallback();
+      td.when(callDouble('relative/path', null)).thenCallback();
+
+      sasAdapter.login('*', '*', function(status) {
+        assert.equal(status, 200, 'We got wrong status code');
+        //metadataRoot is set to '/AJAX/' so the program path is prefixed with it
+        sasAdapter.call('/relative/path', null, function(err) {
+          assert.isUndefined(err, 'We got error on sas program ajax call');
+        });
+        sasAdapter.call('relative/path', null, function(err) {
+          assert.isUndefined(err, 'We got error on sas program ajax call');
+          td.reset();
+          done();
+        });
+      });
     });
 
   });

@@ -1,4 +1,4 @@
-/* global describe, it, assert, serverData, h54s, proclaim */
+/* global describe, it, assert, h54s, proclaim */
 describe('h54s unit -', function() {
   describe('Config:', function() {
 
@@ -14,15 +14,16 @@ describe('h54s unit -', function() {
 
     it('Test config settings', function(done) {
       var sasAdapter;
+      var url = 'http://example.com/';
       sasAdapter = new h54s({
         url: '/SASStoredProcess/someValue'
       });
       assert.equal('/SASStoredProcess/someValue', sasAdapter.url, 'Url is not set with config');
       sasAdapter = new h54s({
         url: '/someValue',
-        hostUrl: serverData.url
+        hostUrl: url
       });
-      assert.equal(serverData.url + 'someValue', sasAdapter.url, 'Full url is not correct');
+      assert.equal(url + 'someValue', sasAdapter.url, 'Full url is not correct');
       assert.isFalse(sasAdapter.debug, 'Debug option is not correct');
       sasAdapter = new h54s({
         debug: true
@@ -111,18 +112,36 @@ describe('h54s unit -', function() {
       var file = new h54s.Files(new File([''], 'test'), 'data');
       var callback = function() {};
 
+      // using test double function to return fake HTTP response
+      function replacePost(sasAdapter) {
+        var ajaxPostDouble = td.replace(sasAdapter._ajax, 'post');
+        td.when(ajaxPostDouble(td.matchers.anything(), td.matchers.anything(), td.matchers.anything())).thenReturn({
+          success: function(callback) {
+            callback({
+              responseText: '{}', //it doesn't matter what's returned, just that it doesn't throw an error
+              status: 200
+            });
+            return this;
+          },
+          error: function() {}
+        });
+      }
+
       proclaim.doesNotThrow(function() {
         var sasAdapter = new h54s({
           useMultipartFormData: false
         });
+        replacePost(sasAdapter);
         sasAdapter.call('...', table, callback);
       });
       proclaim.doesNotThrow(function() {
         var sasAdapter = new h54s();
+        replacePost(sasAdapter);
         sasAdapter.call('...', sasData, callback);
       });
       proclaim.doesNotThrow(function() {
         var sasAdapter = new h54s();
+        replacePost(sasAdapter);
         sasAdapter.call('...', table, callback);
       });
       proclaim.throws(function() {
@@ -130,13 +149,14 @@ describe('h54s unit -', function() {
           useMultipartFormData: false
         });
         sasAdapter.call('...', sasData, callback);
-      });
+      }, 'Cannot send files using application/x-www-form-urlencoded. Please use h54s.Tables or default value for useMultipartFormData', 'Error not thrown.');
       proclaim.throws(function() {
         var sasAdapter = new h54s({
           useMultipartFormData: false
         });
         sasAdapter.call('...', file, callback);
-      });
+      }, 'Cannot send files using application/x-www-form-urlencoded. Please use h54s.Tables or default value for useMultipartFormData', 'Error not thrown.');
+      td.reset();
       done();
     });
 

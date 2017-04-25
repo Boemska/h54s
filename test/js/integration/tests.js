@@ -15,6 +15,58 @@ describe('h54s integration -', function() {
       })
     });
 
+    it('Missing SAS program', function(done) {
+      this.timeout(4000);
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url,
+        metadataRoot: serverData.metadataRoot
+      });
+
+      sasAdapter.call('missingProgram', null, function(err, res) {
+        assert.isDefined(err);
+        assert.equal(err.type, 'programNotFound', 'We got wrong error type');
+        done();
+      });
+    });
+
+    it('Missing SAS program with debug set', function(done) {
+      this.timeout(4000);
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url,
+        debug: true,
+        metadataRoot: serverData.metadataRoot
+      });
+
+      sasAdapter.call('missingProgram', null, function(err, res) {
+        assert.isDefined(err);
+        assert.equal(err.type, 'programNotFound', 'We got wrong error type');
+        done();
+      });
+    });
+
+    it('Test date send and receive', function(done) {
+      this.timeout(10000);
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url,
+        debug: true,
+        metadataRoot: serverData.metadataRoot
+      });
+      var date = new Date();
+      var data = new h54s.Tables([
+        {
+          dt_some_date: date // jshint ignore:line
+        }
+      ], 'data');
+      sasAdapter.call('BounceData', data, function(err, res) {
+        //sas is outputing data in seconds, so we need to round those dates
+        var resSeconds = Math.round(res.outputdata[0].DT_SOME_DATE.getTime() / 1000); // jshint ignore:line
+        var dateSeconds = Math.round(date.getTime() / 1000);
+        assert.isUndefined(err, 'We got error on sas program ajax call');
+        assert.equal(resSeconds, dateSeconds, 'Date is not the same');
+        done();
+      });
+    });
+
     it('Test json character escape', function(done) {
       this.timeout(10000);
       var sasAdapter = new h54s({

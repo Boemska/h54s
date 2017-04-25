@@ -28,8 +28,10 @@
     "karma-chrome-launcher": "^0.2.0",
     "karma-mocha": "^0.1.9",
     "karma-proclaim": "^1.0.0",
+    "karma-testdouble": "^1.0.2",
     "mocha": "^2.3.1",
     "proclaim": "^2.0.0",
+    "testdouble": "^2.1.2",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.6.1"

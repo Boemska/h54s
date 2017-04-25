@@ -28,6 +28,7 @@ var filePaths = {
   srcFiles: './src/**/*.js',
   srcEntryfile: './src/h54s.js',
   unitTestFiles: './test/js/unit/**/*.js',
+  sasResponses: './test/js/sas_responses/**/*.js',
   browserifyTestFiles: './test/js/browserify/**/*.js',
   integrationTestFiles: './test/js/integration/**/*.js',
   helperTestFiles: './test/js/*.js',
@@ -121,6 +122,7 @@ gulp.task('default', ['jshint', 'unset-watch', 'build-dev'], function(done) {
       {pattern: 'test/*.json', served: true, included: false},
       {pattern: filePaths.devBuild, served: true},
       {pattern: filePaths.helperTestFiles},
+      {pattern: filePaths.sasResponses},
       {pattern: filePaths.unitTestFiles},
       {pattern: filePaths.integrationTestFiles}
     ],
@@ -139,11 +141,12 @@ gulp.task('watch', ['build-dev'], function(done) {
       {pattern: 'test/*.json', served: true, included: false},
       {pattern: filePaths.devBuild, served: true},
       {pattern: filePaths.helperTestFiles},
+      {pattern: filePaths.sasResponses},
       {pattern: filePaths.unitTestFiles},
       {pattern: filePaths.integrationTestFiles},
       {pattern: filePaths.browserifyTestFiles}
     ],
-    frameworks: ['browserify', 'mocha', 'proclaim'],
+    frameworks: ['browserify', 'mocha', 'proclaim', 'testdouble'],
     preprocessors: {
       './test/js/browserify/**/*.js': [ 'browserify' ]
     },
@@ -162,10 +165,11 @@ gulp.task('watch-unit', ['build-dev'], function(done) {
       {pattern: 'test/*.json', served: true, included: false},
       {pattern: filePaths.devBuild, served: true},
       {pattern: filePaths.helperTestFiles},
+      {pattern: filePaths.sasResponses},
       {pattern: filePaths.unitTestFiles},
       {pattern: filePaths.browserifyTestFiles}
     ],
-    frameworks: ['browserify', 'mocha', 'proclaim'],
+    frameworks: ['browserify', 'mocha', 'proclaim', 'testdouble'],
     preprocessors: {
       './test/js/browserify/**/*.js': [ 'browserify' ]
     },
@@ -182,6 +186,7 @@ gulp.task('test-release', ['jshint', 'build-production'], function(done) {
     files: [
       {pattern: filePaths.releaseBuild, served: true},
       {pattern: filePaths.helperTestFiles},
+      {pattern: filePaths.sasResponses},
       {pattern: filePaths.unitTestFiles},
       {pattern: filePaths.integrationTestFiles},
     ],
@@ -198,6 +203,7 @@ gulp.task('test-ugly', ['jshint', 'build-ugly'], function(done) {
     files: [
       {pattern: filePaths.releaseBuildMin, served: true},
       {pattern: filePaths.helperTestFiles},
+      {pattern: filePaths.sasResponses},
       {pattern: filePaths.unitTestFiles},
       {pattern: filePaths.integrationTestFiles},
     ],

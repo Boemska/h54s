@@ -2,32 +2,33 @@
 describe('h54s integration -', function() {
   describe('Utils test:', function() {
 
-    before(function(done) {
-      var sasAdapter = new h54s({
-        hostUrl: serverData.url,
-      });
-      sasAdapter.login(serverData.user, serverData.pass, function(status) {
-        if(status === 200) {
-          done();
-        } else {
-          done(new Error('Unable to login'));
-        }
-      })
-    });
-
     it('Server response with errors', function(done) {
-      this.timeout(10000);
+      this.timeout(300);
       var sasAdapter = new h54s({
-        hostUrl: serverData.url,
-        metadataRoot: serverData.metadataRoot
+        maxXhrRetries: 3,
       });
-      var table = new h54s.Tables([
-        {
-          libname: 'WORK',
-          memname: 'CHOSENLIB'
-        }
-      ], 'data');
-      sasAdapter.call('getData', table, function(err) {
+
+      var numOfInvocations = 0;
+      var ajaxPostDouble = td.replace(sasAdapter._ajax, 'post');
+      td.when(ajaxPostDouble(td.matchers.anything(), td.matchers.anything(), td.matchers.anything())).thenReturn({
+          success: function(callback) {
+            setTimeout(function() {
+              callback.call({
+                success: callback
+              }, {
+                responseText: sasResponses.callFail,
+                status: 200
+              });
+              numOfInvocations++;
+            }.bind(this), 0);
+            return this;
+          },
+          error: function(callback) {
+            return this;
+          }
+      });
+
+      sasAdapter.call('*', null, function(err) {
         assert.isObject(err, 'We should get error object');
         assert.equal(err.type, 'parseError', 'We should get parseError');
         var sasErrors = sasAdapter.getSasErrors();
@@ -40,22 +41,31 @@ describe('h54s integration -', function() {
         if(failedRequests.length === 0) {
           assert.notOk(failedRequests, 'failedRequests array should not be empty');
         }
+        assert.equal(numOfInvocations, 3, 'Wrong number of invocations.');
+        td.reset();
         done();
       });
     });
 
     it('Application logs', function(done) {
-      this.timeout(10000);
-      var sasAdapter = new h54s({
-        hostUrl: serverData.url,
-        metadataRoot: serverData.metadataRoot
-      });
-      var table = new h54s.Tables([
-        {
-          data: 'test'
+      this.timeout(300);
+      var sasAdapter = new h54s();
+
+      var ajaxPostDouble = td.replace(sasAdapter._ajax, 'post');
+      td.when(ajaxPostDouble(td.matchers.anything(), td.matchers.anything(), td.matchers.anything())).thenReturn({
+        success: function(callback) {
+          callback({
+            responseText: sasResponses.callSuccess,
+            status: 200
+          });
+          return this;
+        },
+        error: function() {
+          return this;
         }
-      ], 'data');
-      sasAdapter.call('BounceData', table, function(err, res) {
+      });
+
+      sasAdapter.call('*', null, function(err, res) {
         assert.isUndefined(err, 'We got error on sas program ajax call');
         var logs = sasAdapter.getApplicationLogs();
         assert.isArray(logs, 'getApplicationLogs() should return array');
@@ -66,46 +76,72 @@ describe('h54s integration -', function() {
           assert.equal(res.logmessage, logs[logs.length - 1].message, 'Last log message should be equal as logmessage from response');
           assert.isDefined(logs[0].time, 'Application log object should have time property');
         }
-        done();
+        sasAdapter.call('*', table, function(err, res) {
+          assert.equal(sasAdapter.getApplicationLogs().length, 2, 'Wrong number of application logs');
+          sasAdapter.clearApplicationLogs();
+          assert.equal(sasAdapter.getApplicationLogs().length, 0, 'Wrong number of application logs');
+          td.reset();
+          done();
+        });
       });
     });
 
-    it('Test date send and receive', function(done) {
-      this.timeout(10000);
-      var sasAdapter = new h54s({
-        hostUrl: serverData.url,
-        debug: true,
-        metadataRoot: serverData.metadataRoot
-      });
+    it('Test date', function(done) {
+      this.timeout(300);
+      var sasAdapter = new h54s();
       var date = new Date();
-      var table = new h54s.Tables([
+
+      var fileData = new h54s.SasData([
         {
           dt_some_date: date // jshint ignore:line
         }
-      ], 'data');
-      sasAdapter.call('BounceData', table, function(err, res) {
-        //sas is outputing data in seconds, so we need to round those dates
-        var resSeconds = Math.round(res.outputdata[0].DT_SOME_DATE.getTime() / 1000); // jshint ignore:line
-        var dateSeconds = Math.round(date.getTime() / 1000);
-        assert.isUndefined(err, 'We got error on sas program ajax call');
-        assert.equal(resSeconds, dateSeconds, 'Date is not the same');
+      ], 'file');
+      var tableData = new h54s.Tables([
+        {
+          dt_some_date: date // jshint ignore:line
+        }
+      ], 'table');
+
+      var reader = new FileReader();
+      reader.onload = function(){
+        var data = JSON.parse(reader.result);
+        assert.isNotInstanceOf(data[0].dt_some_date, Date, 'Date is not converted');
+        assert.isNumber(data[0].dt_some_date, 'Date is not converted');
         done();
-      });
+      };
+      reader.readAsText(fileData._files.file[1]);
     });
 
     it('Set debug mode and get errors when first request fails', function(done) {
-      this.timeout(20000);
-      var sasAdapter = new h54s({
-        hostUrl: serverData.url,
-        metadataRoot: serverData.metadataRoot
-      });
-      var table = new h54s.Tables([
-        {
-          libname: 'WORK',
-          memname: 'CHOSENLIB'
-        }
-      ], 'data');
-      sasAdapter.call('getData', table, function(err) {
+      this.timeout(300);
+      var sasAdapter = new h54s();
+
+      function getAjaxResponseObj(type) {
+        return {
+            success: function(callback) {
+              setTimeout(function() {
+                callback.call({
+                  success: callback
+                }, {
+                  responseText: type === 'debug' ? sasResponses.callFailDebug : sasResponses.callFail,
+                  status: 200
+                });
+              }.bind(this), 0);
+              return this;
+            },
+            error: function(callback) {
+              return this;
+            }
+        };
+      }
+
+      var ajaxPostDouble = td.replace(sasAdapter._ajax, 'post');
+      td.when(ajaxPostDouble(td.matchers.anything(), td.matchers.anything(), td.matchers.anything())).thenReturn(
+        getAjaxResponseObj(),
+        getAjaxResponseObj('debug')
+      );
+
+      sasAdapter.call('*', null, function(err) {
         assert.isObject(err, 'We should get error object');
         assert.equal(err.type, 'parseError', 'We should get parseError');
         var sasErrors = sasAdapter.getSasErrors();
@@ -115,13 +151,8 @@ describe('h54s integration -', function() {
         }
 
         sasAdapter.setDebugMode();
-        table.add([
-          {
-            libname: 'WORK',
-            memname: 'CHOSENLIB'
-          }
-        ], 'data');
-        sasAdapter.call('getData', table, function(err) {
+
+        sasAdapter.call('*', null, function(err) {
           assert.isObject(err, 'We should get error object');
           assert.equal(err.type, 'sasError', 'We should get sasError');
           var debugData = sasAdapter.getDebugData();
@@ -147,21 +178,9 @@ describe('h54s integration -', function() {
               assert.isDefined(debugData[i].time, 'debug time is undefined');
             }
           }
+          td.reset();
           done();
         });
-      });
-    });
-
-    it('Program not found error', function(done) {
-      var sasAdapter = new h54s({
-        hostUrl: serverData.url,
-        metadataRoot: serverData.metadataRoot
-      });
-
-      sasAdapter.call('notFoundProgram', null, function(err) {
-        assert.isDefined(err, 'We should get error object');
-        assert.equal(err.type, 'programNotFound', 'Wrong error type');
-        done();
       });
     });
 
