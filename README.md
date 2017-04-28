@@ -43,7 +43,7 @@ Then put your SAS hat on.
 
 ```sas
 * get H54s (from wherever you placed it in step 1) ;
-%include '/pub/sasautos/h54s.sas';                
+%include '/pub/sasautos/h54s.sas';
 
 * Process and receive dataset from the client ;
 %hfsGetDataset(datain,work.additions);
@@ -74,6 +74,7 @@ run;
 {
   "usermessage" : "blank",
   "logmessage" : "H54S Exception - Input object datain was not found",
+  "errormessage" : "blank",
   "executingUser" : "sasdemo",
   "executingPerson" : "SAS Demo User",
   "executingPid" : 1337,
@@ -133,8 +134,8 @@ var data = new h54s.SasData(myFirstTable, 'datain');
 // make your first call to SAS
 adapter.call('/Apps/myFirstService', data, function(err, res) {
   if(err) {
-    //Houston we have a problem     
-    console.log(err);               
+    //Houston we have a problem
+    console.log(err);
   } else {
     //res is an object returned from the server
     console.log(res);
@@ -169,7 +170,7 @@ Easy, right? Read on.
 
 ## Data Structures and Conventions
 
-The *Atomic Unit of Data transfer* for a H54S based App is the Dataset. This is a universal concept familiar to both JS and SAS programmers. In JavaScript Speak, a Dataset is an [object array](http://www.w3schools.com/json/json_syntax.asp), similar to the one created in the example above. Using [this terminology](http://www.w3schools.com/js/js_arrays.asp), each object in an array is the row of a dataset, and each of it's named members is the value of a variable of the same name.
+The *Atomic Unit of Data transfer* for a H54S based App is the Dataset. This is a universal concept familiar to both JS and SAS programmers. In JavaScript Speak, a Dataset is an [object array](http://www.w3schools.com/js/js_json_syntax.asp), similar to the one created in the example above. Using [this terminology](http://www.w3schools.com/js/js_arrays.asp), each object in an array is the row of a dataset, and each of it's named members is the value of a variable of the same name.
 
 Data Types between the front-end and back-end are mapped as follows:
 
