@@ -50,8 +50,8 @@ SasData.prototype.addTable = function(table, macroName, specs) {
     throw new h54sError('argumentError', 'Table argument is not an array');
   }
 
+  var key;
   if(specs) {
-    var key;
     if(specs.constructor !== Object) {
       throw new h54sError('argumentError', 'Specs data type wrong. Object expected.');
     }
@@ -71,7 +71,7 @@ SasData.prototype.addTable = function(table, macroName, specs) {
   }
 
   if(!specs) {
-    var specs = {};
+    specs = {};
   }
   var i, j, //counters used latter in code
       specialChars = ['"', '\\', '/', '\n', '\t', '\f', '\r', '\b'];
@@ -84,7 +84,7 @@ SasData.prototype.addTable = function(table, macroName, specs) {
       throw new h54sError('argumentError', 'Table item is not an object');
     }
 
-    for(var key in row) {
+    for(key in row) {
       if(row.hasOwnProperty(key)) {
         var val  = row[key];
         var type = typeof val;
