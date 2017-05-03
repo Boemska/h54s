@@ -220,7 +220,7 @@ describe('h54s integration -', function() {
       });
     });
 
-    it('Test call method with SasData table', function(done) {
+    it('Test call method with SasData table, and check if all properties are set', function(done) {
       this.timeout(10000);
 
       var data = [
@@ -239,6 +239,14 @@ describe('h54s integration -', function() {
       sasAdapter.call('bounceUploadData', table, function(err, res) {
         assert.isUndefined(err, 'We got error on sas program ajax call');
         assert.deepEqual(res.data, data, 'Bounce data is different');
+        assert.isDefined(res.executingPid, 'Pid missing in response');
+        assert.isDefined(res.logmessage, 'Logmessage missing in response');
+        assert.isDefined(res.requestingPerson, 'RequestingPerson missing in response');
+        assert.isDefined(res.requestingUser, 'RequestingUser missing in response');
+        assert.isDefined(res.sasDatetime, 'SasDatetime missing in response');
+        assert.isDefined(res.status, 'Status missing in response');
+        assert.isDefined(res.usermessage, 'Usermessage missing in response');
+        assert.isDefined(res.errormessage, 'Errormessage missing in response');
         done();
       });
     });
