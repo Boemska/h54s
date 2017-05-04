@@ -337,7 +337,7 @@ adapter.call('/BIP_Tree/test', dataObj, function(err, res){
 
 `err` is a custom javascript Error object with one extra field, `type`.
 
-`err.type` can be one of: "loginError", "notLoggedinError", "parseError", "sasError", or http response text if ajax request failed.
+`err.type` can be one of: "loginError", "notLoggedinError", "parseError", "sasError", "programError", or http response text if ajax request failed.
 
 - "notLoggedinError" is returned if user is not logged in or SAS session expired.
 - "parseError" is returned if the adapter can't parse json response from server.
@@ -345,6 +345,7 @@ adapter.call('/BIP_Tree/test', dataObj, function(err, res){
 - "httpError" if http request failed returning status code other than 200.
 - "unknownError" if data is returned, and it's valid json, but dates could not be converted or string values could not be decoded
 - "programNotFound" if sasProgram parameter path is not correct or the user doesn't have the permission to execute it
+- "programError" if `status` in SAS response is not equal to "success". Value of `status` property is saved in `err.status`
 
 
 ### login(user, pass, callback)
