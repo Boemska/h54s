@@ -84,7 +84,7 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
           resObj = self._utils.parseRes(res.responseText, sasProgram, params);
           logs.addApplicationLog(resObj.logmessage, sasProgram);
 
-          resObj          = self._utils.convertDates(resObj);
+          resObj = self._utils.convertDates(resObj);
           if(dataObj instanceof h54s.Tables) {
             unescapedResObj = self._utils.unescapeValues(resObj);
           } else {
@@ -124,10 +124,10 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
         }
       } else {
         try {
-          resObj          = self._utils.parseDebugRes(res.responseText, sasProgram, params);
+          resObj = self._utils.parseDebugRes(res.responseText, sasProgram, params);
           logs.addApplicationLog(resObj.logmessage, sasProgram);
 
-          resObj          = self._utils.convertDates(resObj);
+          resObj = self._utils.convertDates(resObj);
           if(dataObj instanceof h54s.Tables) {
             unescapedResObj = self._utils.unescapeValues(resObj);
           } else {
