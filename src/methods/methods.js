@@ -91,6 +91,10 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
             unescapedResObj = resObj;
           }
 
+          if(resObj.status !== 'success') {
+            err = new h54sError('programError', resObj.errormessage, resObj.status);
+          }
+
           done = true;
         } catch(e) {
           if(e instanceof SyntaxError) {
@@ -132,6 +136,10 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
             unescapedResObj = self._utils.unescapeValues(resObj);
           } else {
             unescapedResObj = resObj;
+          }
+
+          if(resObj.status !== 'success') {
+            err = new h54sError('programError', resObj.errormessage, resObj.status);
           }
         } catch(e) {
           if(e instanceof SyntaxError) {

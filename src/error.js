@@ -4,14 +4,16 @@
 *
 *@param {string} type - Error type
 *@param {string} message - Error message
+*@param {string} status - Error status returned from SAS
 *
 */
-function h54sError(type, message) {
+function h54sError(type, message, status) {
   if(Error.captureStackTrace) {
     Error.captureStackTrace(this);
   }
   this.message = message;
   this.type    = type;
+  this.status  = status;
 }
 
 h54sError.prototype = Object.create(Error.prototype, {

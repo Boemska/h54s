@@ -194,7 +194,7 @@ describe('h54s unit -', function() {
       var successfulResponseObj = {
         success: function(callback) {
           callback({
-            responseText: '{}', //empty json for testing
+            responseText: sasResponses.callSuccess, //empty json for testing
             status: 200
           });
           return this;
@@ -239,6 +239,56 @@ describe('h54s unit -', function() {
           }, 100);
         });
       }, 100);
+    });
+
+    it('Status error', function(done) {
+      this.timeout(300);
+      var sasAdapter = new h54s();
+
+      var ajaxPostDouble = td.replace(sasAdapter._ajax, 'post');
+      td.when(ajaxPostDouble(sasAdapter.url, td.matchers.anything(), td.matchers.anything())).thenReturn({
+        success: function(callback) {
+          callback({
+            responseText: sasResponses.callError,
+            status: 200
+          });
+          return this;
+        },
+        error: function() {}
+      });
+
+      sasAdapter.call('*', null, function(err, res) {
+        assert.equal(err.type, 'programError', 'Wrong error message type');
+        assert.equal(err.message, 'err msg property value', 'Wrong error message value');
+        assert.equal(err.status, 'sasError', 'Wrong error message status');
+        td.reset();
+        done();
+      });
+    });
+
+    it('Status error debug', function(done) {
+      this.timeout(300);
+      var sasAdapter = new h54s({debug: true});
+
+      var ajaxPostDouble = td.replace(sasAdapter._ajax, 'post');
+      td.when(ajaxPostDouble(sasAdapter.url, td.matchers.anything(), td.matchers.anything())).thenReturn({
+        success: function(callback) {
+          callback({
+            responseText: sasResponses.callErrorDebug,
+            status: 200
+          });
+          return this;
+        },
+        error: function() {}
+      });
+
+      sasAdapter.call('*', null, function(err, res) {
+        assert.equal(err.type, 'programError', 'Wrong error message type');
+        assert.equal(err.message, 'err msg property value', 'Wrong error message value');
+        assert.equal(err.status, 'sasError', 'Wrong error message status');
+        td.reset();
+        done();
+      });
     });
 
   });
