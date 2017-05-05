@@ -409,9 +409,22 @@ options NOQUOTELENMAX LRECL=32000 spool;
   %if (%symexist(usermessage) = 0) %then %do;
     %let usermessage = blank;
   %end;
+  %else %if %length(&usermessage)=0 %then %do;
+    %let usermessage = blank;
+  %end;
 
   %if (%symexist(logmessage) = 0) %then %do;
     %let logmessage = blank;
+  %end;
+  %else %if %length(&logmessage)=0 %then %do;
+    %let logmessage= blank;
+  %end;
+
+  %if (%symexist(errormessage) = 0) %then %do;
+    %let errormessage = blank;
+  %end;
+  %else %if %length(&errormessage)=0 %then %do;
+    %let errormessage= blank;
   %end;
 
   %if (%symexist(h54src) = 0) %then %do;
@@ -421,9 +434,10 @@ options NOQUOTELENMAX LRECL=32000 spool;
   data _null_;
     file &h54starget.;
     sasdatetime=datetime();
-    put '"usermessage" : "' "&usermessage." '",';
-    put '"logmessage" : "' "&logmessage." '",';
-    put '"requestingUser" : "' "&_metauser." '",';
+    put '"usermessage" : "' "&usermessage" '",';
+    put '"logmessage" : "' "&logmessage" '",';
+    put ‘”errormessage” : "' “&errormessage” '",';
+    put '"requestingUser" : "' "&_metauser" '",';
     put '"requestingPerson" : "' "&_metaperson." '",';
     put '"executingPid" : ' "&sysjobid." ',';
     put '"sasDatetime" : ' sasdatetime ',';
