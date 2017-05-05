@@ -440,7 +440,7 @@ options NOQUOTELENMAX LRECL=32000 spool;
     sasdatetime=datetime();
     put '"usermessage" : "' "&usermessage." '",';
     put '"logmessage" : "' "&logmessage." '",';
-    put '"errormessage" : "' "&errormessage" '",';
+    put '"errormessage" : "' "&errormessage." '",';
     put '"requestingUser" : "' "&_metauser." '",';
     put '"requestingPerson" : "' "&_metaperson." '",';
     put '"executingPid" : ' "&sysjobid." ',';
