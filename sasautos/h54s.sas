@@ -17,75 +17,70 @@
  *
  *                               VERSION HISTORY
  *
- *     Date      Version                        Notes
+ *     Date      Version                        Notes                          
  * ------------ --------- ----------------------------------------------------
  *  Oct 2012     1.0       Deserialisation with no support from the front end
  *                         making 3 passes to generate metadata at back end.
- *                         Entirely SAS Macro based parser.
+ *                         Entirely SAS Macro based parser.                
  *
- *  Sep 2013     2.0       Rewritten with a Javascript-based Table Metadata
- *                         generator. Down to 1 pass. 2.5x increase in
- *                         performance.
+ *  Sep 2013     2.0       Rewritten with a Javascript-based Table Metadata 
+ *                         generator. Down to 1 pass. 2.5x increase in 
+ *                         performance.   
  *
- *  Mar 2014     3.0       Almost a complete rewrite of the parser, now using
- *                         PRXPARSE and PROC FORMAT. 40-60x increase in
+ *  Mar 2014     3.0       Almost a complete rewrite of the parser, now using 
+ *                         PRXPARSE and PROC FORMAT. 40-60x increase in 
  *                         performance. (with thanks to Hadley Christoffels)
  *
  *  Dec 2014     3.1       Moving entirely away from Macro-based processing
- *                         to avoid quoting issues, partial rw to use SYMGET
+ *                         to avoid quoting issues, partial rw to use SYMGET 
  *                         and data step.   (wih thanks to Prajwal Shetty D)
  *
  *  Dec 2015     3.2       Changed _WEBOUT to be variable, added hfsErrorCheck
- *                         and errorchecking in hfsGet and hfsOut to enable
- *                         processing to be stopped with unexpected input
+ *                         and errorchecking in hfsGet and hfsOut to enable  
+ *                         processing to be stopped with unexpected input 
  *
- *  Apr 2017     3.3       Added errormessage attribute to provide a channel
- *                         for SAS developers to send custom error messages to
- *                         the front end
- *
- *          LATEST VERSION ALWAYS AVAILABLE ON github.com/Boemska/h54s
+ *          LATEST VERSION ALWAYS AVAILABLE ON github.com/Boemska/h54s 
  *
  * Macro Quick Reference:
- * =====================
+ * ===================== 
  *
  * %hfsGetDataset(jsonvarname, outdset);
  *      This macro deserialises a JavaScript data object into a SAS table.
  *        jsonvarname:  the name given to the table array from the front end,
- *                      coresponding to macroName in the
+ *                      coresponding to macroName in the 
  *                      h54s.Tables(tableArray, macroName) example
- *        outdset:      the name of the target dataset that the tableArray is
+ *        outdset:      the name of the target dataset that the tableArray is 
  *                      to be deserialised into
  *
  * %hfsHeader;
- *      This macro prepares the output stream for data object output.
+ *      This macro prepares the output stream for data object output. 
  *      Conceptually similar to %STPBEGIN.
- *
+ * 
  * %hfsOutDataset(objectName, libn, dsn);
  *      This macro serialises a SAS dataset to a JavaScript data object.
  *        objectName:   the name of the target JS object that the table will be
  *                      serialised into
- *        libn:         the libname of the source table to be serialised
+ *        libn:         the libname of the source table to be serialised 
  *        dsn:          the dataset name of the source table to be serialised
- *
+ * 
  * %hfsFooter;
- *      This macro provides some standard attributes and then closes the
- *      output stream for data objects. Counterpart to %hfsHeader.
- *      Conceptually similar to %STPEND.
- *
+ *      This macro closes the output stream for data objects. 
+ *      Counterpart to %hfsHeader. Conceptually similar to %STPEND. 
+ * 
  * The other macros defined here are still in development, and although
  * useful they are not complete and should be used with caution.
- *
+ * 
  */
 
 %GLOBAL h54sQuiet h54sDebug h54ssource h54ssource2 h54slrecl h54snotes h54starget;
 
-* to enable quiet mode (minimal log output) set variable to blank
-  otherwise set variable to *. See around 10 lines below for what it does
+* to enable quiet mode (minimal log output) set variable to blank 
+  otherwise set variable to *. See around 10 lines below for what it does 
 ;
 %let h54sQuiet = ;
 
 * to enable debug log output set this variable to blank
-  otherwise set variable to *
+  otherwise set variable to * 
 ;
 %let h54sDebug = *;
 
@@ -93,7 +88,7 @@
 %&h54sQuiet.put H54S Quiet Mode is Enabled;
 
 
-* This macro stores the current values for some of the log level system
+* This macro stores the current values for some of the log level system 
   options so that they can be restored afte processing is complete. Controlled
   by the h54sQuiet macro var above ;
 %macro hfsQuietenDown;
@@ -105,10 +100,10 @@
 %mend;
 
 %macro hfsQuietenUp;
-  &h54sQuiet.options &h54ssource &h54ssource2 lrecl=&h54slrecl &h54snotes;
+  &h54sQuiet.options &h54ssource &h54ssource2 lrecl=&h54slrecl &h54snotes; 
 %mend;
 
-
+           
 * Go quiet and avoid all the garbage in the log ;
 %hfsQuietenDown;
 
@@ -136,7 +131,7 @@ options NOQUOTELENMAX LRECL=32000 spool;
 %macro hfsGetDataset(jsonvarname, outdset) ;
   * keep quiet in the log;
   %hfsQuietenDown;
-
+  
   * check if the jsonvarname sym EXISTS and if not then gracefully quit this macro ;
   %if (%symexist(&jsonvarname.0) = 0) %then %do;
     *abort macro execution and explain why;
@@ -206,22 +201,22 @@ options NOQUOTELENMAX LRECL=32000 spool;
               if upcase(varvalue) = "STRING" then length_prefix = "$" ;
               else length_prefix = "" ;
             end ;
-
+                 
             else if upcase(varname) = "COLLENGTH" then do ;
 &h54sDebug.putlog "H54S:     Header Loop: Column length found: " varvalue;
               collength = input(varvalue, 8.) ;
             end ;
             currentpairnum + 1 ;
           end ;
-          if upcase(coltype) = "STRING" then do;
+          if upcase(coltype) = "STRING" then do;					
 &h54sDebug.putlog "H54S:     Header Loop: Adding " colname " to list of STRINGS";
             string_colnames = catx(" ", string_colnames, colname) ;
           end;
-          else if upcase(coltype) = "NUM" then do;
+          else if upcase(coltype) = "NUM" then do;				
 &h54sDebug.putlog "H54S:     Header Loop: Adding " colname " to list of NUMBERS";
             num_colnames = catx(" ", num_colnames, colname) ;
           end;
-          else if upcase(coltype) = "DATE" then do;
+          else if upcase(coltype) = "DATE" then do;				
 &h54sDebug.putlog "H54S:     Header Loop: Adding " colname " to list of DATES";
             date_colnames = catx(" ", date_colnames, colname) ;
           end;
@@ -242,38 +237,39 @@ options NOQUOTELENMAX LRECL=32000 spool;
 &h54sDebug.putlog "H54S:     After header loop - String cols: &string_colnames.";
 &h54sDebug.putlog "H54S:     After header loop - Num cols: &num_colnames.";
 &h54sDebug.putlog "H54S:     After header loop - Date cols: &date_colnames.";
-      run;
+      run; 
 
       proc format library=work cntlin=colattribs (keep = fmtname colname coltype type rename = (colname = start coltype = label)) ;
       run;
 
       data _null_;
 &h54sDebug.putlog "H54S:     After Format load - HEADER PROCESSING COMPLETE";
-      run;
+      run; 
 
     %end ;
 
-/* The following section processes the non-metadata rows (actual data) */
+/*		The following section processes the non-metadata rows (actual data)
+*/
     %else %do ;
       data jsontemptable&jsonparseloop. ;
 &h54sDebug.putlog "H54S: Starting data step processing of data macro segments -> Segment # &jsonparseloop.";
         length &length_statement. ;
         length jsonString currentrow currentpair varvalue $32000;
         length coltype $10.;
-
+      
         %if &string_colnames. ^= %then %do;
 &h54sDebug.putlog "H54S: -> Segment # &jsonparseloop. contains strings";
           array string_colnames{*} &string_colnames. ;
-        %end;
+        %end;		
         %if &num_colnames. ^= %then %do;
 &h54sDebug.putlog "H54S: -> Segment # &jsonparseloop. contains numbers";
-          array num_colnames{*} &num_colnames. ;
-        %end;
+          array num_colnames{*} &num_colnames. ;	
+        %end;		
         %if &date_colnames. ^= %then %do;
 &h54sDebug.putlog "H54S: -> Segment # &jsonparseloop. contains dates";
           format &date_colnames. datetime20. ;
           array date_colnames{*} &date_colnames. ;
-        %end;
+        %end;		
 
         jsonString = symget("&jsonvarname&jsonparseloop.");
 
@@ -301,7 +297,7 @@ options NOQUOTELENMAX LRECL=32000 spool;
 /*     Colnum is also used as a flag here - if there is a match it will set to 1, check inner if statements */
 /*     As long as colnum is not 1 then the program will loop and search through.                            */
             colnum = 1 ;
-            do until  (colnum=1);
+            do until  (colnum=1); 
               if coltype = "STRING" then  do;
                 %if &string_colnames. ^= %then %do;
                   if varname = upcase(vname(string_colnames(colnum))) then do ;
@@ -317,7 +313,7 @@ options NOQUOTELENMAX LRECL=32000 spool;
                   if varname = upcase(vname(num_colnames(colnum))) then do ;
                     num_colnames(colnum) = input(varvalue, best20.) ;
 &h54sDebug.putlog "H54S  -> Segment # &jsonparseloop.: NUM   : Assigned  " varname " in " num_colnames(colnum);
-                    colnum = 1 ;
+                    colnum = 1 ;				
                     leave;
                   end ;
                 %end;
@@ -334,9 +330,9 @@ options NOQUOTELENMAX LRECL=32000 spool;
               end ;
 
               colnum + 1 ;
-&h54sDebug.putlog "H54S  -> Segment # &jsonparseloop.: Incrementing colnum FROM " colnum;
-            end;
-&h54sDebug.putlog "H54S  -> Segment # &jsonparseloop.: Incrementing currentpairnum FROM " currentpairnum;
+&h54sDebug.putlog "H54S  -> Segment # &jsonparseloop.: Incrementing colnum FROM " colnum; 
+            end;	
+&h54sDebug.putlog "H54S  -> Segment # &jsonparseloop.: Incrementing currentpairnum FROM " currentpairnum; 
             currentpairnum + 1 ;
           end ;
           output;
@@ -413,13 +409,22 @@ options NOQUOTELENMAX LRECL=32000 spool;
   %if (%symexist(usermessage) = 0) %then %do;
     %let usermessage = blank;
   %end;
+  %else %if %length(&usermessage)=0 %then %do;
+    %let usermessage = blank;
+  %end;
 
   %if (%symexist(logmessage) = 0) %then %do;
     %let logmessage = blank;
   %end;
+  %else %if %length(&logmessage)=0 %then %do;
+    %let logmessage= blank;
+  %end;
 
   %if (%symexist(errormessage) = 0) %then %do;
     %let errormessage = blank;
+  %end;
+  %else %if %length(&errormessage)=0 %then %do;
+    %let errormessage= blank;
   %end;
 
   %if (%symexist(h54src) = 0) %then %do;
@@ -452,7 +457,7 @@ options NOQUOTELENMAX LRECL=32000 spool;
 %macro hfsOutSingleMacro(objectName,singleValue);
 * keep quiet in the log;
   %hfsQuietenDown;
-* Note: Use this with care, not best practice. Not quoted, so always quote string JS variables.
+* Note: Use this with care, not best practice. Not quoted, so always quote string JS variables. 
         It is risky outputting macro vars raw. I personally would not do it.
 ;
   data _null_;
@@ -483,12 +488,12 @@ options NOQUOTELENMAX LRECL=32000 spool;
   %end;
 
   * get the name type length and variable position for all vars ;
-  proc contents noprint data=&libn..&dsn
+  proc contents noprint data=&libn..&dsn 
     out=tempCols(keep=name type length varnum);
   run;
-
+  
   * ensure they are in original order ;
-  proc sort data=tempCols; by varnum;
+  proc sort data=tempCols; by varnum; 
   run;
 
   * get first and last column names;
@@ -512,7 +517,7 @@ options NOQUOTELENMAX LRECL=32000 spool;
 
   *create the urlencoded view here;
   proc sql noprint;
-    create view tempOutputView as
+    create view tempOutputView as 
   select
   %do colNo= 1 %to &totalCols;
     /* type 1=numeric, type 2=character in proc contents */
@@ -539,7 +544,7 @@ options NOQUOTELENMAX LRECL=32000 spool;
   data _null_;
     file &h54starget.;
     set tempOutputView end=lastrec;
-    /* strip SAS numeric formats whilst retaining precision */
+    /* strip SAS numeric formats whilst retaining precision */ 
     format _numeric_ best32.;
     %do colNo= 1 %to &totalCols;
       %if &totalCols = 1 %then %do;
@@ -603,9 +608,9 @@ options NOQUOTELENMAX LRECL=32000 spool;
 %mend;
 
 
-* this macro is a stub that needs further testing with earlier versions of SAS.
-  It needs to escape the rest of the program after outputting its message as to
-  return a standardised error object
+* this macro is a stub that needs further testing with earlier versions of SAS. 
+  It needs to escape the rest of the program after outputting its message as to 
+  return a standardised error object 
 ;
 %macro hfsErrorCheck;
 * keep quiet in the log;
