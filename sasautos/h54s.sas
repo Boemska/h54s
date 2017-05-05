@@ -38,6 +38,9 @@
  *  Dec 2015     3.2       Changed _WEBOUT to be variable, added hfsErrorCheck
  *                         and errorchecking in hfsGet and hfsOut to enable
  *                         processing to be stopped with unexpected input
+ *  Apr 2017     3.3       Added errormessage attribute to provide a channel
+ *                         for SAS developers to send custom error messages to
+ *                         the front end
  *
  *          LATEST VERSION ALWAYS AVAILABLE ON github.com/Boemska/h54s
  *
@@ -64,8 +67,9 @@
  *        dsn:          the dataset name of the source table to be serialised
  *
  * %hfsFooter;
- *      This macro closes the output stream for data objects.
- *      Counterpart to %hfsHeader. Conceptually similar to %STPEND.
+ *      This macro provides some standard attributes and then closes the
+ *      output stream for data objects.  Counterpart to %hfsHeader.
+ *      Conceptually similar to %STPEND.
  *
  * The other macros defined here are still in development, and although
  * useful they are not complete and should be used with caution.
@@ -248,8 +252,7 @@ options NOQUOTELENMAX LRECL=32000 spool;
 
     %end ;
 
-/*		The following section processes the non-metadata rows (actual data)
-*/
+/*		The following section processes the non-metadata rows (actual data) */
     %else %do ;
       data jsontemptable&jsonparseloop. ;
 &h54sDebug.putlog "H54S: Starting data step processing of data macro segments -> Segment # &jsonparseloop.";
