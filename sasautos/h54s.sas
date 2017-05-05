@@ -413,13 +413,22 @@ options NOQUOTELENMAX LRECL=32000 spool;
   %if (%symexist(usermessage) = 0) %then %do;
     %let usermessage = blank;
   %end;
+  %else %if %length(&usermessage)=0 %then %do;
+    %let usermessage = blank;
+  %end;
 
   %if (%symexist(logmessage) = 0) %then %do;
     %let logmessage = blank;
   %end;
+  %else %if %length(&logmessage)=0 %then %do;
+    %let logmessage= blank;
+  %end;
 
   %if (%symexist(errormessage) = 0) %then %do;
     %let errormessage = blank;
+  %end;
+  %else %if %length(&errormessage)=0 %then %do;
+    %let errormessage= blank;
   %end;
 
   %if (%symexist(h54src) = 0) %then %do;
@@ -516,13 +525,13 @@ options NOQUOTELENMAX LRECL=32000 spool;
   select
   %do colNo= 1 %to &totalCols;
     /* type 1=numeric, type 2=character in proc contents */
-    %if &&&type&colNo = 2 %then %do;
-      urlencode(strip(&&&name&colNo)) as &&&name&colNo length=30000
+    %if &&type&colNo = 2 %then %do;
+      urlencode(strip(&&name&colNo)) as &&name&colNo length=30000
     %end;
     %else %do;
-      &&&name&colNo as &&&name&colNo
+      &&name&colNo as &&name&colNo
     %end;
-    %if &&&name&colNo ne &lastCol %then %do;
+    %if &&name&colNo ne &lastCol %then %do;
       ,
     %end;
   %end;
@@ -543,46 +552,46 @@ options NOQUOTELENMAX LRECL=32000 spool;
     format _numeric_ best32.;
     %do colNo= 1 %to &totalCols;
       %if &totalCols = 1 %then %do;
-        %if &&&type&colNo = 2 %then %do;
-          put '{"' "&&&name&colNo" '":"' &&&name&colNo +(-1) '"}';
+        %if &&type&colNo = 2 %then %do;
+          put '{"' "&&name&colNo" '":"' &&name&colNo +(-1) '"}';
           if not lastrec then put ",";
         %end;
-        %else %if &&&type&colNo = 1 %then %do;
-          if &&&name&colNo = . then put '{"' "&&&name&colNo" '":' 'null ' +(-1) '}';
-          else put '{"' "&&&name&colNo" '":' &&&name&colNo +(-1) '}';
+        %else %if &&type&colNo = 1 %then %do;
+          if &&name&colNo = . then put '{"' "&&name&colNo" '":' 'null ' +(-1) '}';
+          else put '{"' "&&name&colNo" '":' &&name&colNo +(-1) '}';
           if not lastrec then put ",";
         %end;
       %end;
 
-      %else %if &&&name&colNo = &firstCol %then %do;
-        %if &&&type&colNo = 2 %then %do;
-          put '{"' "&&&name&colNo" '":"' &&&name&colNo +(-1) '",';
+      %else %if &&name&colNo = &firstCol %then %do;
+        %if &&type&colNo = 2 %then %do;
+          put '{"' "&&name&colNo" '":"' &&name&colNo +(-1) '",';
         %end;
-        %else %if &&&type&colNo = 1 %then %do;
-          if &&&name&colNo = . then put '{"' "&&&name&colNo" '":' 'null ' +(-1) ',';
-          else put '{"' "&&&name&colNo" '":' &&&name&colNo +(-1) ',';
+        %else %if &&type&colNo = 1 %then %do;
+          if &&name&colNo = . then put '{"' "&&name&colNo" '":' 'null ' +(-1) ',';
+          else put '{"' "&&name&colNo" '":' &&name&colNo +(-1) ',';
         %end;
       %end;
 
-      %else %if &&&name&colNo = &lastCol %then %do;
-        %if &&&type&colNo = 2 %then %do;
-          put '"' "&&&name&colNo" '":"' &&&name&colNo +(-1) '"}';
+      %else %if &&name&colNo = &lastCol %then %do;
+        %if &&type&colNo = 2 %then %do;
+          put '"' "&&name&colNo" '":"' &&name&colNo +(-1) '"}';
           if not lastrec then put ",";
         %end;
-        %else %if &&&type&colNo = 1 %then %do;
-          if &&&name&colNo = . then put '"' "&&&name&colNo" '":' 'null ' +(-1) '}';
-          else put '"' "&&&name&colNo" '":' &&&name&colNo +(-1) '}';
+        %else %if &&type&colNo = 1 %then %do;
+          if &&name&colNo = . then put '"' "&&name&colNo" '":' 'null ' +(-1) '}';
+          else put '"' "&&name&colNo" '":' &&name&colNo +(-1) '}';
           if not lastrec then put ",";
         %end;
       %end;
 
       %else %do;
-        %if &&&type&colNo = 2 %then %do;
-          put '"' "&&&name&colNo" '":"' &&&name&colNo +(-1) '",';
+        %if &&type&colNo = 2 %then %do;
+          put '"' "&&name&colNo" '":"' &&name&colNo +(-1) '",';
         %end;
-        %else %if &&&type&colNo = 1 %then %do;
-          if &&&name&colNo = . then put '"' "&&&name&colNo" '":' 'null ' +(-1) ',';
-          else put '"' "&&&name&colNo" '":' &&&name&colNo +(-1) ',';
+        %else %if &&type&colNo = 1 %then %do;
+          if &&name&colNo = . then put '"' "&&name&colNo" '":' 'null ' +(-1) ',';
+          else put '"' "&&name&colNo" '":' &&name&colNo +(-1) ',';
         %end;
       %end;
     %end;
