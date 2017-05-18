@@ -1,5 +1,5 @@
 /* global describe, it, assert, serverData, h54s, proclaim */
-describe('h54s integration -', function() {
+describe('h54s unit -', function() {
   describe('Utils test:', function() {
 
     it('Server response with errors', function(done) {
