@@ -98,17 +98,10 @@ describe('h54s unit -', function() {
           dt_some_date: date // jshint ignore:line
         }
       ], 'file');
-      var tableData = new h54s.Tables([
-        {
-          dt_some_date: date // jshint ignore:line
-        }
-      ], 'table');
 
       var reader = new FileReader();
-      reader.onload = function(){
-        var data = JSON.parse(reader.result);
-        assert.isNotInstanceOf(data[0].dt_some_date, Date, 'Date is not converted');
-        assert.isNumber(data[0].dt_some_date, 'Date is not converted');
+      reader.onload = function() {
+        assert.isTrue(!isNaN(reader.result), 'Expected number representation of date');
         done();
       };
       reader.readAsText(fileData._files.file[1]);

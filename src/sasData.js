@@ -70,29 +70,64 @@ SasData.prototype.addTable = function(table, macroName, specs) {
     }
   }
 
-  if(!specs) {
-    specs = {};
-  }
   var i, j, //counters used latter in code
+      row, val, type,
+      specKeys = [],
       specialChars = ['"', '\\', '/', '\n', '\t', '\f', '\r', '\b'];
 
-  //going backwards and removing empty rows
-  for (i = table.length - 1; i >= 0; i--) {
-    var row = table[i];
+  if(!specs) {
+    specs = {};
 
-    if(typeof row !== 'object') {
-      throw new h54sError('argumentError', 'Table item is not an object');
-    }
+    for (i = 0; i < table.length; i++) {
+      row = table[i];
 
-    for(key in row) {
-      if(row.hasOwnProperty(key)) {
-        var val  = row[key];
-        var type = typeof val;
+      if(typeof row !== 'object') {
+        throw new h54sError('argumentError', 'Table item is not an object');
+      }
 
-        if(row[key] === null || row[key] === undefined) {
-          delete row[key];
-          continue;
+      for(key in row) {
+        if(row.hasOwnProperty(key)) {
+          val  = row[key];
+          type = typeof val;
+
+          if(specs[key] === undefined) {
+            specKeys.push(key);
+            specs[key] = {};
+
+            if (type === 'number') {
+              if(val < Number.MIN_SAFE_INTEGER || val > Number.MAX_SAFE_INTEGER) {
+                logs.addApplicationLog('Object[' + i + '].' + key + ' - This value exceeds expected numeric precision.');
+              }
+              specs[key].colType   = 'num';
+              specs[key].colLength = 8;
+            } else if (type === 'string' && !(val instanceof Date)) { // straightforward string
+              specs[key].colType    = 'string';
+              specs[key].colLength  = val.length;
+            } else if(val instanceof Date) {
+              specs[key].colType   = 'date';
+              specs[key].colLength = 8;
+            } else if (type === 'object') {
+              specs[key].colType   = 'json';
+              specs[key].colLength = JSON.stringify(val).length;
+            }
+          }
         }
+      }
+    }
+  } else {
+    specKeys = Object.keys(specs);
+  }
+
+  var sasCsv = '';
+
+  // we need two loops - the first one is creating specs and validating
+  for (i = 0; i < table.length; i++) {
+    row = table[i];
+    for(j = 0; j < specKeys.length; j++) {
+      key = specKeys[j];
+      if(row.hasOwnProperty(key)) {
+        val  = row[key];
+        type = typeof val;
 
         if(type === 'number' && isNaN(val)) {
           throw new h54sError('typeError', 'NaN value in one of the values (columns) is not allowed');
@@ -103,32 +138,12 @@ SasData.prototype.addTable = function(table, macroName, specs) {
         if(val === true || val === false) {
           throw new h54sError('typeError', 'Boolean value in one of the values (columns) is not allowed');
         }
+        if(type === 'string' && val.indexOf('\n') !== -1) {
+          throw new h54sError('typeError', 'New line character is not supported');
+        }
 
-        if(specs[key] === undefined) {
-          specs[key] = {};
 
-          if (type === 'number') {
-            if(val < Number.MIN_SAFE_INTEGER || val > Number.MAX_SAFE_INTEGER) {
-              logs.addApplicationLog('Object[' + i + '].' + key + ' - This value exceeds expected numeric precision.');
-            }
-            specs[key].colType   = 'num';
-            specs[key].colLength = 8;
-          } else if (type === 'string' && !(val instanceof Date)) { // straightforward string
-            specs[key].colType    = 'string';
-            specs[key].colLength  = val.length;
-            for(j = 0; j < val.length; j++) {
-              if(specialChars.indexOf(val[j]) !== -1) {
-                specs[key].colLength++;
-              }
-            }
-          } else if(val instanceof Date) {
-            specs[key].colType   = 'date';
-            specs[key].colLength = 8;
-          } else if (type === 'object') {
-            specs[key].colType   = 'json';
-            specs[key].colLength = JSON.stringify(val).length;
-          }
-        } else if ((type === 'number' && specs[key].colType !== 'num') ||
+        if ((type === 'number' && specs[key].colType !== 'num') ||
           (type === 'string' && !(val instanceof Date) && specs[key].colType !== 'string') ||
           (val instanceof Date && specs[key].colType !== 'date') ||
           ((type === 'object' && val.constructor !== Date) && specs[key].colType !== 'json'))
@@ -141,26 +156,57 @@ SasData.prototype.addTable = function(table, macroName, specs) {
         }
 
         if (val instanceof Date) {
-          table[i][key] = toSasDateTime(val);
+          val = toSasDateTime(val);
+        }
+
+        switch(specs[key].colType) {
+          case 'num':
+          case 'date':
+            sasCsv += val;
+            break;
+          case 'string':
+            sasCsv += '"' + val.replace('"', '""') + '"';
+            var colLength = val.length;
+            for(var k = 0; k < val.length; k++) {
+              if(specialChars.indexOf(val[k]) !== -1) {
+                colLength++;
+              } else {
+                var code = val.charCodeAt(k);
+                if(code > 0xffff) {
+                  colLength += 3;
+                } else if(code > 0x7ff) {
+                  colLength += 2;
+                } else if(code > 0x7f) {
+                  colLength += 1;
+                }
+              }
+            }
+            // -2 for the csv quotation added at the beginning of the block
+            specs[key].colLength = Math.max(specs[key].colLength, colLength - 2);
+            break;
+          case 'object':
+            sasCsv += '"' + JSON.stringidy(val).replace('"', '""') + '"';
+            break;
         }
       }
+      // do not insert if it's the last column
+      if(j < specKeys.length - 1) {
+        sasCsv += ',';
+      }
     }
-
-    //delete row if it's empty
-    if(Object.keys(row).length === 0) {
-      table.splice(i, 1);
+    if(i < table.length - 1) {
+      sasCsv += '\n';
     }
   }
 
   //convert specs to csv with pipes
-  var specString = Object.keys(specs).map(function(key) {
+  var specString = specKeys.map(function(key) {
     return key + ',' + specs[key].colType + ',' + specs[key].colLength;
   }).join('|');
 
-  var sasJson = JSON.stringify(table).replace('\\"', '""');
   this._files[macroName] = [
     specString,
-    new File([sasJson], 'table.json', {type: 'text/plain;charset=UTF-8'})
+    new File([sasCsv], 'table.csv', {type: 'text/csv;charset=UTF-8'})
   ];
 };
 

@@ -55,31 +55,6 @@ describe('h54s unit -', function() {
       done();
     });
 
-    it('Remove empty table row', function(done) {
-      var table = new h54s.Tables([
-        {prop: 'test'},
-        {},
-        {prop: 'test2'},
-        {prop1: null, prop2: undefined}
-      ], 'data');
-      assert.deepEqual(JSON.parse(table._tables.data[1]), [{prop: 'test'}, {prop: 'test2'}], 'Table data is wrong after removing empty row');
-
-
-      table = new h54s.SasData([
-        {prop: 'test'},
-        {},
-        {prop: 'test2'},
-        {prop1: null, prop2: undefined}
-      ], 'data');
-
-      var reader = new FileReader();
-      reader.onload = function() {
-        assert.deepEqual(JSON.parse(reader.result), [{prop: 'test'}, {prop: 'test2'}], 'Table data is wrong after removing empty row');
-        done();
-      };
-      reader.readAsText(table._files.data[1]);
-    });
-
     it('Test parameter threshold', function(done) {
       var rows = [];
 
@@ -127,6 +102,20 @@ describe('h54s unit -', function() {
 
       assert.isDefined(sasData._files.macroName, 'Table not set');
       done();
+    });
+
+    it('Test SasData CSV value', function(done) {
+      var sasData = new h54s.SasData([
+        {col1: 1},
+        {col2: 'str'}
+      ], 'macroName');
+
+      var reader = new FileReader();
+      reader.onload = function() {
+        assert.equal(reader.result, '1,\n,"str"', 'Wrong csv string');
+        done();
+      };
+      reader.readAsText(sasData._files.macroName[1]);
     });
 
     it('Test both Files and Tables in SasData object', function(done) {
