@@ -263,7 +263,7 @@ describe('h54s integration -', function() {
         c1: '\\',
         c2: '/',
         // we don't support new line with new CSV
-        // it's commented out until we decide if it should be supported 
+        // it's commented out until we decide if it should be supported
         // c3: '\n',
         c4: '\t',
         c5: '\f',
