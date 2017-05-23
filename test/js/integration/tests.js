@@ -251,6 +251,36 @@ describe('h54s integration -', function() {
       });
     });
 
+    it('Test SasData with multiple tables', function(done) {
+      this.timeout(10000);
+
+      var data1 = [
+        {
+          data: 'test 1'
+        }
+      ];
+      var data2 = [
+        {
+          data: 'test 2'
+        }
+      ];
+
+      var tables = new h54s.SasData(data1, 'data_one');
+      tables.addTable(data2, 'data_two');
+
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url,
+        metadataRoot: serverData.metadataRoot
+      });
+
+      sasAdapter.call('bounceUploadData', tables, function(err, res) {
+        assert.isUndefined(err, 'We got error on sas program ajax call');
+        assert.deepEqual(res.data_one, data1, 'Bounce data1 is different');
+        assert.deepEqual(res.data_two, data2, 'Bounce data2 is different');
+        done();
+      });
+    });
+
     it('Test json character escape in SasData', function(done) {
       this.timeout(10000);
       var sasAdapter = new h54s({
