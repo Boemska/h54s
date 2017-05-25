@@ -405,5 +405,21 @@ describe('h54s integration -', function() {
       });
     });
 
+    it('Test file sending', function(done) {
+      this.timeout(10000);
+      var sasAdapter = new h54s({
+        hostUrl: serverData.url,
+        metadataRoot: serverData.metadataRoot
+      });
+
+      var data = new h54s.SasData(new File(['some string'], 'file'), 'fileMacro');
+
+      sasAdapter.call('bounceUploadData', data, function(err, res) {
+        assert.isUndefined(err, 'We got error on sas program ajax call');
+        done();
+      });
+
+    });
+
   });
 });

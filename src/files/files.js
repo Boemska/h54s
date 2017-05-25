@@ -36,7 +36,7 @@ Files.prototype.add = function(file, macroName) {
   }
 
   this._files[macroName] = [
-    JSON.stringify({contentType: 'FILE', fileName: file.name}),
+    'FILE',
     file
   ];
 };
