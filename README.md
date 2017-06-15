@@ -66,7 +66,7 @@ run;
 %hfsFooter;
 ```
 
-4. Save your Stored Process.
+4. Save your Stored Process.  If you are using Enterprise Guide to do this, be sure to check "Global Macro Variables" under the "Include code for" dropdown.
 
 5. Log on to your SAS Stored Process Web Application and run the STP. It should produce something like this output:
 
