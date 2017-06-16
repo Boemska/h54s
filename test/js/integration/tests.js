@@ -1,6 +1,6 @@
 /* global describe, it, assert, serverData, h54s, getRandomAsciiChars, proclaim */
 describe('h54s integration -', function() {
-  describe('Characters and tables tests:', function() {
+  describe('Integration tests:', function() {
 
     before(function(done) {
       var sasAdapter = new h54s({
@@ -418,7 +418,6 @@ describe('h54s integration -', function() {
         assert.isUndefined(err, 'We got error on sas program ajax call');
         done();
       });
-
     });
 
   });
