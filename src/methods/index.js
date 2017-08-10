@@ -1,5 +1,8 @@
 var h54sError = require('../error.js');
 var logs = require('../logs.js');
+var Tables = require('../tables');
+var SasData = require('../sasData.js');
+var Files = require('../files');
 
 /*
 * Call Sas program
@@ -22,8 +25,8 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
   if(typeof sasProgram !== 'string') {
     throw new h54sError('argumentError', 'First parameter should be string');
   }
-  if(this.useMultipartFormData === false && !(dataObj instanceof h54s.Tables)) {
-    throw new h54sError('argumentError', 'Cannot send files using application/x-www-form-urlencoded. Please use h54s.Tables or default value for useMultipartFormData');
+  if(this.useMultipartFormData === false && !(dataObj instanceof Tables)) {
+    throw new h54sError('argumentError', 'Cannot send files using application/x-www-form-urlencoded. Please use Tables or default value for useMultipartFormData');
   }
 
   if(!params) {
@@ -36,9 +39,9 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
 
   if(dataObj) {
     var key, dataProvider;
-    if(dataObj instanceof h54s.Tables) {
+    if(dataObj instanceof Tables) {
       dataProvider = dataObj._tables;
-    } else if(dataObj instanceof h54s.Files || dataObj instanceof h54s.SasData){
+    } else if(dataObj instanceof Files || dataObj instanceof SasData){
       dataProvider = dataObj._files;
     } else {
       throw new h54sError('argumentError', 'Wrong type of tables object');
@@ -85,7 +88,7 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
           logs.addApplicationLog(resObj.logmessage, sasProgram);
 
           resObj = self._utils.convertDates(resObj);
-          if(dataObj instanceof h54s.Tables) {
+          if(dataObj instanceof Tables) {
             unescapedResObj = self._utils.unescapeValues(resObj);
           } else {
             unescapedResObj = resObj;
@@ -132,7 +135,7 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
           logs.addApplicationLog(resObj.logmessage, sasProgram);
 
           resObj = self._utils.convertDates(resObj);
-          if(dataObj instanceof h54s.Tables) {
+          if(dataObj instanceof Tables) {
             unescapedResObj = self._utils.unescapeValues(resObj);
           } else {
             unescapedResObj = resObj;

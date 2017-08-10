@@ -1,7 +1,7 @@
 var h54sError = require('./error.js');
 var logs      = require('./logs.js');
-var Tables    = require('./tables/tables.js');
-var Files     = require('./files/files.js');
+var Tables    = require('./tables');
+var Files     = require('./files');
 var toSasDateTime = require('./tables/utils.js').toSasDateTime;
 
 /*

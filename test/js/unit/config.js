@@ -149,13 +149,13 @@ describe('h54s unit -', function() {
           useMultipartFormData: false
         });
         sasAdapter.call('...', sasData, callback);
-      }, 'Cannot send files using application/x-www-form-urlencoded. Please use h54s.Tables or default value for useMultipartFormData', 'Error not thrown.');
+      }, 'Cannot send files using application/x-www-form-urlencoded. Please use Tables or default value for useMultipartFormData', 'Error not thrown.');
       proclaim.throws(function() {
         var sasAdapter = new h54s({
           useMultipartFormData: false
         });
         sasAdapter.call('...', file, callback);
-      }, 'Cannot send files using application/x-www-form-urlencoded. Please use h54s.Tables or default value for useMultipartFormData', 'Error not thrown.');
+      }, 'Cannot send files using application/x-www-form-urlencoded. Please use Tables or default value for useMultipartFormData', 'Error not thrown.');
       td.reset();
       done();
     });
