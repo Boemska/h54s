@@ -355,6 +355,8 @@ Log a user in to the SASLogon application. Example:
 adapter.login('username', 'password', function(status) {
   if(status === -1) {
     //Wrong username or password
+  } else if(status === -2) {
+    //Login is not working
   } else if(status === 200) {
     //Success - user is logged in
   } else {

@@ -203,7 +203,13 @@ module.exports.login = function(user, pass, callback) {
     loginParams[key] = this._aditionalLoginParams[key];
   }
 
+  this._loginAttempts = 0;
+
   this._ajax.post(this.loginUrl, loginParams).success(function(res) {
+    if(++self._loginAttempts === 3) {
+      return callback(-2);
+    }
+
     if(self._utils.needToLogin.call(self, res)) {
       //we are getting form again after redirect
       //and need to login again using the new url
