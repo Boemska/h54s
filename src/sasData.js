@@ -142,8 +142,21 @@ SasData.prototype.addTable = function(table, macroName, specs) {
           throw new h54sError('typeError', 'New line character is not supported');
         }
 
+        // convert null to '.' for numbers and to '' for strings
+        if(val === null) {
+          if(specs[key].colType === 'string') {
+            val = '';
+            type = 'string';
+          } else if(specs[key].colType === 'num') {
+            val = '.';
+            type = 'number';
+          } else {
+            throw new h54sError('typeError', 'Cannot convert null value');
+          }
+        }
 
-        if ((type === 'number' && specs[key].colType !== 'num') ||
+
+        if ((type === 'number' && specs[key].colType !== 'num' && val !== '.') ||
           (type === 'string' && !(val instanceof Date) && specs[key].colType !== 'string') ||
           (val instanceof Date && specs[key].colType !== 'date') ||
           ((type === 'object' && val.constructor !== Date) && specs[key].colType !== 'json'))

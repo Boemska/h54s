@@ -44,6 +44,13 @@ describe('h54s unit -', function() {
         ], 'data');
       }, 'Boolean value in one of the values (columns) is not allowed');
 
+      proclaim.doesNotThrow(function() {
+        new h54s.SasData([
+          {num: 1, str: 'str'},
+          {num: null, str: null}
+        ], 'data');
+      });
+
       done();
     });
 
