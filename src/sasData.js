@@ -194,8 +194,7 @@ SasData.prototype.addTable = function(table, macroName, specs) {
                 }
               }
             }
-            // -2 for the csv quotation added at the beginning of the block
-            specs[key].colLength = Math.max(specs[key].colLength, colLength - 2);
+            specs[key].colLength = Math.max(specs[key].colLength, colLength);
             break;
           case 'object':
             sasCsv += '"' + JSON.stringidy(val).replace('"', '""') + '"';
