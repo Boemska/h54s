@@ -466,37 +466,37 @@ Set debugging mode - `debug:true`:
 adapter.setDebugMode();
 ```
 
-###unsetDebugMode()
+### unsetDebugMode()
 Unset  debugging mode - `debug:false`:
 ```js
 adapter.unsetDebugMode();
 ```
 
-###clearApplicationLogs()
+### clearApplicationLogs()
 Clears the application logs array
 ```js
 adapter.clearApplicationLogs();
 ```
 
-###clearDebugData()
+### clearDebugData()
 Clears the debug data array
 ```js
 adapter.clearDebugData()
 ```
 
-###clearSasErrors()
+### clearSasErrors()
 Clears the SAS errors array
 ```js
 adapter.clearSasErrors()
 ```
 
-###clearFailedRequests()
+### clearFailedRequests()
 Clears the failed requests array
 ```js
 adapter.clearFailedRequests()
 ```
 
-###clearAllLogs()
+### clearAllLogs()
 Clears all log arrays
 ```js
 adapter.clearAllLogs()
