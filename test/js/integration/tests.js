@@ -394,9 +394,9 @@ describe('h54s integration -', function() {
         metadataRoot: serverData.metadataRoot
       });
 
-      var data = new h54s.SasData(new File(['some string'], 'file'), 'fileMacro');
+      var data = new h54s.SasData(new File(['some string'], 'some_file'), 'fileMacro');
 
-      sasAdapter.call('bounceUploadData', data, function(err, res) {
+      sasAdapter.call('bounceUploadFile', data, function(err, res) {
         assert.isUndefined(err, 'We got error on sas program ajax call');
         done();
       });
