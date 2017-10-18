@@ -281,7 +281,7 @@ describe('h54s integration -', function() {
       });
     });
 
-    it('Test json character escape in SasData', function(done) {
+    it('Test json character escape in SasData and empty string', function(done) {
       this.timeout(10000);
       var sasAdapter = new h54s({
         hostUrl: serverData.url,
@@ -298,7 +298,8 @@ describe('h54s integration -', function() {
         c4: '\t',
         c5: '\f',
         c6: '\r',
-        c7: '\b'
+        c7: '\b',
+        c8: ''
       };
 
       var table = new h54s.SasData([
@@ -317,6 +318,7 @@ describe('h54s integration -', function() {
         assert.equal(res.data[0].c5, data.c5, 'Bounce data is different - c5');
         assert.equal(res.data[0].c6, data.c6, 'Bounce data is different - c6');
         assert.equal(res.data[0].c7, data.c7, 'Bounce data is different - c7');
+        assert.equal(res.data[0].c8, data.c8, 'Bounce data is different - c8');
         done();
       });
     });

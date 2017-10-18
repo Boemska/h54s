@@ -194,7 +194,8 @@ SasData.prototype.addTable = function(table, macroName, specs) {
                 }
               }
             }
-            specs[key].colLength = Math.max(specs[key].colLength, colLength);
+            // use maximum value between max previous, current value and 1 (first two can be 0 wich is not supported)
+            specs[key].colLength = Math.max(specs[key].colLength, colLength, 1);
             break;
           case 'object':
             sasCsv += '"' + JSON.stringidy(val).replace(/"/g, '""') + '"';
