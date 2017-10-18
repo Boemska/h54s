@@ -218,7 +218,7 @@ SasData.prototype.addTable = function(table, macroName, specs) {
 
   this._files[macroName] = [
     specString,
-    new File([sasCsv], 'table.csv', {type: 'text/csv;charset=UTF-8'})
+    new Blob([sasCsv], {type: 'text/csv;charset=UTF-8'})
   ];
 };
 
