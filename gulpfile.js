@@ -31,6 +31,7 @@ var filePaths = {
   sasResponses: './test/js/sas_responses/**/*.js',
   browserifyTestFiles: './test/js/browserify/**/*.js',
   integrationTestFiles: './test/js/integration/**/*.js',
+  performanceTestFiles: ['./test/js/performance/response.js', './test/js/performance/test.js'],
   helperTestFiles: './test/js/*.js',
   testRemoteConfigFile: './test/h54sConfig.json'
 };
@@ -212,6 +213,30 @@ gulp.task('test-ugly', ['jshint', 'build-ugly'], function(done) {
     ],
     singleRun: true
   }, done).start();
+});
+
+gulp.task('test-performance', ['build-dev'], function(done) {
+  var files = [
+    {pattern: 'test/*.json', served: true, included: false},
+    {pattern: filePaths.devBuild, served: true},
+    {pattern: filePaths.helperTestFiles}
+  ].concat(filePaths.performanceTestFiles);
+
+  new karma.Server({
+    configFile: __dirname + '/karma.conf.js',
+    files: files,
+    frameworks: ['browserify', 'mocha', 'proclaim', 'testdouble'],
+    preprocessors: {
+      './test/js/browserify/**/*.js': [ 'browserify' ]
+    },
+    browserify: {
+      debug: true
+    },
+    singleRun: true
+  }, function() {
+    done();
+    process.exit();
+  }).start();
 });
 
 gulp.task('release', gulpsync.sync(['set-production', 'clean', 'test-release', 'test-ugly']), function(done) {
