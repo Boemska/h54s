@@ -117,5 +117,8 @@ h54s.Tables = require('./tables');
 h54s.Files = require('./files');
 h54s.SasData = require('./sasData.js');
 
+h54s.fromSasDateTime = require('./methods/utils.js').fromSasDateTime;
+h54s.toSasDateTime = require('./tables/utils.js').toSasDateTime;
+
 //self invoked function module
 require('./ie_polyfills.js');

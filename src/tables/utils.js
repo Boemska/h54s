@@ -101,11 +101,7 @@ module.exports.convertTableObject = function(inObject, chunkThreshold) {
         }
         thisSpec.encodedLength = targetArray[currentTarget][j][key].length;
       } else if(isDate) {
-        thisSpec.colName                    = key;
-        thisSpec.colType                    = 'date';
-        thisSpec.colLength                  = 8;
-        targetArray[currentTarget][j][key]  = self.toSasDateTime(thisValue);
-        thisSpec.encodedLength              = targetArray[currentTarget][j][key].toString().length;
+        throw new h54sError('typeError', 'Date type not supported. Please use h54s.toSasDateTime function to convert it');
       } else if (thisType == 'object') {
         thisSpec.colName                    = key;
         thisSpec.colType                    = 'json';

@@ -88,23 +88,10 @@ describe('h54s unit -', function() {
       });
     });
 
-    it('Test date', function(done) {
-      this.timeout(300);
-      var sasAdapter = new h54s();
+    it('Test date', function() {
       var date = new Date();
-
-      var fileData = new h54s.SasData([
-        {
-          dt_some_date: date // jshint ignore:line
-        }
-      ], 'file');
-
-      var reader = new FileReader();
-      reader.onload = function() {
-        assert.isTrue(!isNaN(reader.result), 'Expected number representation of date');
-        done();
-      };
-      reader.readAsText(fileData._files.file[1]);
+      var dateConvertedBack = h54s.fromSasDateTime(h54s.toSasDateTime(date));
+      assert.equal(Math.round(dateConvertedBack.getTime() / 1000), Math.round(date.getTime() / 1000), 'Date conversion incorrect');
     });
 
     it('Set debug mode and get errors when first request fails', function(done) {

@@ -176,23 +176,6 @@ module.exports.fromSasDateTime = function (sasDate) {
   return jsDate;
 };
 
-/*
-* Convert sas timestamps to javascript Date object
-*
-* @param {object} obj
-*
-*/
-module.exports.convertDates = function(obj) {
-  for (var key in obj) {
-    if (typeof obj[key] === 'number' && (key.indexOf('dt_') === 0 || key.indexOf('DT_') === 0)) {
-      obj[key] = this.fromSasDateTime(obj[key]);
-    } else if(typeof obj === 'object') {
-      this.convertDates(obj[key]);
-    }
-  }
-  return obj;
-};
-
 module.exports.needToLogin = function(responseObj) {
   var patt = /<form.+action="(.*Logon[^"]*).*>/;
   var matches = patt.exec(responseObj.responseText);

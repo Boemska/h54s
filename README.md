@@ -180,11 +180,11 @@ Data Types between the front-end and back-end are mapped as follows:
 |------------|----------|-------------------------------------------------------------------------|
 | String     | String   | ASCII only at the moment. Working on UTF support                        |
 | Numeric    | Numeric  | Same precision in both SAS and JS. Enforced.                            |
-| Date()     | Datetime | JS Date objects are converted to SAS datetimes. UTC locale is stripped. |
 | Boolean    |          | Not permitted by adapter. Throws typeError. Use numerics for bools.     |
 | Null       |          | Ignored. The value for the column is not included for that row.         |
 | Undefined  |          | Same as Null                                                            |
 
+To send dates to SAS, use `h54s.toSasDateTime(date)` to convert instance of `Date` object to numeric SAS date value.
 
 #### SAS to JavaScript
 
@@ -192,9 +192,9 @@ Data Types between the front-end and back-end are mapped as follows:
 |----------|------------|-----------------------------------------------------------------------------------------------------|
 | String   | String     | NewLine characters are stripped.                                                                    |
 | Numeric  | Numeric    | Same precision in both SAS and JS.                                                                  |
-| Datetime | Date()     | SAS Datetime columns are converted to Date() objects if their column name is prefixed with 'DT_'    |
-| Date     |            | Unsupported. You won't be able to transmit data as SAS Dates. Convert, use output views and DHMS()   |
+| Date     |            | Unsupported. You won't be able to transmit data as SAS Dates. Convert, use output views and DHMS()  |
 
+To parse numeric dates sent from SAS, use `h54s.fromSasDateTime(date)` to convert numeric SAS date value to JavaScript `Date` object
 
 ### But what about Parameters? I'm used to Parameters
 
