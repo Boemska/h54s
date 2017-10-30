@@ -79,7 +79,7 @@ module.exports.convertTableObject = function(inObject, chunkThreshold) {
 
       // get type... if it is an object then convert it to json and store as a string
       var thisType  = typeof (thisValue);
-      var isDate = thisValue instanceof Date;
+
       if (thisType === 'number') { // straightforward number
         if(thisValue < Number.MIN_SAFE_INTEGER || thisValue > Number.MAX_SAFE_INTEGER) {
           logs.addApplicationLog('Object[' + i + '].' + key + ' - This value exceeds expected numeric precision.');
@@ -89,7 +89,7 @@ module.exports.convertTableObject = function(inObject, chunkThreshold) {
         thisSpec.colLength                  = 8;
         thisSpec.encodedLength              = thisValue.toString().length;
         targetArray[currentTarget][j][key]  = thisValue;
-      } else if (thisType === 'string' && !isDate) { // straightforward string
+      } else if (thisType === 'string') {
         thisSpec.colName    = key;
         thisSpec.colType    = 'string';
         thisSpec.colLength  = thisValue.length;
@@ -100,7 +100,7 @@ module.exports.convertTableObject = function(inObject, chunkThreshold) {
           targetArray[currentTarget][j][key] = encodeURIComponent(thisValue).replace(/'/g, '%27');
         }
         thisSpec.encodedLength = targetArray[currentTarget][j][key].length;
-      } else if(isDate) {
+      } else if(thisValue instanceof Date) {
         throw new h54sError('typeError', 'Date type not supported. Please use h54s.toSasDateTime function to convert it');
       } else if (thisType == 'object') {
         thisSpec.colName                    = key;

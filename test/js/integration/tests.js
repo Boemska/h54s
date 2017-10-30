@@ -54,12 +54,12 @@ describe('h54s integration -', function() {
       var date = new Date();
       var data = new h54s.Tables([
         {
-          dt_some_date: date // jshint ignore:line
+          date: h54s.toSasDateTime(date)
         }
       ], 'data');
       sasAdapter.call('BounceData', data, function(err, res) {
         //sas is outputing data in seconds, so we need to round those dates
-        var resSeconds = Math.round(res.outputdata[0].DT_SOME_DATE.getTime() / 1000); // jshint ignore:line
+        var resSeconds = Math.round(h54s.fromSasDateTime(res.outputdata[0].DATE).getTime() / 1000); // jshint ignore:line
         var dateSeconds = Math.round(date.getTime() / 1000);
         assert.isUndefined(err, 'We got error on sas program ajax call');
         assert.equal(resSeconds, dateSeconds, 'Date is not the same');
