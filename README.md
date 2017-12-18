@@ -209,7 +209,7 @@ var paramsRow={};
 
 var paramTable = [paramsRow];
 
-    data.add(paramTable,'controlTable');
+    data.addTable(paramTable,'controlTable');
 ```
 
 and the following SAS code would get you a table called `WORK.CONTROL` with three columns and one row:
@@ -377,8 +377,11 @@ adapter.logout(function(err) {
 })
 ```
 
-### h54s.SasData(tableArray, macroName [, specs])
-Creates an object which stores tables, which are then sent back to SAS via the `call` method.
+### h54s.SasData(tableArray | File, macroName [, specs])
+Creates an object which stores tables or files, which are then sent back to SAS via the `call` method.
+Note that `specs` parameter is ignore if the first parameter is instance of `Files` object.
+For more information how to create File object, check `h54s.SasData.prototype.addFile` method.
+
 This is equivalent to `h54s.Tables` constructor deprecated in v0.11.
 
 ```js
@@ -396,7 +399,7 @@ var data = new h54s.SasData([
 ], 'data', specs);
 ```
 
-### h54s.SasData.prototype.add(tableArray, macroName [, specs])
+### h54s.SasData.prototype.addTable(tableArray, macroName [, specs])
 For specs object check the previous description (h54s.SasData) - it accepts the same specs object.
 
 Adds additional tables to a SasData object:
@@ -407,12 +410,24 @@ var data = new h54s.SasData([
   { name: 'Abdul', sex: 'M', weight: 133.7 }
 ], 'datain');
 
-data.add([
+data.addTable([
   {
     someNumber: 42.0,
     someString: 'Stuff'
   }
 ], 'moredata');
+```
+
+### h54s.SasData.prototype.addFile(File, macroName)
+Add an instance of File object
+
+```js
+var data = new h54s.SasData([
+  { name: 'Allan', sex: 'M', weight: 101.1 },
+  { name: 'Abdul', sex: 'M', weight: 133.7 }
+], 'datain');
+
+data.addFile(new File(['content'], 'myFileName'), 'myFile');
 ```
 
 
