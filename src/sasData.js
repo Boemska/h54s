@@ -17,7 +17,7 @@ function SasData(data, macroName, specs) {
   if(data instanceof Array) {
     this._files = {};
     this.addTable(data, macroName, specs);
-  } else if(data instanceof File) {
+  } else if(data instanceof File || data instanceof Blob) {
     Files.call(this, data, macroName);
   } else {
     throw new h54sError('argumentError', 'Data argument wrong type or missing');

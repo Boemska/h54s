@@ -22,7 +22,7 @@ function Files(file, macroName) {
 */
 Files.prototype.add = function(file, macroName) {
   if(file && macroName) {
-    if(!(file instanceof File)) {
+    if(!(file instanceof File || file instanceof Blob)) {
       throw new h54sError('argumentError', 'First argument must be instance of File object');
     }
     if(typeof macroName !== 'string') {
