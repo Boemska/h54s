@@ -1,5 +1,5 @@
-var fs = require('fs');
-var os = require('os');
+const fs = require('fs');
+const os = require('os');
 
 module.exports.numberValidator = function (input) {
   if(isNaN(input)) {
@@ -10,9 +10,9 @@ module.exports.numberValidator = function (input) {
 }
 
 module.exports.pathValidator = function (input) {
-  input = input.replace('~', os.homedir());
+  input = input.trim().replace('~', os.homedir());
   try {
-    var stat = fs.lstatSync(input.replace('~', os.homedir()));
+    let stat = fs.lstatSync(input.replace('~', os.homedir()));
     return stat.isFile() || 'Invalid path';
   } catch(e) {
     return 'Invalid path';
@@ -33,10 +33,10 @@ module.exports.numberOrDataTypesValidator = function(input) {
 module.exports.chunkValidator = function (input) {
   if(isNaN(input)) {
     return 'This value needs to be a number';
-  } 
+  }
   if(input > 32767) {
     return 'This number must be less than 32767';
-  } 
+  }
   if(input < 50) {
     return 'This number must be greater than 50';
   }

@@ -1,11 +1,11 @@
 "use strict";
 
-var childProcess = require('child_process');
-var fs = require('fs');
-var path = require('path');
+const childProcess = require('child_process');
+const fs = require('fs');
+const path = require('path');
 
 module.exports = function (execFile, log) {
-  var child = childProcess.spawn(execFile, ['-stdio']);
+  const child = childProcess.spawn(execFile, ['-stdio']);
 
   if(log) {
     var outStream = fs.createWriteStream(path.join(__dirname, '..', 'log', 'sas-out.log'));
@@ -13,7 +13,7 @@ module.exports = function (execFile, log) {
   }
 
   return new Promise((fulfill, reject) => {
-    var outData = '',
+    let outData = '',
         errData = '',
         startTime,
         startupTime,
@@ -50,8 +50,8 @@ module.exports = function (execFile, log) {
       }
     }
     function stderrCallback(chunk) {
-      var patt = /(\d+\s+)?(%put )?--codeend--;?/g;
-      var scriptEnded = patt.test(chunk.toString());
+      const patt = /(\d+\s+)?(%put )?--codeend--;?/g;
+      const scriptEnded = patt.test(chunk.toString());
 
       if(log) {
         errStream.write(chunk);

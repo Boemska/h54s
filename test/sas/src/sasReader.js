@@ -1,7 +1,7 @@
-var fs = require('fs');
-var path = require('path');
+const fs = require('fs');
+const path = require('path');
 
-var methodUtils = require(path.join(__dirname, '../../..', 'src/methods/utils.js'));
+const methodUtils = require(path.join(__dirname, '../../..', 'src/methods/utils.js'));
 
 module.exports = function() {
   return new Promise((resolve, reject) => {
@@ -10,12 +10,16 @@ module.exports = function() {
         return reject(err);
       }
 
-      var patt = /DATA[^1|0]=(\[.*\])/gm;
-      var matches = patt.exec(data.toString());
-      matches.shift();
+      const matches = [];
+      const patt = /DATA[^1|0]=(\[.*\])/gm;
+
+      let match;
+      while(match = patt.exec(data.toString())) {
+        matches.push(match[1]);
+      }
 
       resolve(matches.map(val => {
-        return methodUtils.unescapeValues(methodUtils.convertDates(JSON.parse(val)));
+        return methodUtils.unescapeValues(JSON.parse(val));
       }).reduce((prev, cur) => {
         return prev.concat(cur);
       }));

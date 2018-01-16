@@ -1,29 +1,33 @@
 #! /usr/bin/env node
 "use strict";
 
-var inquirer = require('inquirer');
-var fs = require('fs');
-var suspend = require('suspend');
-var readline = require('readline');
-var clc = require('cli-color');
-var rl = readline.createInterface({
+const inquirer = require('inquirer');
+const fs = require('fs');
+const suspend = require('suspend');
+const readline = require('readline');
+const clc = require('cli-color');
+const rl = readline.createInterface({
   output: process.stdout,
   input: process.stdin
 });
-var chance = require('chance').Chance();
-var path = require('path');
-var methodUtils = require('../../../src/methods/utils.js');
+const chance = require('chance').Chance();
+const path = require('path');
 
-var inputValidators = require('./inputValidators.js');
-var generator = require('./generator.js');
-var executor = require('./executor.js');
-var sasReader = require('./sasReader.js');
+const methodUtils = require('../../../src/methods/utils.js');
+const fromSasDateTime = require('../../../src/methods/utils.js').fromSasDateTime;
+const toSasDateTime = require('../../../src/tables/utils.js').toSasDateTime;
 
-var argv = require('minimist')(process.argv.slice(2));
+const inputValidators = require('./inputValidators.js');
+const generator = require('./generator.js');
+const executor = require('./executor.js');
+const sasReader = require('./sasReader.js');
+
+const argv = require('minimist')(process.argv.slice(2));
+
 if(argv.log) {
   let logDir = path.join(__dirname, '..', 'log');
   if(!fs.existsSync(logDir)) {
-    fs.mkdir(logDir);
+    fs.mkdir(logDir, handleError);
   }
 }
 
@@ -42,22 +46,29 @@ try {
         message: 'Use old generated.sas (do not create new)',
         default: true
       }], answers => {
-        var values = require(path.join(__dirname, '..', 'settings.json'));
-        suspend(run(values, answers.useOldGeneratedFile))();
+        let values = require(path.join(__dirname, '..', 'settings.json'));
+        let runner = runGenerator(values, answers.useOldGeneratedFile);
+        suspend(runner)();
       });
     } else {
       getUserInput().then((values) => {
-        suspend(run(values))();
+        let runner = runGenerator(values);
+        suspend(runner)();
       }).catch(handleError);
     }
   });
 } catch(e) {
   getUserInput().then((values) => {
-    suspend(run(values))();
+    let runner = runGenerator(values);
+    suspend(runner)();
   }).catch(handleError);
 }
 
-function run(values, useOldGeneratedFile) {
+function runGenerator(values, useOldGeneratedFile) {
+  for(let key in values) {
+    values[key] = values[key].trim();
+  }
+
   //convert number of columns to string of column types
   if(!isNaN(values.columns)) {
     let columns = '';
@@ -72,7 +83,7 @@ function run(values, useOldGeneratedFile) {
   }
 
   return function*() {
-    var gt;
+    let gt;
 
     try {
       if(useOldGeneratedFile) {
@@ -81,14 +92,13 @@ function run(values, useOldGeneratedFile) {
         gt = yield generator(values);
       }
 
-      var data = yield executor(values.execFile, argv.log);
+      let data = yield executor(values.execFile, argv.log);
 
-      var resJson = /--h54s-data-start--([\S\s]*)--h54s-data-end--/.exec(data.out.replace(/(\r\n|\r|\n)/g, ''));
-      var resObj = JSON.parse(resJson[1]);
-      resObj = methodUtils.convertDates(resObj);
+      let resJson = /--h54s-data-start--([\S\s]*)--h54s-data-end--/.exec(data.out.replace(/(\r\n|\r|\n)/g, ''));
+      let resObj = JSON.parse(resJson[1]);
       resObj = methodUtils.unescapeValues(resObj);
 
-      var lineStr = '';
+      let lineStr = '';
       for(let compareRes of compare(resObj.bounced, gt)) {
         //new row
         if(compareRes.col === 0 && compareRes.row !== 0) {
@@ -117,8 +127,8 @@ function run(values, useOldGeneratedFile) {
       rl.write(`Output Time: ${data.outputTime}ms\n`);
       rl.close();
 
-    } catch(e) {
-      console.log(e.stack);
+    } catch(err) {
+      handleError(err);
     }
   }
 }
@@ -131,15 +141,16 @@ function* compare(response, generated) {
   if(Object.keys(response[0]).length !== Object.keys(generated[0]).length) {
     return 'Number of columns is not the same';
   }
+
   for(let i = 0; i < response.length; i++) {
-    var j = 0;
+    let j = 0;
+
     for(let key in response[i]) {
       if(generated[i][key] instanceof Date) {
-        //check if milliseconds difference is greater than 1000 because sas is rounding the value to seconds
-        if(Math.abs(generated[i][key].getTime() - response[i][key].getTime()) > 1000) {
+        if(toSasDateTime(generated[i][key]) !== response[i][key]) {
           yield {
             diff: true,
-            message: `row ${i}, column ${key}(${j})\ngenerated: ${generated[i][key].getTime()}, response: ${response[i][key].getTime()}`,
+            message: `row ${i}, column ${key}(${j})\ngenerated: ${toSasDateTime(generated[i][key])}, response: ${response[i][key]}`,
             row: i,
             col: j
           };
@@ -166,14 +177,14 @@ function* compare(response, generated) {
           };
         }
       }
+
       j++;
     }
   }
 }
 
 function handleError(err) {
-  console.log(err);
-  console.log(err.stack);
+  console.error(err);
 }
 
 function getUserInput() {
