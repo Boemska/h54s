@@ -157,8 +157,12 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
       }
     }
   }).error(function(res) {
-    logs.addApplicationLog('Request failed with status: ' + res.status, sasProgram);
-    callback(new h54sError('httpError', res.statusText));
+    if(res.status === 401) {
+      callback(new h54sError('notLoggedinError', 'You are not logged in'));
+    } else {
+      logs.addApplicationLog('Request failed with status: ' + res.status, sasProgram);
+      callback(new h54sError('httpError', res.statusText));
+    }
   });
 };
 
@@ -284,7 +288,11 @@ function handleRestLogon(user, pass, callback) {
       if(self.url.indexOf('?') === -1) {
         self.url += '?ticket=' + res.responseText;
       } else {
-        self.url += '&ticket=' + res.responseText;
+        if(self.url.indexOf('ticket') !== -1) {
+          self.url = self.url.replace(/ticket=[^&]+/, 'ticket=' + res.responseText);
+        } else {
+          self.url += '&ticket=' + res.responseText;
+        }
       }
 
       callback(res.status);

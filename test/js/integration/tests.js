@@ -413,15 +413,25 @@ describe('h54s integration -', function() {
       });
 
       sasAdapter.logout(function() {
-        sasAdapter.login('wrongUser', 'andPass', function(status) {
-          assert.equal(status, -1);
 
-          sasAdapter.login(serverData.user, serverData.pass, function(status) {
-            if(status === 200) {
-              done();
-            } else {
-              done(new Error('Unable to login'));
-            }
+        sasAdapter.url += '?ticket=wrongTicket';
+        sasAdapter.call('missingProgram', null, function(err, res) {
+          assert.equal(err.type, 'notLoggedinError');
+
+          sasAdapter.login('wrongUser', 'andPass', function(status) {
+            assert.equal(status, -1);
+
+            sasAdapter.login(serverData.user, serverData.pass, function(status) {
+              if(status === 200) {
+                // make sure we are not getting login error
+                sasAdapter.call('missingProgram', null, function(err, res) {
+                  assert.equal(err.type, 'programNotFound');
+                  done();
+                });
+              } else {
+                done(new Error('Unable to login'));
+              }
+            });
           });
         });
       });
