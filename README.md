@@ -279,7 +279,9 @@ The default configuration looks like this:
   ajaxTimeout: 30000,
   isRemoteConfig: false,
   metadataRoot: undefined,
-  useMultipartFormData: true
+  useMultipartFormData: true,
+  RESTauth: false,
+  RESTauthLoginUrl: '/SASLogon/v1/tickets'
 }
 ```
 `url` is the URI of the SAS Stored Process Web Application (SPWA), as configured on your SAS server.
