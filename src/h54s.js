@@ -17,6 +17,8 @@ var h54s = module.exports = function(config) {
   this.retryAfterLogin      = true;
   this.ajaxTimeout          = 30000;
   this.useMultipartFormData = true;
+  this.RESTauth             = false;
+  this.RESTauthLoginUrl     = '/SASLogon/v1/tickets';
 
   this.remoteConfigUpdateCallbacks = [];
   this._pendingCalls = [];
@@ -98,9 +100,10 @@ var h54s = module.exports = function(config) {
       if(config.hostUrl.charAt(config.hostUrl.length - 1) === '/') {
         config.hostUrl = config.hostUrl.slice(0, -1);
       }
-      this.hostUrl  = config.hostUrl;
-      this.url      = config.hostUrl + this.url;
-      this.loginUrl = config.hostUrl + this.loginUrl;
+      this.hostUrl          = config.hostUrl;
+      this.url              = config.hostUrl + this.url;
+      this.loginUrl         = config.hostUrl + this.loginUrl;
+      this.RESTauthLoginUrl = config.hostUrl + this.RESTauthLoginUrl;
     }
 
     this._ajax.setTimeout(this.ajaxTimeout);

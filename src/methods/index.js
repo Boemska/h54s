@@ -175,8 +175,6 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
 *
 */
 module.exports.login = function(user, pass, callback) {
-  var self = this;
-
   if(!user || !pass) {
     throw new h54sError('argumentError', 'Credentials not set');
   }
@@ -187,6 +185,16 @@ module.exports.login = function(user, pass, callback) {
   if(!callback || typeof callback !== 'function') {
     throw new h54sError('argumentError', 'You must provide callback');
   }
+
+  if(!this.RESTauth) {
+    handleSasLogon.call(this, user, pass, callback);
+  } else {
+    handleRestLogon.call(this, user, pass, callback);
+  }
+};
+
+function handleSasLogon(user, pass, callback) {
+  var self = this;
 
   var loginParams = {
     _service: 'default',
@@ -257,7 +265,42 @@ module.exports.login = function(user, pass, callback) {
     logs.addApplicationLog('Login failed with status code: ' + res.status);
     callback(res.status);
   });
-};
+}
+
+function handleRestLogon(user, pass, callback) {
+  var self = this;
+
+  var loginParams = {
+    username: user,
+    password: pass
+  };
+
+  this._ajax.post(this.RESTauthLoginUrl, loginParams).success(function(res) {
+    var location = res.getResponseHeader('Location');
+
+    self._ajax.post(location, {
+      service: self.url
+    }).success(function(res) {
+      if(self.url.indexOf('?') === -1) {
+        self.url += '?ticket=' + res.responseText;
+      } else {
+        self.url += '&ticket=' + res.responseText;
+      }
+
+      callback(res.status);
+    }).error(function(res) {
+      logs.addApplicationLog('Login failed with status code: ' + res.status);
+      callback(res.status);
+    });
+  }).error(function(res) {
+    if(res.responseText === 'error.authentication.credentials.bad') {
+      callback(-1);
+    } else {
+      logs.addApplicationLog('Login failed with status code: ' + res.status);
+      callback(res.status);
+    }
+  });
+}
 
 /*
 * Logout method

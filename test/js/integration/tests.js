@@ -404,5 +404,28 @@ describe('h54s integration -', function() {
       });
     });
 
+    it('Test REST auth', function(done) {
+      this.timeout(1000);
+      var sasAdapter = new h54s({
+        RESTauth: true,
+        hostUrl: serverData.url,
+        metadataRoot: serverData.metadataRoot
+      });
+
+      sasAdapter.logout(function() {
+        sasAdapter.login('wrongUser', 'andPass', function(status) {
+          assert.equal(status, -1);
+
+          sasAdapter.login(serverData.user, serverData.pass, function(status) {
+            if(status === 200) {
+              done();
+            } else {
+              done(new Error('Unable to login'));
+            }
+          });
+        });
+      });
+    });
+
   });
 });
