@@ -1,3 +1,6 @@
+//self invoked function module
+require('./ie_polyfills.js');
+
 var h54sError = require('./error.js');
 
 /*
@@ -116,6 +119,3 @@ h54s.version = '__version__';
 h54s.prototype = require('./methods/methods.js');
 
 h54s.Tables = require('./tables/tables.js');
-
-//self invoked function module
-require('./ie_polyfills.js');
