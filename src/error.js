@@ -14,7 +14,9 @@ function h54sError(type, message) {
   this.type    = type;
 }
 
-h54sError.prototype = Object.create(Error.prototype, {
+h54sError.prototype = Object.create(Error.prototype);
+
+Object.defineProperties(h54sError.prototype, {
   constructor: {
     configurable: false,
     enumerable: false,
