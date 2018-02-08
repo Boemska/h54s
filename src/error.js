@@ -16,19 +16,7 @@ function h54sError(type, message) {
 
 h54sError.prototype = Object.create(Error.prototype);
 
-Object.defineProperties(h54sError.prototype, {
-  constructor: {
-    configurable: false,
-    enumerable: false,
-    writable: false,
-    value: h54sError
-  },
-  name: {
-    configurable: false,
-    enumerable: false,
-    writable: false,
-    value: 'h54sError'
-  }
-});
+h54sError.prototype.constructor = h54sError;
+h54sError.prototype.name = 'h54sError';
 
 module.exports = h54sError;
