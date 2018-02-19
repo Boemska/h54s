@@ -6,6 +6,9 @@ describe('h54s unit -', function() {
         new h54s.Tables([
           {a: "Dummy Name", specialNumberVal :NaN}
         ], 'data');
+      }, 'NaN value in one of the values (columns) is not allowed');
+
+      proclaim.throws(function() {
         new h54s.SasData([
           {a: "Dummy Name", specialNumberVal :NaN}
         ], 'data');
@@ -15,6 +18,9 @@ describe('h54s unit -', function() {
         new h54s.Tables([
           {b: "Dummy Name", specialNumberVal: Infinity}
         ], 'data');
+      }, 'Infinity value in one of the values (columns) is not allowed');
+
+      proclaim.throws(function() {
         new h54s.SasData([
           {b: "Dummy Name", specialNumberVal: Infinity}
         ], 'data');
@@ -24,6 +30,9 @@ describe('h54s unit -', function() {
         new h54s.Tables([
           {c: "Dummy Name", specialNumberVal: -Infinity}
         ], 'data');
+      }, '-Infinity value in one of the values (columns) is not allowed');
+
+      proclaim.throws(function() {
         new h54s.SasData([
           {c: "Dummy Name", specialNumberVal: -Infinity}
         ], 'data');
@@ -39,6 +48,9 @@ describe('h54s unit -', function() {
         new h54s.Tables([
           {e: "Dummy Name", boolVal: false}
         ], 'data');
+      }, 'Boolean value in one of the values (columns) is not allowed');
+
+      proclaim.throws(function() {
         new h54s.SasData([
           {e: "Dummy Name", boolVal: false}
         ], 'data');
@@ -182,29 +194,37 @@ describe('h54s unit -', function() {
       proclaim.throws(function() {
         new h54s.SasData(data, 'data', []);
       }, 'Specs data type wrong. Object expected.', 'Wrong specs data type');
+
       proclaim.throws(function() {
         new h54s.SasData(data, 'data', {});
       }, 'Missing columns in specs data.', 'Specs object length wrong');
+
       proclaim.throws(function() {
         new h54s.SasData(data, 'data', Object.assign({}, specs, {data1: []}));
       }, 'Wrong column descriptor in specs data.', 'Column description wrong type');
+
       proclaim.throws(function() {
         new h54s.SasData(data, 'data', Object.assign({}, specs, {data1: 'wrong'}));
       }, 'Wrong column descriptor in specs data.', 'Column description wrong type');
+
       proclaim.throws(function() {
         new h54s.SasData(data, 'data', Object.assign({}, specs, {data1: {}}));
       }, 'Missing columns in specs descriptor.', 'Column description data missing');
+
       proclaim.throws(function() {
         specs.data1.colLength = 1;
         new h54s.SasData(data, 'data', specs);
       }, 'There is a specs mismatch in the array between values (columns) of the same name.', 'No error on wrong description colLength');
+
       proclaim.throws(function() {
         delete specs.data1.colLength;
         new h54s.SasData(data, 'data', specs);
       }, 'Missing columns in specs descriptor.', 'Column description data missing');
+
       proclaim.doesNotThrow(function() {
         new h54s.SasData(data, 'data');
       });
+
       proclaim.doesNotThrow(function() {
         var specs = {
           someNumber: {colType: 'num', colLength: 8},
@@ -230,9 +250,16 @@ function byteLength(str) {
   var s = str.length;
   for (var i=str.length-1; i>=0; i--) {
     var code = str.charCodeAt(i);
-    if (code > 0x7f && code <= 0x7ff) s++;
-    else if (code > 0x7ff && code <= 0xffff) s+=2;
-    if (code >= 0xDC00 && code <= 0xDFFF) i--; //trail surrogate
+
+    if (code > 0x7f && code <= 0x7ff) {
+      s++;
+    } else if (code > 0x7ff && code <= 0xffff) {
+      s+=2;
+    }
+
+    if (code >= 0xDC00 && code <= 0xDFFF) {
+      i--; //trail surrogate
+    }
   }
   return s;
 }
