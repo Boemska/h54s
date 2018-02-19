@@ -4,6 +4,30 @@ var Tables    = require('./tables');
 var Files     = require('./files');
 var toSasDateTime = require('./tables/utils.js').toSasDateTime;
 
+function validateMacro(macroName) {
+  if(macroName.length > 32) {
+    throw new h54sError('argumentError', 'Table name too long. Maximum is 32 characters');
+  }
+
+  var charCodeAt0 = macroName.charCodeAt(0);
+  // validate it starts with A-Z, a-z, or _
+  if((charCodeAt0 < 65 || charCodeAt0 > 90) && (charCodeAt0 < 97 || charCodeAt0 > 122) && macroName[0] !== '_') {
+    throw new h54sError('argumentError', 'Table name starting with number or special characters');
+  }
+
+  for(var i = 0; i < macroName.length; i++) {
+    var charCode = macroName.charCodeAt(i);
+
+    if((charCode < 48 || charCode > 57) &&
+      (charCode < 65 || charCode > 90) &&
+      (charCode < 97 || charCode > 122) &&
+      macroName[0] !== '_')
+    {
+      throw new h54sError('argumentError', 'Table name has unsupported characters')
+    }
+  }
+}
+
 /*
 * h54s SAS data object constructor
 * @constructor
@@ -39,9 +63,8 @@ SasData.prototype.addTable = function(table, macroName, specs) {
     if(typeof macroName !== 'string') {
       throw new h54sError('argumentError', 'Second argument must be string');
     }
-    if(!isNaN(macroName[macroName.length - 1])) {
-      throw new h54sError('argumentError', 'Macro name cannot have number at the end');
-    }
+
+    validateMacro(macroName);
   } else {
     throw new h54sError('argumentError', 'Missing arguments');
   }

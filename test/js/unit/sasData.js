@@ -242,6 +242,74 @@ describe('h54s unit -', function() {
       done();
     });
 
+    it('Test macro name validation', function(done) {
+      proclaim.doesNotThrow(function() {
+        new h54s.Tables([], 'data');
+        new h54s.SasData([], 'data');
+      });
+
+      let name33 = new Array(33).fill('a').join('');
+      let name32 = new Array(32).fill('a').join('');
+
+      proclaim.doesNotThrow(function() {
+        new h54s.SasData([], name32);
+      });
+
+      proclaim.throws(function() {
+        new h54s.SasData([], name33);
+      }, 'Table name too long. Maximum is 32 characters');
+
+
+      proclaim.throws(function() {
+        new h54s.SasData([], '1table');
+      }, 'Table name starting with number or special characters');
+
+      proclaim.throws(function() {
+        new h54s.SasData([], '!table');
+      }, 'Table name starting with number or special characters');
+
+      proclaim.throws(function() {
+        new h54s.SasData([], '@table');
+      }, 'Table name starting with number or special characters');
+
+      proclaim.throws(function() {
+        new h54s.SasData([], '^table');
+      }, 'Table name starting with number or special characters');
+
+      proclaim.throws(function() {
+        new h54s.SasData([], '~table');
+      }, 'Table name starting with number or special characters');
+
+      proclaim.doesNotThrow(function() {
+        new h54s.SasData([], '_table');
+      });
+
+
+      proclaim.throws(function() {
+        new h54s.SasData([], 'ta ble');
+      }, 'Table name has unsupported characters');
+
+      proclaim.throws(function() {
+        new h54s.SasData([], 'ta!ble');
+      }, 'Table name has unsupported characters');
+
+      proclaim.throws(function() {
+        new h54s.SasData([], 'ta/ble');
+      }, 'Table name has unsupported characters');
+
+      proclaim.throws(function() {
+        new h54s.SasData([], 'ta:ble');
+      }, 'Table name has unsupported characters');
+
+      proclaim.doesNotThrow(function() {
+        new h54s.SasData([], 'table1');
+        new h54s.SasData([], 'ta0ble');
+        new h54s.SasData([], 'ta9ble');
+      });
+
+      done();
+    });
+
   });
 });
 
