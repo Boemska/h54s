@@ -305,6 +305,8 @@ describe('h54s unit -', function() {
         new h54s.SasData([], 'table1');
         new h54s.SasData([], 'ta0ble');
         new h54s.SasData([], 'ta9ble');
+        new h54s.SasData([], 'ta_ble');
+        new h54s.SasData([], '_ta_ble_');
       });
 
       done();

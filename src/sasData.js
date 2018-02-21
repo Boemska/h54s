@@ -21,7 +21,7 @@ function validateMacro(macroName) {
     if((charCode < 48 || charCode > 57) &&
       (charCode < 65 || charCode > 90) &&
       (charCode < 97 || charCode > 122) &&
-      macroName[0] !== '_')
+      macroName[i] !== '_')
     {
       throw new h54sError('argumentError', 'Table name has unsupported characters')
     }
