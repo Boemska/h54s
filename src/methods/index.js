@@ -253,6 +253,7 @@ function handleSasLogon(user, pass, callback) {
 
       while(self._pendingCalls.length > 0) {
         var pendingCall     = self._pendingCalls.shift();
+        var method          = pendingCall.method || self.call.bind(self);
         var sasProgram      = pendingCall.sasProgram;
         var callbackPending = pendingCall.callback;
         var params          = pendingCall.params;
@@ -261,7 +262,7 @@ function handleSasLogon(user, pass, callback) {
         params._debug = self.debug ? 131 : 0;
 
         if(self.retryAfterLogin) {
-          self.call(sasProgram, null, callbackPending, params);
+          method(sasProgram, null, callbackPending, params);
         }
       }
     }
