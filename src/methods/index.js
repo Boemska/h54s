@@ -81,8 +81,9 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
       callback(new h54sError('notLoggedinError', 'You are not logged in'));
     } else {
       var resObj, unescapedResObj, err;
+      var done = false;
+
       if(!dbg) {
-        var done = false;
         try {
           resObj = self._utils.parseRes(res.responseText, sasProgram, params);
           logs.addApplicationLog(resObj.logmessage, sasProgram);
@@ -142,17 +143,35 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
           if(resObj.status !== 'success') {
             err = new h54sError('programError', resObj.errormessage, resObj.status);
           }
+
+          done = true;
         } catch(e) {
           if(e instanceof SyntaxError) {
             err = new h54sError('parseError', e.message);
+            done = true;
           } else if(e instanceof h54sError) {
-            err = e;
+            if(e.type === 'parseError' && retryCount < 1) {
+              done = false;
+              self._ajax.post(self.url, params, self.useMultipartFormData).success(this.success).error(this.error);
+              retryCount++;
+              logs.addApplicationLog("Retrying #" + retryCount, sasProgram);
+            } else {
+              if(e instanceof h54sError) {
+                err = e;
+              } else {
+                err = new h54sError('parseError', 'Unable to parse response json');
+              }
+              done = true;
+            }
           } else {
             err = new h54sError('unknownError', e.message);
             err.stack = e.stack;
+            done = true;
           }
         } finally {
-          callback(err, unescapedResObj);
+          if(done) {
+            callback(err, unescapedResObj);
+          }
         }
       }
     }
