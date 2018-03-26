@@ -102,6 +102,8 @@ Assuming that you have a local Web Server installed for development:
 </html>
 ```
 
+For IE, you may need to add `<meta http-equiv="X-UA-Compatible" content="IE=edge;" />`.
+
 3. *If you are hosting your index.html and project files from within a deployed static.war, or behind the same reverse proxy as your SPWA, you don't need this step. Otherwise, for most people:*
 
    Fire up your browser. This is where Chrome comes in handy, as it allows developers to disable [Same-Origin Policy](https://en.wikipedia.org/wiki/Same-origin_policy). To tell your browser to allow background requests to non-local pages while you develop, you need to start Chrome with the `--disable-web-security` command line flag.  For example, on Mac OS, first close Chrome and run the following in the Terminal:  `open /Applications/Google\ Chrome.app --args --disable-web-security`
