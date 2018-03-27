@@ -166,5 +166,22 @@ describe('h54s unit -', function() {
       });
     });
 
+    it('Test error parsing in debug logs', function() {
+      var sasAdapter = new h54s();
+      var errorsRes = 'ERROR: from the start.\n';
+      errorsRes += 'some ERROR: not on line start.\n' +
+        'ERROR: some.text.\n' +
+        'ERROR: multi\n' +
+        'line.';
+
+      sasAdapter.clearAllLogs();
+      h54s.prototype._utils.parseErrorResponse.call(sasAdapter._utils, errorsRes, 'program');
+      var errors = sasAdapter.getSasErrors();
+
+      assert.equal(errors[0].message, 'ERROR: from the start.', 'Wrong error parsed.');
+      assert.equal(errors[1].message, 'ERROR: some.text.', 'Wrong error parsed.');
+      assert.equal(errors[2].message, 'ERROR: multi line.', 'Wrong error parsed.');
+    });
+
   });
 });

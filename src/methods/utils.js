@@ -110,8 +110,8 @@ module.exports.unescapeValues = function(obj) {
 */
 module.exports.parseErrorResponse = function(res, sasProgram) {
   //capture 'ERROR: [text].' or 'ERROR xx [text].'
-  var patt    = /ERROR(:\s|\s\d\d)(.*\.|.*\n.*\.)/gm;
-  var errors  = res.match(patt);
+  var patt    = /^ERROR(:\s|\s\d\d)(.*\.|.*\n.*\.)/gm;
+  var errors  = res.replace(/(<([^>]+)>)/ig, '').match(patt);
   if(!errors) {
     return;
   }
