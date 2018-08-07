@@ -32,9 +32,9 @@ var h54s = module.exports = function(config) {
 
     this._disableCalls = true;
 
-    // '/base/test/h54sConfig.json' is for the testing with karma
+    // 'h54sConfig.json' is for the testing with karma
     //replaced with gulp in dev build
-    this._ajax.get('/base/test/h54sConfig.json').success(function(res) {
+    this._ajax.get('h54sConfig.json').success(function(res) {
       var remoteConfig = JSON.parse(res.responseText);
 
       for(var key in remoteConfig) {
