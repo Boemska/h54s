@@ -1,6 +1,8 @@
 # HTML5 Data Adapter for SAS&reg; (H54S)
-
-[![Join the chat at https://gitter.im/Boemska/h54s](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Boemska/h54s?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![npm version](https://img.shields.io/npm/v/axios.svg?style=flat-square)](https://www.npmjs.org/package/h54s)
+[![install size](https://packagephobia.now.sh/badge?p=axios)](https://packagephobia.now.sh/result?p=h54s)
+[![npm downloads](https://img.shields.io/npm/dm/axios.svg?style=flat-square)](http://npm-stat.com/charts.html?package=h54s)
+[![gitter chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Boemska/h54s?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## What is H54S?
 
@@ -43,7 +45,7 @@ Then put your SAS hat on.
 
 ```sas
 * get H54s (from wherever you placed it in step 1) ;
-%include '/pub/sasautos/h54s.sas';                
+%include '/pub/sasautos/h54s.sas';
 
 * Process and receive dataset from the client ;
 %hfsGetDataset(datain,work.additions);
@@ -134,8 +136,8 @@ var tables = new h54s.Tables(myFirstTable, 'datain');
 // make your first call to SAS
 adapter.call('/Apps/myFirstService', tables, function(err, res) {
   if(err) {
-    //Houston we have a problem     
-    console.log(err);               
+    //Houston we have a problem
+    console.log(err);
   } else {
     //res is an object returned from the server
     console.log(res);
