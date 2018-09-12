@@ -180,15 +180,18 @@ SasData.prototype.addTable = function(table, macroName, specs) {
 
 
         if ((type === 'number' && specs[key].colType !== 'num' && val !== '.') ||
-          (type === 'string' && !(val instanceof Date) && specs[key].colType !== 'string') ||
+          ((type === 'string' && !(val instanceof Date) && specs[key].colType !== 'string') &&
+          (type === 'string' && specs[key].colType == 'num' && val !== '.')) ||
           (val instanceof Date && specs[key].colType !== 'date') ||
           ((type === 'object' && val.constructor !== Date) && specs[key].colType !== 'json'))
         {
-          throw new h54sError('typeError', 'There is a specs mismatch in the array between values (columns) of the same name.');
+          throw new h54sError('typeError', 'There is a specs type mismatch in the array between values (columns) of the same name.'
+            + ' type/colType/val = ' + type +'/' + specs[key].colType + '/' + val );
         } else if(!isSpecsProvided && type === 'string' && specs[key].colLength < val.length) {
           specs[key].colLength = val.length;
         } else if((type === 'string' && specs[key].colLength < val.length) || (type !== 'string' && specs[key].colLength !== 8)) {
-          throw new h54sError('typeError', 'There is a specs mismatch in the array between values (columns) of the same name.');
+          throw new h54sError('typeError', 'There is a specs length mismatch in the array between values (columns) of the same name.' 
+            + ' type/colType/val = ' + type +'/' + specs[key].colType + '/' + val );
         }
 
         if (val instanceof Date) {
