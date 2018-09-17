@@ -45,11 +45,8 @@ Then put your SAS hat on.
 * get H54s (from wherever you placed it in step 1) ;
 %include '/pub/sasautos/h54s.sas';
 
-* Process and receive dataset from the client ;
-%hfsGetDataset(datain,work.additions);
-
-* Check if the dataset(s) were received ok;
-%hfsErrorCheck;
+* Process and receive datasets from the client ;
+%bafgetdatasets()
 
 * Do some SAS. Can be Anything. Merge and sort as an example ;
 data mydata;
@@ -61,9 +58,9 @@ proc sort data=mydata;
 run;
 
 * Return a resulting dataset to the client ;
-%hfsHeader;
-  %hfsOutDataset(processed, work, myData);
-%hfsFooter;
+%bafheader()
+  %bafOutDataset(processed, work, myData)
+%bafFooter()
 ```
 
 4. Save your Stored Process.  If you are using Enterprise Guide to do this, be sure to check "Global Macro Variables" under the "Include code for" dropdown.
