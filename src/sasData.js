@@ -23,7 +23,7 @@ function validateMacro(macroName) {
       (charCode < 97 || charCode > 122) &&
       macroName[i] !== '_')
     {
-      throw new h54sError('argumentError', 'Table name has unsupported characters')
+      throw new h54sError('argumentError', 'Table name has unsupported characters');
     }
   }
 }
@@ -185,13 +185,13 @@ SasData.prototype.addTable = function(table, macroName, specs) {
           (val instanceof Date && specs[key].colType !== 'date') ||
           ((type === 'object' && val.constructor !== Date) && specs[key].colType !== 'json'))
         {
-          throw new h54sError('typeError', 'There is a specs type mismatch in the array between values (columns) of the same name.'
-            + ' type/colType/val = ' + type +'/' + specs[key].colType + '/' + val );
+          throw new h54sError('typeError', 'There is a specs type mismatch in the array between values (columns) of the same name.' +
+            ' type/colType/val = ' + type +'/' + specs[key].colType + '/' + val );
         } else if(!isSpecsProvided && type === 'string' && specs[key].colLength < val.length) {
           specs[key].colLength = val.length;
         } else if((type === 'string' && specs[key].colLength < val.length) || (type !== 'string' && specs[key].colLength !== 8)) {
-          throw new h54sError('typeError', 'There is a specs length mismatch in the array between values (columns) of the same name.' 
-            + ' type/colType/val = ' + type +'/' + specs[key].colType + '/' + val );
+          throw new h54sError('typeError', 'There is a specs length mismatch in the array between values (columns) of the same name.' +
+            ' type/colType/val = ' + type +'/' + specs[key].colType + '/' + val );
         }
 
         if (val instanceof Date) {

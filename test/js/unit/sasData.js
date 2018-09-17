@@ -214,7 +214,7 @@ describe('h54s unit -', function() {
       proclaim.throws(function() {
         specs.data1.colLength = 1;
         new h54s.SasData(data, 'data', specs);
-      }, 'There is a specs mismatch in the array between values (columns) of the same name.', 'No error on wrong description colLength');
+      }, 'There is a specs length mismatch in the array between values (columns) of the same name. type/colType/val = string/string/test', 'No error on wrong description colLength');
 
       proclaim.throws(function() {
         delete specs.data1.colLength;
@@ -248,8 +248,8 @@ describe('h54s unit -', function() {
         new h54s.SasData([], 'data');
       });
 
-      let name33 = new Array(33).fill('a').join('');
-      let name32 = new Array(32).fill('a').join('');
+      var name33 = new Array(33).fill('a').join('');
+      var name32 = new Array(32).fill('a').join('');
 
       proclaim.doesNotThrow(function() {
         new h54s.SasData([], name32);
