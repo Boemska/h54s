@@ -66,7 +66,7 @@ run;
 %hfsFooter;
 ```
 
-4. Save your Stored Process.
+4. Save your Stored Process.  If you are using Enterprise Guide to do this, be sure to check "Global Macro Variables" under the "Include code for" dropdown.
 
 5. Log on to your SAS Stored Process Web Application and run the STP. It should produce something like this output:
 
@@ -105,7 +105,8 @@ Assuming that you have a local Web Server installed for development:
 
 3. *If you are hosting your index.html and project files from within a deployed static.war, or behind the same reverse proxy as your SPWA, you don't need this step. Otherwise, for most people:*
 
-   Fire up your browser. This is where Chrome comes in handy, as it allows developers to disable [Same-Origin Policy](https://en.wikipedia.org/wiki/Same-origin_policy). To tell your browser to allow background requests to non-local pages while you develop, you need to start Chrome with the `--disable-web-security` command line flag. When you see this warning, you're in business:
+   Fire up your browser. This is where Chrome comes in handy, as it allows developers to disable [Same-Origin Policy](https://en.wikipedia.org/wiki/Same-origin_policy). To tell your browser to allow background requests to non-local pages while you develop, you need to start Chrome with the `--disable-web-security` command line flag.  For example, on Mac OS, first close Chrome and run the following in the Terminal:  `open /Applications/Google\ Chrome.app --args --disable-web-security`
+When you see this warning, you're in business:
 
    ![Chrome with --disable-web-security](https://cloud.githubusercontent.com/assets/1783133/11691304/abd0cb1a-9e9a-11e5-8d5e-9706b62a272f.png)
 
@@ -497,37 +498,37 @@ Set debugging mode - `debug:true`:
 adapter.setDebugMode();
 ```
 
-###unsetDebugMode()
+### unsetDebugMode()
 Unset  debugging mode - `debug:false`:
 ```js
 adapter.unsetDebugMode();
 ```
 
-###clearApplicationLogs()
+### clearApplicationLogs()
 Clears the application logs array
 ```js
 adapter.clearApplicationLogs();
 ```
 
-###clearDebugData()
+### clearDebugData()
 Clears the debug data array
 ```js
 adapter.clearDebugData()
 ```
 
-###clearSasErrors()
+### clearSasErrors()
 Clears the SAS errors array
 ```js
 adapter.clearSasErrors()
 ```
 
-###clearFailedRequests()
+### clearFailedRequests()
 Clears the failed requests array
 ```js
 adapter.clearFailedRequests()
 ```
 
-###clearAllLogs()
+### clearAllLogs()
 Clears all log arrays
 ```js
 adapter.clearAllLogs()
