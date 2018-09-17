@@ -33,7 +33,7 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
     params = {
       _program: this._utils.getFullProgramPath(this.metadataRoot, sasProgram),
       _debug:   this.debug ? 131 : 0,
-      _service: 'default',
+      _service: 'default'
     };
   }
 

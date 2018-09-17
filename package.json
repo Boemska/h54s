@@ -3,6 +3,22 @@
   "version": "1.0.0",
   "description": "HTML5 Data Adapter for SAS",
   "main": "./src/h54s.js",
+  "homepage": "https://github.com/Boemska/h54s/blob/master/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Boemska/h54s.git"
+  },
+  "keywords": [
+    "sas",
+    "stored processes",
+    "spwa",
+    "h54s",
+    "boemska"
+  ],
+  "bugs": {
+    "url": "https://github.com/Boemska/h54s/issues"
+    , "email" : "support@boemskats.com"
+  },
   "scripts": {
     "test-sas": "node test/sas/src/main.js"
   },

@@ -1,6 +1,8 @@
 # HTML5 Data Adapter for SAS&reg; (H54S)
-
-[![Join the chat at https://gitter.im/Boemska/h54s](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Boemska/h54s?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![npm version](https://img.shields.io/npm/v/axios.svg?style=flat-square)](https://www.npmjs.org/package/h54s)
+[![install size](https://packagephobia.now.sh/badge?p=axios)](https://packagephobia.now.sh/result?p=h54s)
+[![npm downloads](https://img.shields.io/npm/dm/axios.svg?style=flat-square)](http://npm-stat.com/charts.html?package=h54s)
+[![gitter chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Boemska/h54s?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## What is H54S?
 
@@ -99,6 +101,8 @@ Assuming that you have a local Web Server installed for development:
   </body>
 </html>
 ```
+
+For IE, you may need to add `<meta http-equiv="X-UA-Compatible" content="IE=edge;" />`.
 
 3. *If you are hosting your index.html and project files from within a deployed static.war, or behind the same reverse proxy as your SPWA, you don't need this step. Otherwise, for most people:*
 
