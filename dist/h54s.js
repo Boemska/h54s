@@ -17,70 +17,16 @@ function h54sError(type, message, status) {
   this.status  = status;
 }
 
-h54sError.prototype = Object.create(Error.prototype, {
-  constructor: {
-    configurable: false,
-    enumerable: false,
-    writable: false,
-    value: h54sError
-  },
-  name: {
-    configurable: false,
-    enumerable: false,
-    writable: false,
-    value: 'h54sError'
-  }
-});
+h54sError.prototype = Object.create(Error.prototype);
+
+h54sError.prototype.constructor = h54sError;
+h54sError.prototype.name = 'h54sError';
 
 module.exports = h54sError;
 
 },{}],2:[function(require,module,exports){
-var h54sError = require('../error.js');
-
-/*
-* h54s SAS Files object constructor
-* @constructor
-*
-*@param {file} file - File added when object is created
-*@param {string} macroName - macro name
-*
-*/
-function Files(file, macroName) {
-  this._files = {};
-
-  Files.prototype.add.call(this, file, macroName);
-}
-
-/*
-* Add file to files object
-* @param {file} file - Instance of JavaScript File object
-* @param {string} macroName - Sas macro name
-*
-*/
-Files.prototype.add = function(file, macroName) {
-  if(file && macroName) {
-    if(!(file instanceof File)) {
-      throw new h54sError('argumentError', 'First argument must be instance of File object');
-    }
-    if(typeof macroName !== 'string') {
-      throw new h54sError('argumentError', 'Second argument must be string');
-    }
-    if(!isNaN(macroName[macroName.length - 1])) {
-      throw new h54sError('argumentError', 'Macro name cannot have number at the end');
-    }
-  } else {
-    throw new h54sError('argumentError', 'Missing arguments');
-  }
-
-  this._files[macroName] = [
-    JSON.stringify({contentType: 'FILE', fileName: file.name}),
-    file
-  ];
-};
-
-module.exports = Files;
-
-},{"../error.js":1}],3:[function(require,module,exports){
+==== BASE ====
+==== BASE ====
 var h54sError = require('./error.js');
 
 /*
@@ -191,7 +137,7 @@ var h54s = module.exports = function(config) {
 };
 
 //replaced with gulp
-h54s.version = '0.11.0';
+h54s.version = '0.11.1';
 
 
 h54s.prototype = require('./methods/methods.js');
@@ -200,10 +146,12 @@ h54s.Tables = require('./tables/tables.js');
 h54s.Files = require('./files/files.js');
 h54s.SasData = require('./sasData.js');
 
+==== BASE ====
 //self invoked function module
 require('./ie_polyfills.js');
 
-},{"./error.js":1,"./files/files.js":2,"./ie_polyfills.js":4,"./methods/ajax.js":6,"./methods/methods.js":7,"./sasData.js":9,"./tables/tables.js":10}],4:[function(require,module,exports){
+},{"./error.js":1,"./ie_polyfills.js":3,"./methods/ajax.js":5,"./methods/methods.js":6,"./tables/tables.js":8}],3:[function(require,module,exports){
+==== BASE ====
 module.exports = function() {
   if (!Object.create) {
     Object.create = function(proto, props) {
@@ -564,7 +512,7 @@ module.exports.call = function(sasProgram, dataObj, callback, params) {
     params = {
       _program: this._utils.getFullProgramPath(this.metadataRoot, sasProgram),
       _debug:   this.debug ? 131 : 0,
-      _service: 'default',
+      _service: 'default'
     };
   }
 
