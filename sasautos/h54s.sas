@@ -38,6 +38,11 @@
 
   %put h54s ==> WEBIN FILE COUNT IS &_WEBIN_FILE_COUNT.;
 
+  /* prevent bafgetdatasets() running for regular file uploads */
+  %if %symexist(_webin_filename)=1 %then %do;
+    %if "&_webin_filename" ne "blob" %then %return;
+  %end;
+
   /*
   bafpn is the index of a file described as FILE
   bafxn is the index of a file described as XML
