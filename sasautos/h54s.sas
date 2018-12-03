@@ -115,7 +115,7 @@
 
   %put h54s ==> === START DESERIALISING TABLE &&_WEBIN_name&baftn. === ;
       data "&&_WEBIN_name&baftn."n;
-        INFILE &&_WEBIN_FILEREF&baftn. LRECL=32767 recfm=v dsd;
+        INFILE &&_WEBIN_FILEREF&baftn. LRECL=32767 recfm=v dsd termstr=crlf;
         /*length %do j=1 %to &totalcol.;
         &&lens&j.
         %end;*/

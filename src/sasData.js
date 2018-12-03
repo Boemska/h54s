@@ -161,8 +161,8 @@ SasData.prototype.addTable = function(table, macroName, specs) {
         if(val === true || val === false) {
           throw new h54sError('typeError', 'Boolean value in one of the values (columns) is not allowed');
         }
-        if(type === 'string' && val.indexOf('\n') !== -1) {
-          throw new h54sError('typeError', 'New line character is not supported');
+        if(type === 'string' && val.indexOf('\r\n') !== -1) {
+          throw new h54sError('typeError', 'CRLF character is not supported');
         }
 
         // convert null to '.' for numbers and to '' for strings
@@ -234,7 +234,7 @@ SasData.prototype.addTable = function(table, macroName, specs) {
       }
     }
     if(i < table.length - 1) {
-      sasCsv += '\n';
+      sasCsv += '\r\n';
     }
   }
 
