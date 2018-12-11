@@ -93,7 +93,7 @@ SasData.prototype.addTable = function(table, macroName, specs) {
     }
   }
 
-  var i, j, //counters used latter in code
+  var i, j, //counters used later in code
       row, val, type,
       specKeys = [],
       specialChars = ['"', '\\', '/', '\n', '\t', '\f', '\r', '\b'];
@@ -224,7 +224,7 @@ SasData.prototype.addTable = function(table, macroName, specs) {
             specs[key].colLength = Math.max(specs[key].colLength, colLength, 1);
             break;
           case 'object':
-            sasCsv += '"' + JSON.stringidy(val).replace(/"/g, '""') + '"';
+            sasCsv += '"' + JSON.stringify(val).replace(/"/g, '""') + '"';
             break;
         }
       }
