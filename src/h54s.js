@@ -119,6 +119,8 @@ h54s.prototype = require('./methods');
 h54s.Tables = require('./tables');
 h54s.Files = require('./files');
 h54s.SasData = require('./sasData.js');
+h54s.Error = require('./error.js');
+h54s.Logs = require('./logs');
 
 h54s.fromSasDateTime = require('./methods/utils.js').fromSasDateTime;
 h54s.toSasDateTime = require('./tables/utils.js').toSasDateTime;
