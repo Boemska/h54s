@@ -12,7 +12,7 @@ Yes. Unprecedented.
 
 #### Server Requirements
 
-- SAS&reg; BI Platform (v9.2 or later)
+- SAS&reg; BI Platform (v9.4 or later)
 - SAS&reg; Stored Process Web Application (Integration Technologies)
 
 #### Client Requirements
