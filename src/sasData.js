@@ -162,7 +162,9 @@ SasData.prototype.addTable = function(table, macroName, specs) {
           throw new h54sError('typeError', 'Boolean value in one of the values (columns) is not allowed');
         }
         if(type === 'string' && val.indexOf('\r\n') !== -1) {
-          throw new h54sError('typeError', 'CRLF character is not supported');
+          // replace CRLF with LF in data so that we can support newlines without throwing errors
+          // the adapter uses CRLF as a linefeed so if the data contains CRLF it will corrupt
+          val.replace('\r\n','\n')
         }
 
         // convert null to '.' for numbers and to '' for strings

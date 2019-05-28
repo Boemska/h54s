@@ -16,8 +16,8 @@
     "boemska"
   ],
   "bugs": {
-    "url": "https://github.com/Boemska/h54s/issues"
-    , "email" : "support@boemskats.com"
+    "url": "https://github.com/Boemska/h54s/issues",
+    "email": "support@boemskats.com"
   },
   "scripts": {
     "test-sas": "node test/sas/src/main.js"
