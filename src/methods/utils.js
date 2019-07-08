@@ -52,18 +52,24 @@ module.exports.parseDebugRes = function(responseText, sasProgram, params) {
 
   logs.addDebugData(bodyMatches[1], debugText, sasProgram, params);
 
-  if(this.parseErrorResponse(responseText, sasProgram)) {
-    throw new h54sError('sasError', 'Sas program completed with errors');
-  }
-
   if(!matches) {
     throw new h54sError('parseError', 'Unable to parse response json');
   }
   //remove new lines in json response
   //replace \\(d) with \(d) - SAS json parser is escaping it
-  var jsonObj = JSON.parse(responseReplace(matches[2]));
-
-  return jsonObj;
+  var jsonObj;
+  try{
+    jsonObj = JSON.parse(responseReplace(matches[2]));
+  }catch(e){
+    throw new h54sError('parseError', 'Unable to parse response json');
+  }
+  if(jsonObj && jsonObj.h54sAbort){
+    return jsonObj;
+  }else if(this.parseErrorResponse(responseText, sasProgram)) {
+    throw new h54sError('sasError', 'Sas program completed with errors');
+  }else{
+    return jsonObj;
+  }
 };
 
 /*
