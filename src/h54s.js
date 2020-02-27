@@ -1,7 +1,15 @@
-//self invoked function module
-require('./ie_polyfills.js');
-
 var h54sError = require('./error.js');
+
+const sasVersionMap = {
+	v9: {
+		url: '/SASStoredProcess/do',
+		logoutUrl: '/SASStoredProcess/do'
+	},
+	viya: {
+		url: '/SASJobExecution/',
+		logoutUrl: '/SASLogon/logout.do?'
+	}
+}
 
 /*
 * Represents html5 for sas adapter
@@ -12,19 +20,27 @@ var h54sError = require('./error.js');
 */
 var h54s = module.exports = function(config) {
 
+  // first thing first - set sas version config
+  const sasVersionConfig = sasVersionMap[config.sasVersion] || sasVersionMap['v9'] //use v9 as default
+
   //default config values
-  this.maxXhrRetries    = 5;
-  this.url              = "/SASStoredProcess/do";
-  this.debug            = false;
-  this.loginUrl         = '/SASLogon/Logon.do';
-  this.retryAfterLogin  = true;
-  this.sasApp           = 'Stored Process Web App 9.3';
-  this.ajaxTimeout      = 30000;
+  this.maxXhrRetries        = 5;
+  this.url                  = sasVersionConfig.url
+  this.isViya								= this.url === '/SASJobExecution/'
+  this.debug                = true;
+  this.loginUrl             = '/SASLogon/login.do';
+  this.logoutUrl            = sasVersionConfig.logoutUrl
+  this.retryAfterLogin      = true;
+  this.ajaxTimeout          = config.ajaxTimeout || 30000;
+  this.useMultipartFormData = true;
+  this.RESTauth             = false;
+  this.RESTauthLoginUrl     = '/SASLogon/v1/tickets';
+  this.csrf                 = ''
 
   this.remoteConfigUpdateCallbacks = [];
-
-  this._pendingCalls    = [];
-
+  this._pendingCalls = [];
+  this._customPendingCalls = [];
+  this._customDisableCalls = false
   this._ajax = require('./methods/ajax.js')();
 
   _setConfig.call(this, config);
@@ -34,8 +50,9 @@ var h54s = module.exports = function(config) {
     var self = this;
 
     this._disableCalls = true;
+    this._customDisableCalls = true;
 
-    // '/base/test/h54sConfig.json' is for the testing with karma
+    // 'h54sConfig.json' is for the testing with karma
     //replaced with gulp in dev build
     this._ajax.get('h54sConfig.json').success(function(res) {
       var remoteConfig = JSON.parse(res.responseText);
@@ -73,6 +90,26 @@ var h54s = module.exports = function(config) {
 
         self.call(sasProgram, null, callback, params);
       }
+
+      //execute custom calls that we made while waitinf for the config
+      self._customDisableCalls = false;
+      while(self._customPendingCalls.length > 0) {
+      	//TODO - Implement logic that will reflect managedRequest method
+        // const pendingCall = self._customPendingCalls.shift();
+        // const sasProgram  = pendingCall.sasProgram;
+        // const callback    = pendingCall.callback;
+        // const params      = pendingCall.params;
+				//
+        // //update program with metadataRoot if it's not set
+        // if(self.metadataRoot && pendingCall.params._program.indexOf(self.metadataRoot) === -1) {
+        //   pendingCall.params._program = self.metadataRoot.replace(/\/?$/, '/') + pendingCall.params._program.replace(/^\//, '');
+        // }
+				//
+        // //update debug because it may change in the meantime
+        // params._debug = self.debug ? 131 : 0;
+				//
+        // self.call(sasProgram, null, callback, params);
+      }
     }).error(function (err) {
       throw new h54sError('ajaxError', 'Remote config file cannot be loaded. Http status code: ' + err.status);
     });
@@ -103,9 +140,10 @@ var h54s = module.exports = function(config) {
       if(config.hostUrl.charAt(config.hostUrl.length - 1) === '/') {
         config.hostUrl = config.hostUrl.slice(0, -1);
       }
-      this.hostUrl  = config.hostUrl;
-      this.url      = config.hostUrl + this.url;
-      this.loginUrl = config.hostUrl + this.loginUrl;
+      this.hostUrl          = config.hostUrl;
+      this.url              = config.hostUrl + this.url;
+      this.loginUrl         = config.hostUrl + this.loginUrl;
+      this.RESTauthLoginUrl = config.hostUrl + this.RESTauthLoginUrl;
     }
 
     this._ajax.setTimeout(this.ajaxTimeout);
@@ -116,6 +154,14 @@ var h54s = module.exports = function(config) {
 h54s.version = '__version__';
 
 
-h54s.prototype = require('./methods/methods.js');
+h54s.prototype = require('./methods');
 
-h54s.Tables = require('./tables/tables.js');
+h54s.Tables = require('./tables');
+h54s.Files = require('./files');
+h54s.SasData = require('./sasData.js');
+
+h54s.fromSasDateTime = require('./methods/utils.js').fromSasDateTime;
+h54s.toSasDateTime = require('./tables/utils.js').toSasDateTime;
+
+//self invoked function module
+require('./ie_polyfills.js');

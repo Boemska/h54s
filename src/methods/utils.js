@@ -1,7 +1,12 @@
 var logs = require('../logs.js');
 var h54sError = require('../error.js');
 
-var programNotFoundPatt = /<title>(Stored Process Error|SASStoredProcess)<\/title>[\s\S]*<h2>Stored process not found:.*<\/h2>/;
+var programNotFoundPatt = /<title>(Stored Process Error|SASStoredProcess)<\/title>[\s\S]*<h2>(Stored process not found:.*|.*not a valid stored process path.)<\/h2>/;
+var badJobDefinition = "<h2>Parameter Error <br/>Unable to get job definition.</h2>";
+
+var responseReplace = function(res) {
+  return res.replace(/(\r\n|\r|\n)/g, '').replace(/\\\\(n|r|t|f|b)/g, '\\$1').replace(/\\"\\"/g, '\\"');
+};
 
 /*
 * Parse response from server
@@ -14,10 +19,11 @@ var programNotFoundPatt = /<title>(Stored Process Error|SASStoredProcess)<\/titl
 module.exports.parseRes = function(responseText, sasProgram, params) {
   var matches = responseText.match(programNotFoundPatt);
   if(matches) {
-    throw new h54sError('programNotFound', 'Sas program completed with errors');
+    throw new h54sError('programNotFound', 'You have not been granted permission to perform this action, or the STP is missing.');
   }
   //remove new lines in json response
-  return JSON.parse(responseText.replace(/(\r\n|\r|\n)/g, ''));
+  //replace \\(d) with \(d) - SAS json parser is escaping it
+  return JSON.parse(responseReplace(responseText));
 };
 
 /*
@@ -26,39 +32,68 @@ module.exports.parseRes = function(responseText, sasProgram, params) {
 * @param {object} responseText - response html from the server
 * @param {string} sasProgram - sas program path
 * @param {object} params - params sent to sas program with addTable
+* @param {string} hostUrl
+* @param {bool} isViya
 *
 */
-module.exports.parseDebugRes = function(responseText, sasProgram, params) {
-  var matches = responseText.match(programNotFoundPatt);
-  if(matches) {
-    throw new h54sError('programNotFound', 'Sas program completed with errors');
-  }
+module.exports.parseDebugRes = function (responseText, sasProgram, params, hostUrl, isViya) {
+	let matches = responseText.match(programNotFoundPatt);
+	if (matches) {
+		throw new h54sError('programNotFound', 'Sas program completed with errors');
+	}
 
-  //find json
-  patt              = /^(.?--h54s-data-start--)([\S\s]*?)(--h54s-data-end--)/m;
-  matches           = responseText.match(patt);
+	if (isViya) {
+		const matchesWrongJob = responseText.match(badJobDefinition);
+		if (matchesWrongJob) {
+			throw new h54sError('programNotFound', 'Sas program completed with errors. Unable to get job definition.');
+		}
+	}
 
-  var page          = responseText.replace(patt, '');
-  var htmlBodyPatt  = /<body.*>([\s\S]*)<\/body>/;
-  var bodyMatches   = page.match(htmlBodyPatt);
+	//find json
+	let patt = isViya ? /^(.?<iframe.*src=")([^"]+)(.*iframe>)/m : /^(.?--h54s-data-start--)([\S\s]*?)(--h54s-data-end--)/m;
+	matches = responseText.match(patt);
 
-  //remove html tags
-  var debugText = bodyMatches[1].replace(/<[^>]*>/g, '');
-  debugText     = this.decodeHTMLEntities(debugText);
+	const page = responseText.replace(patt, '');
+	const htmlBodyPatt = /<body.*>([\s\S]*)<\/body>/;
+	const bodyMatches = page.match(htmlBodyPatt);
+	//remove html tags
+	let debugText = bodyMatches[1].replace(/<[^>]*>/g, '');
+	debugText = this.decodeHTMLEntities(debugText);
 
-  logs.addDebugData(bodyMatches[1], debugText, sasProgram, params);
+	logs.addDebugData(bodyMatches[1], debugText, sasProgram, params);
 
-  if(this.parseErrorResponse(responseText, sasProgram)) {
-    throw new h54sError('sasError', 'Sas program completed with errors');
-  }
+  if (isViya && this.parseErrorResponse(responseText, sasProgram)) {
+		throw new h54sError('sasError', 'Sas program completed with errors');
+	}
+	if (!matches) {
+		throw new h54sError('parseError', 'Unable to parse response json');
+	}
 
-  if(!matches) {
-    throw new h54sError('parseError', 'Unable to parse response json');
-  }
-  //remove new lines in json response
-  var jsonObj = JSON.parse(matches[2].replace(/(\r\n|\r|\n)/g, ''));
+  let jsonObj
+	if (isViya) {
+		const xhttp = new XMLHttpRequest();
+		const baseUrl = hostUrl || "";
 
-  return jsonObj;
+		xhttp.open("GET", baseUrl + matches[2], false);
+		xhttp.send();
+		const response = xhttp.responseText;
+		jsonObj = JSON.parse(response.replace(/(\r\n|\r|\n)/g, ''));
+		return jsonObj;
+	}
+
+	// v9 support code
+	try {
+		jsonObj = JSON.parse(responseReplace(matches[2]));
+	} catch (e) {
+		throw new h54sError('parseError', 'Unable to parse response json');
+	}
+	if (jsonObj && jsonObj.h54sAbort) {
+		return jsonObj;
+	} else if (this.parseErrorResponse(responseText, sasProgram)) {
+		throw new h54sError('sasError', 'Sas program completed with errors');
+	} else {
+		return jsonObj;
+	}
 };
 
 /*
@@ -105,8 +140,8 @@ module.exports.unescapeValues = function(obj) {
 */
 module.exports.parseErrorResponse = function(res, sasProgram) {
   //capture 'ERROR: [text].' or 'ERROR xx [text].'
-  var patt    = /ERROR(:\s|\s\d\d)(.*\.|.*\n.*\.)/gm;
-  var errors  = res.match(patt);
+  var patt    = /^ERROR(:\s|\s\d\d)(.*\.|.*\n.*\.)/gm;
+  var errors  = res.replace(/(<([^>]+)>)/ig, '').match(patt);
   if(!errors) {
     return;
   }
@@ -171,23 +206,6 @@ module.exports.fromSasDateTime = function (sasDate) {
   return jsDate;
 };
 
-/*
-* Convert sas timestamps to javascript Date object
-*
-* @param {object} obj
-*
-*/
-module.exports.convertDates = function(obj) {
-  for (var key in obj) {
-    if (typeof obj[key] === 'number' && (key.indexOf('dt_') === 0 || key.indexOf('DT_') === 0)) {
-      obj[key] = this.fromSasDateTime(obj[key]);
-    } else if(typeof obj === 'object') {
-      this.convertDates(obj[key]);
-    }
-  }
-  return obj;
-};
-
 module.exports.needToLogin = function(responseObj) {
   var patt = /<form.+action="(.*Logon[^"]*).*>/;
   var matches = patt.exec(responseObj.responseText);
@@ -233,3 +251,22 @@ module.exports.needToLogin = function(responseObj) {
     return true;
   }
 };
+
+/*
+* Get full program path from metadata root and relative path
+*
+* @param {string} metadataRoot - Metadata root (path where all programs for the project are located)
+* @param {string} sasProgramPath - Sas program path
+*
+*/
+module.exports.getFullProgramPath = function(metadataRoot, sasProgramPath) {
+  return metadataRoot ? metadataRoot.replace(/\/?$/, '/') + sasProgramPath.replace(/^\//, '') : sasProgramPath;
+};
+
+module.exports.getObjOfTable = function (table, key, value = null) {
+	const obj = {}
+	table.forEach(row => {
+		obj[row[key]] = value ? row[value] : row
+	})
+	return obj
+}
