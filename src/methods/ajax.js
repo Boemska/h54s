@@ -101,28 +101,46 @@ module.exports = function() {
 			var urlWithParams = dataStr ? (url + '?' + dataStr) : url;
 			return xhr('GET', urlWithParams, null, headers, null);
 		},
-		post: function (url, data, headers, multipartFormData) {
-			var payload;
-			if (typeof data === 'object') {
-				if (multipartFormData) {
-					payload = createMultipartFormDataPayload(data);
-				} else {
-					payload = serialize(data);
-				}
-			}
-			return xhr('POST', url, payload, headers, multipartFormData);
-		},
-		put: function (url, data, multipartFormData, headers) {
-			let payload = data;
-			if (typeof data === 'object') {
-				if (multipartFormData) {
-					payload = createMultipartFormDataPayload(data);
-				} else {
-					payload = serialize(data);
-				}
-			}
-			return xhr('PUT', url, payload, headers, multipartFormData);
-		},
+		// post: function (url, data, headers, multipartFormData) {
+		// 	var payload;
+		// 	if (typeof data === 'object') {
+		// 		if (multipartFormData) {
+		// 			payload = createMultipartFormDataPayload(data);
+		// 		} else {
+		// 			payload = serialize(data);
+		// 		}
+		// 	}
+		// 	return xhr('POST', url, payload, headers, multipartFormData);
+		// },
+		// put: function (url, data, multipartFormData, headers) {
+		// 	let payload = data;
+		// 	if (typeof data === 'object') {
+		// 		if (multipartFormData) {
+		// 			payload = createMultipartFormDataPayload(data);
+		// 		} else {
+		// 			payload = serialize(data);
+		// 		}
+		// 	}
+		// 	return xhr('PUT', url, payload, headers, multipartFormData);
+		// },
+		post: function(url, data, multipartFormData, headers) {
+      let payload = data;
+      if(typeof data === 'object') {
+        if(multipartFormData) {
+          payload = createMultipartFormDataPayload(data);
+        }
+      }
+      return xhr('POST', url, payload, multipartFormData, headers);
+    },
+    put: function(url, data, multipartFormData, headers) {
+      let payload = data;
+      if(typeof data === 'object') {
+        if(multipartFormData) {
+          payload = createMultipartFormDataPayload(data);
+        }
+      }
+      return xhr('PUT', url, payload, multipartFormData, headers);
+    },
 		setTimeout: function (t) {
 			timeout = t;
 		}

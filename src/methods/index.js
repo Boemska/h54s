@@ -271,6 +271,7 @@ module.exports.managedRequest = function (callMethod = 'get', _url, options = {
 	const {useMultipartFormData, sasProgram, dataObj, params, callback, headers} = options
 
 	if (sasProgram) {
+		// TODO return object with headers body etc...
 		return self.call(sasProgram, dataObj, callback, params)
 	}
 

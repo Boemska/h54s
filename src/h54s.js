@@ -31,7 +31,7 @@ var h54s = module.exports = function(config) {
   this.loginUrl             = '/SASLogon/login.do';
   this.logoutUrl            = sasVersionConfig.logoutUrl
   this.retryAfterLogin      = true;
-  this.ajaxTimeout          = config.ajaxTimeout || 30000;
+  this.ajaxTimeout          = config.ajaxTimeout || 300000;
   this.useMultipartFormData = true;
   this.RESTauth             = false;
   this.RESTauthLoginUrl     = '/SASLogon/v1/tickets';
