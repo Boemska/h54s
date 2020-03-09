@@ -101,14 +101,14 @@ module.exports = function() {
 			var urlWithParams = dataStr ? (url + '?' + dataStr) : url;
 			return xhr('GET', urlWithParams, null, headers, null);
 		},
-		post: function(url, data, multipartFormData, headers) {
+		post: function(url, data, headers, multipartFormData) {
       let payload = data;
       if(typeof data === 'object') {
         if(multipartFormData) {
           payload = createMultipartFormDataPayload(data);
         }
       }
-      return xhr('POST', url, payload, multipartFormData, headers);
+      return xhr('POST', url, payload, headers, multipartFormData);
     },
     put: function(url, data, multipartFormData, headers) {
       let payload = data;
