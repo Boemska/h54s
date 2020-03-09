@@ -7,7 +7,7 @@ var Files = require('../files');
 var defaultCsrfHeader = 'X-CSRF-TOKEN'
 
 /*
-* Call Sas program
+* Call Sas program - LEGACY
 *
 * @param {string} sasProgram - Path of the sas program
 * @param {function} callback - Callback function called when ajax call is finished
@@ -246,9 +246,9 @@ module.exports.login = function (user, pass, callback) {
 	}
 
 	if (!this.RESTauth) {
-		customHandleSasLogon.call(this, user, pass, callback);
-	} else {
-		customHandleRestLogon.call(this, user, pass, callback);
+		handleSasLogon.call(this, user, pass, callback);
+  } else {
+    handleRestLogon.call(this, user, pass, callback);
 	}
 };
 
@@ -376,25 +376,6 @@ module.exports.managedRequest = function (callMethod = 'get', _url, options = {
 			callback(new h54sError('httpError', res && res.response, res && res.status));
 		}
 	});
-}
-
-
-module.exports.promiseLogin = function (user, pass) {
-	return new Promise((resolve, reject) => {
-		if (!user || !pass) {
-			reject(new h54sError('argumentError', 'Credentials not set'))
-		}
-		if (typeof user !== 'string' || typeof pass !== 'string') {
-			reject(new h54sError('argumentError', 'User and pass parameters must be strings'))
-		}
-		if (!this.RESTauth) {
-			customHandleSasLogon.call(this, user, pass, resolve);
-			// promiseHandleSasLogon.call(this, user, pass, resolve, reject);
-		} else {
-			customHandleRestLogon.call(this, user, pass, resolve);
-			// handleRestLogon.call(this, user, pass, resolve);
-		}
-	})
 }
 
 /*
@@ -581,4 +562,142 @@ function customHandleRestLogon(user, pass, callback, callbackUrl) {
 			callback(res.status);
 		}
 	});
+}
+
+// LEGACY FUNCTIONS
+
+
+module.exports.promiseLogin = function (user, pass) {
+	return new Promise((resolve, reject) => {
+		if (!user || !pass) {
+			reject(new h54sError('argumentError', 'Credentials not set'))
+		}
+		if (typeof user !== 'string' || typeof pass !== 'string') {
+			reject(new h54sError('argumentError', 'User and pass parameters must be strings'))
+		}
+		if (!this.RESTauth) {
+			customHandleSasLogon.call(this, user, pass, resolve);
+			// promiseHandleSasLogon.call(this, user, pass, resolve, reject);
+		} else {
+			customHandleRestLogon.call(this, user, pass, resolve);
+			// handleRestLogon.call(this, user, pass, resolve);
+		}
+	})
+}
+
+function handleSasLogon(user, pass, callback) {
+  var self = this;
+
+  var loginParams = {
+    _service: 'default',
+    //for SAS 9.4,
+    username: user,
+    password: pass
+  };
+
+  for (var key in this._aditionalLoginParams) {
+    loginParams[key] = this._aditionalLoginParams[key];
+  }
+
+  this._loginAttempts = 0;
+
+  this._ajax.post(this.loginUrl, loginParams)
+    .success(handleSasLogonSuccess)
+    .error(handleSasLogonError);
+
+  function handleSasLogonError(res) {
+    if (res.status == 449) {
+      handleSasLogonSuccess(res);
+      return;
+    }
+
+    logs.addApplicationLog('Login failed with status code: ' + res.status);
+    callback(res.status);
+  }
+
+  function handleSasLogonSuccess(res) {
+    if (++self._loginAttempts === 3) {
+      return callback(-2);
+    }
+    if (self._utils.needToLogin.call(self, res)) {
+      //we are getting form again after redirect
+      //and need to login again using the new url
+      //_loginChanged is set in needToLogin function
+      //but if login url is not different, we are checking if there are aditional parameters
+      if (self._loginChanged || (self._isNewLoginPage && !self._aditionalLoginParams)) {
+        delete self._loginChanged;
+        var inputs = res.responseText.match(/<input.*"hidden"[^>]*>/g);
+        if (inputs) {
+          inputs.forEach(function (inputStr) {
+            var valueMatch = inputStr.match(/name="([^"]*)"\svalue="([^"]*)/);
+            loginParams[valueMatch[1]] = valueMatch[2];
+          });
+        }
+        self._ajax.post(self.loginUrl, loginParams).success(function () {
+          //we need this get request because of the sas 9.4 security checks
+          self._ajax.get(self.url).success(handleSasLogonSuccess).error(handleSasLogonError);
+        }).error(handleSasLogonError);
+      }
+      else {
+        //getting form again, but it wasn't a redirect
+        logs.addApplicationLog('Wrong username or password');
+        callback(-1);
+      }
+    }
+    else {
+      self._disableCalls = false;
+      callback(res.status);
+      while (self._pendingCalls.length > 0) {
+        var pendingCall = self._pendingCalls.shift();
+        var method = pendingCall.method || self.call.bind(self);
+        var sasProgram = pendingCall.sasProgram;
+        var callbackPending = pendingCall.callback;
+        var params = pendingCall.params;
+        //update debug because it may change in the meantime
+        params._debug = self.debug ? 131 : 0;
+        if (self.retryAfterLogin) {
+          method(sasProgram, null, callbackPending, params);
+        }
+      }
+    }
+  };
+}
+
+function handleRestLogon(user, pass, callback) {
+  var self = this;
+
+  var loginParams = {
+    username: user,
+    password: pass
+  };
+
+  this._ajax.post(this.RESTauthLoginUrl, loginParams).success(function (res) {
+    var location = res.getResponseHeader('Location');
+
+    self._ajax.post(location, {
+      service: self.url
+    }).success(function (res) {
+      if (self.url.indexOf('?') === -1) {
+        self.url += '?ticket=' + res.responseText;
+      } else {
+        if (self.url.indexOf('ticket') !== -1) {
+          self.url = self.url.replace(/ticket=[^&]+/, 'ticket=' + res.responseText);
+        } else {
+          self.url += '&ticket=' + res.responseText;
+        }
+      }
+
+      callback(res.status);
+    }).error(function (res) {
+      logs.addApplicationLog('Login failed with status code: ' + res.status);
+      callback(res.status);
+    });
+  }).error(function (res) {
+    if (res.responseText === 'error.authentication.credentials.bad') {
+      callback(-1);
+    } else {
+      logs.addApplicationLog('Login failed with status code: ' + res.status);
+      callback(res.status);
+    }
+  });
 }

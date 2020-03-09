@@ -106,6 +106,8 @@ module.exports = function() {
       if(typeof data === 'object') {
         if(multipartFormData) {
           payload = createMultipartFormDataPayload(data);
+        } else {
+          payload = serialize(data);
         }
       }
       return xhr('POST', url, payload, headers, multipartFormData);
