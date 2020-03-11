@@ -262,11 +262,3 @@ module.exports.needToLogin = function(responseObj) {
 module.exports.getFullProgramPath = function(metadataRoot, sasProgramPath) {
   return metadataRoot ? metadataRoot.replace(/\/?$/, '/') + sasProgramPath.replace(/^\//, '') : sasProgramPath;
 };
-
-module.exports.getObjOfTable = function (table, key, value = null) {
-	const obj = {}
-	table.forEach(row => {
-		obj[row[key]] = value ? row[value] : row
-	})
-	return obj
-}
