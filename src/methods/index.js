@@ -63,7 +63,7 @@ module.exports.call = function (sasProgram, dataObj, callback, params) {
   }
 
   if (this._disableCalls) {
-    this._customPendingCalls.push({
+    this._pendingCalls.push({
       params,
       options: {
         sasProgram,
@@ -77,7 +77,7 @@ module.exports.call = function (sasProgram, dataObj, callback, params) {
   this._ajax.post(this.url, params, this.useMultipartFormData).success(async function (res) {
     if (self._utils.needToLogin.call(self, res)) {
       //remember the call for latter use
-      self._customPendingCalls.push({
+      self._pendingCalls.push({
         params,
         options: {
           sasProgram,
