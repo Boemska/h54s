@@ -434,8 +434,8 @@ function handleSasLogon(user, pass, callback) {
       while (self._pendingCalls.length > 0) {
         var pendingCall = self._pendingCalls.shift();
         var method = pendingCall.method || self.call.bind(self);
-        var sasProgram = pendingCall.sasProgram;
-        var callbackPending = pendingCall.callback;
+        var sasProgram = pendingCall.options.sasProgram;
+        var callbackPending = pendingCall.options.callback;
         var params = pendingCall.params;
         //update debug because it may change in the meantime
         params._debug = self.debug ? 131 : 0;
