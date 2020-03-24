@@ -3,7 +3,7 @@ var h54sError = require('./error.js');
 const sasVersionMap = {
 	v9: {
 		url: '/SASStoredProcess/do',
-		logoutUrl: '/SASStoredProcess/do'
+		logoutUrl: '/SASStoredProcess/do?_action=logoff'
 	},
 	viya: {
 		url: '/SASJobExecution/',
@@ -19,9 +19,10 @@ const sasVersionMap = {
 *
 */
 var h54s = module.exports = function(config) {
+	this.sasVersion = config.sasVersion || 'v9'
 
   // first thing first - set sas version config
-  const sasVersionConfig = sasVersionMap[config.sasVersion] || sasVersionMap['v9'] //use v9 as default
+  const sasVersionConfig = sasVersionMap[this.sasVersion] || sasVersionMap['v9'] //use v9 as default=
 
   //default config values
   this.maxXhrRetries        = 5;
@@ -40,7 +41,7 @@ var h54s = module.exports = function(config) {
   this.remoteConfigUpdateCallbacks = [];
   this._pendingCalls = [];
   this._customPendingCalls = [];
-  this._customDisableCalls = false
+  this._disableCalls = false
   this._ajax = require('./methods/ajax.js')();
 
   _setConfig.call(this, config);
@@ -93,7 +94,7 @@ var h54s = module.exports = function(config) {
 
       //execute custom calls that we made while waitinf for the config
       self._customDisableCalls = false;
-      while(self._customPendingCalls.length > 0) {
+      while(self._pendingCalls.length > 0) {
       	//TODO - Implement logic that will reflect managedRequest method
         // const pendingCall = self._customPendingCalls.shift();
         // const sasProgram  = pendingCall.sasProgram;
