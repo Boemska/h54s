@@ -236,14 +236,15 @@ module.exports.needToLogin = function(responseObj) {
     }
 
     //save parameters from hidden form fields
-    var inputs = responseObj.responseText.match(/<input.*"hidden"[^>]*>/g);
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(responseObj.responseText,"text/html");
+    var res = doc.querySelectorAll("input[type='hidden']");
     var hiddenFormParams = {};
-    if(inputs) {
+    if(res) {
       //it's new login page if we have these additional parameters
       this._isNewLoginPage = true;
-      inputs.forEach(function(inputStr) {
-        var valueMatch = inputStr.match(/name="([^"]*)"\svalue="([^"]*)/);
-        hiddenFormParams[valueMatch[1]] = valueMatch[2];
+      res.forEach(function(node) {
+        hiddenFormParams[node.name] = node.value;
       });
       this._aditionalLoginParams = hiddenFormParams;
     }
