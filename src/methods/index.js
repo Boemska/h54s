@@ -689,10 +689,3 @@ function customHandleRestLogon(user, pass, callback, callbackUrl) {
   });
 }
 
-module.exports.getObjOfTable = function (table, key, value = null) {
-	const obj = {}
-	table.forEach(row => {
-		obj[row[key]] = value ? row[value] : row
-	})
-	return obj
-}
