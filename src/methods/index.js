@@ -689,3 +689,97 @@ function customHandleRestLogon(user, pass, callback, callbackUrl) {
   });
 }
 
+
+// Utilility functioins for handling files and folders on VIYA
+module.exports.getFolderDetails = function (folderName, options) {
+	// First call to get folder's id
+	let url = "/folders/folders/@item?path=" + folderName
+	return this.managedRequest('get', url, options);
+}
+module.exports.getFileDetails = function (fileUri, options) {
+	return this.managedRequest('get', fileUri, options);
+}
+
+module.exports.getFileContent = function (fileUri, options) {
+	let uri = fileUri + '/content'
+	return this.managedRequest('get', uri, options);
+}
+
+
+// Util functions for working with files and folders
+// Returns details about folder it self and it's members with details
+module.exports.getFolderContents = async function (folderName, options) {
+	const self = this
+	const {callback} = options
+
+	// Second call to get folder's memebers
+	const _callback = (err, data) => {
+		let id = data.body.id
+		let membersUrl = '/folders/folders/' + id + '/members' + '/?limit=10000000';
+		return self.managedRequest('get', membersUrl, {callback})
+	}
+
+	// First call to get folder's id
+	let url = "/folders/folders/@item?path=" + folderName
+	this.managedRequest('get', url, {...options, callback: _callback});
+}
+
+module.exports.createNewFolder = function (parentUri, folderName, options) {
+	var headers = {
+		'Accept': 'application/json, text/javascript, */*; q=0.01',
+		'Content-Type': 'application/json',
+	}
+
+	var url = '/folders/folders?parentFolderUri=' + parentUri;
+	var data = {
+		'name': folderName,
+		'type': "folder"
+	}
+
+	return this.managedRequest('post', url, {
+		...options,
+		params: JSON.stringify(data),
+		headers,
+		useMultipartFormData: false
+	});
+}
+
+module.exports.deleteFolderById = function (folderId, options) {
+	var url = '/folders/folders/' + folderId;
+	return this.managedRequest('delete', url, options)
+}
+
+// TODO module.exports.deleteFolder = functino (folderId, optins)
+
+module.exports.createNewFile = function (fileName, fileBlob, parentFolderUri, options) {
+	let url = "/files/files#multipartUpload";
+	let dataObj = {
+		file: [fileBlob, fileName],
+		parentFolderUri
+	}
+	return this.managedRequest('post', url, {
+		params: dataObj,
+		useMultipartFormData: true,
+		...options
+	});
+}
+
+module.exports.deleteItem = function (itemUri, options) {
+	return this.managedRequest('delete', itemUri, options)
+}
+
+module.exports.updateFile = function (itemUri, fileBlob, lastModified, options) {
+	const url = itemUri + '/content'
+	console.log('URL', url)
+	let headers = {
+		'Content-Type': 'application/vnd.sas.file',
+		'If-Unmodified-Since': lastModified
+	}
+	return this.managedRequest('put', url, {
+		params: fileBlob,
+		headers,
+		useMultipartFormData: false,
+		...options
+	});
+}
+

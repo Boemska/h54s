@@ -123,6 +123,9 @@ module.exports = function () {
       }
       return xhr('PUT', url, payload, multipartFormData, headers);
     },
+		delete: function(url, payload, multipartFormData, headers) {
+    	return xhr('DELETE', url, payload, null, headers);
+		},
     setTimeout: function (t) {
       timeout = t;
     },
