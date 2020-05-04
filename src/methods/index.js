@@ -696,12 +696,21 @@ module.exports.getFolderDetails = function (folderName, options) {
 	let url = "/folders/folders/@item?path=" + folderName
 	return this.managedRequest('get', url, options);
 }
+
 module.exports.getFileDetails = function (fileUri, options) {
+	const cacheBust = options.cacheBust
+	if (cacheBust) {
+		fileUri += '?cacheBust=' + new Date().getTime()
+	}
 	return this.managedRequest('get', fileUri, options);
 }
 
 module.exports.getFileContent = function (fileUri, options) {
+	const cacheBust = options.cacheBust
 	let uri = fileUri + '/content'
+	if (cacheBust) {
+		uri += '?cacheBust=' + new Date().getTime()
+	}
 	return this.managedRequest('get', uri, options);
 }
 
