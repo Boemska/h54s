@@ -192,7 +192,8 @@ module.exports.call = function (sasProgram, dataObj, callback, params) {
     }
   }).error(function (res) {
     let _csrf
-		if ((res.status == 403 || res.status == 449) && (res.responseText.includes('_csrf') || res.getResponseHeader('X-Forbidden-Reason') === 'CSRF') && (_csrf = res.getResponseHeader(res.getResponseHeader('X-CSRF-HEADER')))) {
+		if (res.status == 449 || (res.status == 403 && (res.responseText.includes('_csrf') || res.getResponseHeader('X-Forbidden-Reason') === 'CSRF') && (_csrf = res.getResponseHeader(res.getResponseHeader('X-CSRF-HEADER'))))) {
+		// if ((res.status == 403 || res.status == 449) && (res.responseText.includes('_csrf') || res.getResponseHeader('X-Forbidden-Reason') === 'CSRF') && (_csrf = res.getResponseHeader(res.getResponseHeader('X-CSRF-HEADER')))) {
       params['_csrf'] = _csrf;
       self.csrf = _csrf
       if (retryCount < self.maxXhrRetries) {
@@ -350,7 +351,8 @@ module.exports.managedRequest = function (callMethod = 'get', _url, options = {
     }
   }).error(function (res) {
     let _csrf
-		if ((res.status == 403 || res.status == 449) && (res.responseText.includes('_csrf') || res.getResponseHeader('X-Forbidden-Reason') === 'CSRF') && (_csrf = res.getResponseHeader(res.getResponseHeader('X-CSRF-HEADER')))) {
+		if (res.status == 449 || (res.status == 403 && (res.responseText.includes('_csrf') || res.getResponseHeader('X-Forbidden-Reason') === 'CSRF') && (_csrf = res.getResponseHeader(res.getResponseHeader('X-CSRF-HEADER'))))) {
+		// if ((res.status == 403 || res.status == 449) && (res.responseText.includes('_csrf') || res.getResponseHeader('X-Forbidden-Reason') === 'CSRF') && (_csrf = res.getResponseHeader(res.getResponseHeader('X-CSRF-HEADER')))) {
       self.csrf = _csrf
       const _headers = Object.assign({}, headers, {[res.getResponseHeader('X-CSRF-HEADER')]: _csrf})
       if (retryCount < self.maxXhrRetries) {
