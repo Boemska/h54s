@@ -661,8 +661,7 @@ function customHandleSasLogon(user, pass, callback) {
 				}
 			}
 		}
-	}
-};
+	};
 }
 
 
