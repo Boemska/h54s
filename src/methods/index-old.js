@@ -645,6 +645,19 @@ function customHandleSasLogon(user, pass, callback) {
 					method(callMethod, _url, options);
 				}
 			}
+
+			while (self._pendingCalls.length > 0) {
+        const pendingCall = self._pendingCalls.shift();
+        const method = pendingCall.method || self.call.bind(self);
+        const sasProgram = pendingCall.options.sasProgram;
+        const callbackPending = pendingCall.options.callback;
+        const params = pendingCall.params;
+        //update debug because it may change in the meantime
+        params._debug = self.debug ? 131 : 0;
+        if (self.retryAfterLogin) {
+          method(sasProgram, null, callbackPending, params);
+        }
+      }
 		}
 	};
 }
