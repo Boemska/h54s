@@ -1,5 +1,16 @@
 var h54sError = require('./error.js');
 
+const sasVersionMap = {
+	v9: {
+		url: '/SASStoredProcess/do',
+		logoutUrl: '/SASStoredProcess/do?_action=logoff'
+	},
+	viya: {
+		url: '/SASJobExecution/',
+		logoutUrl: '/SASLogon/logout.do?'
+	}
+}
+
 /*
 * Represents html5 for sas adapter
 * @constructor
@@ -8,20 +19,29 @@ var h54sError = require('./error.js');
 *
 */
 var h54s = module.exports = function(config) {
+	this.sasVersion = config.sasVersion || 'v9'
+
+  // first thing first - set sas version config
+  const sasVersionConfig = sasVersionMap[this.sasVersion] || sasVersionMap['v9'] //use v9 as default=
 
   //default config values
   this.maxXhrRetries        = 5;
-  this.url                  = "/SASStoredProcess/do";
-  this.debug                = false;
-  this.loginUrl             = '/SASLogon/Logon.do';
+  this.url                  = sasVersionConfig.url
+  this.isViya								= this.url === '/SASJobExecution/'
+  this.debug                = true;
+  this.loginUrl             = '/SASLogon/login.do';
+  this.logoutUrl            = sasVersionConfig.logoutUrl
   this.retryAfterLogin      = true;
-  this.ajaxTimeout          = 30000;
+  this.ajaxTimeout          = config.ajaxTimeout || 300000;
   this.useMultipartFormData = true;
   this.RESTauth             = false;
   this.RESTauthLoginUrl     = '/SASLogon/v1/tickets';
+  this.csrf                 = ''
 
   this.remoteConfigUpdateCallbacks = [];
   this._pendingCalls = [];
+  this._customPendingCalls = [];
+  this._disableCalls = false
   this._ajax = require('./methods/ajax.js')();
 
   _setConfig.call(this, config);
@@ -31,6 +51,7 @@ var h54s = module.exports = function(config) {
     var self = this;
 
     this._disableCalls = true;
+    this._customDisableCalls = true;
 
     // 'h54sConfig.json' is for the testing with karma
     //replaced with gulp in dev build
@@ -69,6 +90,26 @@ var h54s = module.exports = function(config) {
         params._debug = self.debug ? 131 : 0;
 
         self.call(sasProgram, null, callback, params);
+      }
+
+      //execute custom calls that we made while waitinf for the config
+      self._customDisableCalls = false;
+      while(self._pendingCalls.length > 0) {
+      	//TODO - Implement logic that will reflect managedRequest method
+        // const pendingCall = self._customPendingCalls.shift();
+        // const sasProgram  = pendingCall.sasProgram;
+        // const callback    = pendingCall.callback;
+        // const params      = pendingCall.params;
+				//
+        // //update program with metadataRoot if it's not set
+        // if(self.metadataRoot && pendingCall.params._program.indexOf(self.metadataRoot) === -1) {
+        //   pendingCall.params._program = self.metadataRoot.replace(/\/?$/, '/') + pendingCall.params._program.replace(/^\//, '');
+        // }
+				//
+        // //update debug because it may change in the meantime
+        // params._debug = self.debug ? 131 : 0;
+				//
+        // self.call(sasProgram, null, callback, params);
       }
     }).error(function (err) {
       throw new h54sError('ajaxError', 'Remote config file cannot be loaded. Http status code: ' + err.status);
@@ -119,8 +160,6 @@ h54s.prototype = require('./methods');
 h54s.Tables = require('./tables');
 h54s.Files = require('./files');
 h54s.SasData = require('./sasData.js');
-h54s.Error = require('./error.js');
-h54s.Logs = require('./logs');
 
 h54s.fromSasDateTime = require('./methods/utils.js').fromSasDateTime;
 h54s.toSasDateTime = require('./tables/utils.js').toSasDateTime;

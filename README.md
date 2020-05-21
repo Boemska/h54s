@@ -194,7 +194,8 @@ To send dates to SAS, use `h54s.toSasDateTime(date)` to convert instance of `Dat
 |----------|------------|-----------------------------------------------------------------------------------------------------|
 | String   | String     | NewLine characters are stripped.                                                                    |
 | Numeric  | Numeric    | Same precision in both SAS and JS.                                                                  |
-| Date     |            | Unsupported. You won't be able to transmit data as SAS Dates. Convert, use output views and DHMS()  |
+| Datetime | Date()     | SAS Datetime columns are converted to Date() objects if their column name is prefixed with 'DT_' (by default, conditional can be edited [here](https://github.com/Boemska/h54s/blob/master/dist/h54s.js#L948))    |
+| Date     |            | Unsupported. You won't be able to transmit data as SAS Dates. Convert, use output views and DHMS()   |
 
 To parse numeric dates sent from SAS, use `h54s.fromSasDateTime(date)` to convert numeric SAS date value to JavaScript `Date` object
 

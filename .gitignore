@@ -1,3 +1,5 @@
 node_modules
 test/_server_data.js
 dev/
+.idea/
+.idea/workspace.xml

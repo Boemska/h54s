@@ -2,8 +2,10 @@ var logs = require('../logs.js');
 var h54sError = require('../error.js');
 
 var programNotFoundPatt = /<title>(Stored Process Error|SASStoredProcess)<\/title>[\s\S]*<h2>(Stored process not found:.*|.*not a valid stored process path.)<\/h2>/;
+var badJobDefinition = "<h2>Parameter Error <br/>Unable to get job definition.</h2>";
+
 var responseReplace = function(res) {
-  return res.replace(/(\r\n|\r|\n)/g, '').replace(/\\\\(n|r|t|f|b)/g, '\\$1')
+  return res.replace(/(\r\n|\r|\n)/g, '').replace(/\\\\(n|r|t|f|b)/g, '\\$1').replace(/\\"\\"/g, '\\"');
 };
 
 /*
@@ -30,46 +32,68 @@ module.exports.parseRes = function(responseText, sasProgram, params) {
 * @param {object} responseText - response html from the server
 * @param {string} sasProgram - sas program path
 * @param {object} params - params sent to sas program with addTable
+* @param {string} hostUrl
+* @param {bool} isViya
 *
 */
-module.exports.parseDebugRes = function(responseText, sasProgram, params) {
-  var matches = responseText.match(programNotFoundPatt);
-  if(matches) {
-    throw new h54sError('programNotFound', 'You have not been granted permission to perform this action, or the STP is missing.');
-  }
+module.exports.parseDebugRes = function (responseText, sasProgram, params, hostUrl, isViya) {
+	let matches = responseText.match(programNotFoundPatt);
+	if (matches) {
+		throw new h54sError('programNotFound', 'Sas program completed with errors');
+	}
 
-  //find json
-  patt              = /^(.?--h54s-data-start--)([\S\s]*?)(--h54s-data-end--)/m;
-  matches           = responseText.match(patt);
+	if (isViya) {
+		const matchesWrongJob = responseText.match(badJobDefinition);
+		if (matchesWrongJob) {
+			throw new h54sError('programNotFound', 'Sas program completed with errors. Unable to get job definition.');
+		}
+	}
 
-  var page          = responseText.replace(patt, '');
-  var htmlBodyPatt  = /<body.*>([\s\S]*)<\/body>/;
-  var bodyMatches   = page.match(htmlBodyPatt);
+	//find json
+	let patt = isViya ? /^(.?<iframe.*src=")([^"]+)(.*iframe>)/m : /^(.?--h54s-data-start--)([\S\s]*?)(--h54s-data-end--)/m;
+	matches = responseText.match(patt);
 
-  //remove html tags
-  var debugText = bodyMatches[1].replace(/<[^>]*>/g, '');
-  debugText     = this.decodeHTMLEntities(debugText);
+	const page = responseText.replace(patt, '');
+	const htmlBodyPatt = /<body.*>([\s\S]*)<\/body>/;
+	const bodyMatches = page.match(htmlBodyPatt);
+	//remove html tags
+	let debugText = bodyMatches[1].replace(/<[^>]*>/g, '');
+	debugText = this.decodeHTMLEntities(debugText);
 
-  logs.addDebugData(bodyMatches[1], debugText, sasProgram, params);
+	logs.addDebugData(bodyMatches[1], debugText, sasProgram, params);
 
-  if(!matches) {
-    throw new h54sError('parseError', 'Unable to parse response json');
-  }
-  //remove new lines in json response
-  //replace \\(d) with \(d) - SAS json parser is escaping it
-  var jsonObj;
-  try{
-    jsonObj = JSON.parse(responseReplace(matches[2]));
-  }catch(e){
-    throw new h54sError('parseError', 'Unable to parse response json');
-  }
-  if(jsonObj && jsonObj.h54sAbort){
-    return jsonObj;
-  }else if(this.parseErrorResponse(responseText, sasProgram)) {
-    throw new h54sError('sasError', 'Sas program completed with errors');
-  }else{
-    return jsonObj;
-  }
+  if (isViya && this.parseErrorResponse(responseText, sasProgram)) {
+		throw new h54sError('sasError', 'Sas program completed with errors');
+	}
+	if (!matches) {
+		throw new h54sError('parseError', 'Unable to parse response json');
+	}
+
+  let jsonObj
+	if (isViya) {
+		const xhttp = new XMLHttpRequest();
+		const baseUrl = hostUrl || "";
+
+		xhttp.open("GET", baseUrl + matches[2], false);
+		xhttp.send();
+		const response = xhttp.responseText;
+		jsonObj = JSON.parse(response.replace(/(\r\n|\r|\n)/g, ''));
+		return jsonObj;
+	}
+
+	// v9 support code
+	try {
+		jsonObj = JSON.parse(responseReplace(matches[2]));
+	} catch (e) {
+		throw new h54sError('parseError', 'Unable to parse response json');
+	}
+	if (jsonObj && jsonObj.h54sAbort) {
+		return jsonObj;
+	} else if (this.parseErrorResponse(responseText, sasProgram)) {
+		throw new h54sError('sasError', 'Sas program completed with errors');
+	} else {
+		return jsonObj;
+	}
 };
 
 /*
@@ -212,14 +236,15 @@ module.exports.needToLogin = function(responseObj) {
     }
 
     //save parameters from hidden form fields
-    var inputs = responseObj.responseText.match(/<input.*"hidden"[^>]*>/g);
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(responseObj.responseText,"text/html");
+    var res = doc.querySelectorAll("input[type='hidden']");
     var hiddenFormParams = {};
-    if(inputs) {
+    if(res) {
       //it's new login page if we have these additional parameters
       this._isNewLoginPage = true;
-      inputs.forEach(function(inputStr) {
-        var valueMatch = inputStr.match(/name="([^"]*)"\svalue="([^"]*)/);
-        hiddenFormParams[valueMatch[1]] = valueMatch[2];
+      res.forEach(function(node) {
+        hiddenFormParams[node.name] = node.value;
       });
       this._aditionalLoginParams = hiddenFormParams;
     }
@@ -238,3 +263,14 @@ module.exports.needToLogin = function(responseObj) {
 module.exports.getFullProgramPath = function(metadataRoot, sasProgramPath) {
   return metadataRoot ? metadataRoot.replace(/\/?$/, '/') + sasProgramPath.replace(/^\//, '') : sasProgramPath;
 };
+
+/*
+* Returns object where table rows are groupped by key
+ */
+module.exports.getObjOfTable = function (table, key, value = null) {
+	const obj = {}
+	table.forEach(row => {
+		obj[row[key]] = value ? row[value] : row
+	})
+	return obj
+}

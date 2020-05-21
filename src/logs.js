@@ -24,6 +24,14 @@ module.exports.get = {
   },
   getFailedRequests: function() {
     return logs.failedRequests;
+  },
+  getAllLogs: function () {
+    return {
+      sasErrors: logs.sasErrors,
+      applicationLogs: logs.applicationLogs,
+      debugData: logs.debugData,
+      failedRequests: logs.failedRequests
+    }
   }
 };
 

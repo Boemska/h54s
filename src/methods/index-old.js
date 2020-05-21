@@ -62,35 +62,36 @@ module.exports.call = function (sasProgram, dataObj, callback, params) {
 		}
 	}
 
-	if (this._disableCalls) {
-		this._pendingCalls.push({
+	if (this._customDisableCalls) {
+		this._customPendingCalls.push({
 			params,
 			options: {
 				sasProgram,
 				dataObj,
-				callback
+				callback,
+				params
 			}
 		});
 		return;
 	}
 
-	this._ajax.post(this.url, params, this.useMultipartFormData).success(async function (res) {
+	this._ajax.post(this.url, params, this.useMultipartFormData).success(function (res) {
 		if (self._utils.needToLogin.call(self, res)) {
 			//remember the call for latter use
-			self._pendingCalls.push({
-				params,
+			self._customPendingCalls.push({
 				options: {
 					sasProgram,
 					dataObj,
-					callback
+					callback,
+					params
 				}
 			});
 
 			//there's no need to continue if previous call returned login error
-			if (self._disableCalls) {
+			if (self._customDisableCalls) {
 				return;
 			} else {
-				self._disableCalls = true;
+				self._customDisableCalls = true;
 			}
 
 			callback(new h54sError('notLoggedinError', 'You are not logged in'));
@@ -146,7 +147,7 @@ module.exports.call = function (sasProgram, dataObj, callback, params) {
 				}
 			} else {
 				try {
-					resObj = await self._utils.parseDebugRes(res.responseText, sasProgram, params, self.hostUrl, self.isViya, self.managedRequest.bind(self));
+					resObj = self._utils.parseDebugRes(res.responseText, sasProgram, params, self.hostUrl, self.isViya);
 					logs.addApplicationLog(resObj.logmessage, sasProgram);
 
 					if (dataObj instanceof Tables) {
@@ -192,10 +193,9 @@ module.exports.call = function (sasProgram, dataObj, callback, params) {
 		}
 	}).error(function (res) {
 		let _csrf
-		if (res.status == 449 || (res.status == 403 && (res.responseText.includes('_csrf') || res.getResponseHeader('X-Forbidden-Reason') === 'CSRF') && (_csrf = res.getResponseHeader(res.getResponseHeader('X-CSRF-HEADER'))))) {
-			// if ((res.status == 403 || res.status == 449) && (res.responseText.includes('_csrf') || res.getResponseHeader('X-Forbidden-Reason') === 'CSRF') && (_csrf = res.getResponseHeader(res.getResponseHeader('X-CSRF-HEADER')))) {
+		if ((res.status === 449 || res.status === 403) && res.responseText.includes('_csrf') && (_csrf = res.getResponseHeader(res.getResponseHeader('X-CSRF-HEADER')))) {
 			params['_csrf'] = _csrf;
-			self.csrf = _csrf
+			self.csrf = _csrf;
 			if (retryCount < self.maxXhrRetries) {
 				self._ajax.post(self.url, params, true).success(this.success).error(this.error);
 				retryCount++;
@@ -239,9 +239,9 @@ module.exports.login = function (user, pass, callback) {
 	}
 
 	if (!this.RESTauth) {
-		handleSasLogon.call(this, user, pass, callback);
+		customHandleSasLogon.call(this, user, pass, callback);
 	} else {
-		handleRestLogon.call(this, user, pass, callback);
+		customHandleRestLogon.call(this, user, pass, callback);
 	}
 };
 
@@ -280,7 +280,7 @@ module.exports.managedRequest = function (callMethod = 'get', _url, options = {
 		headers: _headers
 	})
 
-	if (this._disableCalls) {
+	if (this._customDisableCalls) {
 		this._customPendingCalls.push({
 			callMethod,
 			_url,
@@ -299,10 +299,10 @@ module.exports.managedRequest = function (callMethod = 'get', _url, options = {
 			});
 
 			//there's no need to continue if previous call returned login error
-			if (self._disableCalls) {
+			if (self._customDisableCalls) {
 				return;
 			} else {
-				self._disableCalls = true;
+				self._customDisableCalls = true;
 			}
 
 			callback(new h54sError('notLoggedinError', 'You are not logged in'));
@@ -314,7 +314,6 @@ module.exports.managedRequest = function (callMethod = 'get', _url, options = {
 				// todo: check that this returns valid json or something
 				// resObj = res.responseText;
 				// done = true;
-
 				const arr = res.getAllResponseHeaders().split('\r\n');
 				const resHeaders = arr.reduce(function (acc, current, i) {
 					let parts = current.split(': ');
@@ -335,8 +334,6 @@ module.exports.managedRequest = function (callMethod = 'get', _url, options = {
 					})
 					done = true;
 				}
-
-
 			} catch (e) {
 				err = new h54sError('unknownError', e.message);
 				err.stack = e.stack;
@@ -346,13 +343,12 @@ module.exports.managedRequest = function (callMethod = 'get', _url, options = {
 				if (done) {
 					callback(err, resObj)
 				}
-
 			}
 		}
 	}).error(function (res) {
 		let _csrf
 		if (res.status == 449 || (res.status == 403 && (res.responseText.includes('_csrf') || res.getResponseHeader('X-Forbidden-Reason') === 'CSRF') && (_csrf = res.getResponseHeader(res.getResponseHeader('X-CSRF-HEADER'))))) {
-			// if ((res.status == 403 || res.status == 449) && (res.responseText.includes('_csrf') || res.getResponseHeader('X-Forbidden-Reason') === 'CSRF') && (_csrf = res.getResponseHeader(res.getResponseHeader('X-CSRF-HEADER')))) {
+			params['_csrf'] = _csrf;
 			self.csrf = _csrf
 			const _headers = Object.assign({}, headers, {[res.getResponseHeader('X-CSRF-HEADER')]: _csrf})
 			if (retryCount < self.maxXhrRetries) {
@@ -370,6 +366,24 @@ module.exports.managedRequest = function (callMethod = 'get', _url, options = {
 	});
 }
 
+
+module.exports.promiseLogin = function (user, pass) {
+	return new Promise((resolve, reject) => {
+		if (!user || !pass) {
+			reject(new h54sError('argumentError', 'Credentials not set'))
+		}
+		if (typeof user !== 'string' || typeof pass !== 'string') {
+			reject(new h54sError('argumentError', 'User and pass parameters must be strings'))
+		}
+		if (!this.RESTauth) {
+			customHandleSasLogon.call(this, user, pass, resolve);
+			// promiseHandleSasLogon.call(this, user, pass, resolve, reject);
+		} else {
+			customHandleRestLogon.call(this, user, pass, resolve);
+			// handleRestLogon.call(this, user, pass, resolve);
+		}
+	})
+}
 
 function handleSasLogon(user, pass, callback) {
 	var self = this;
@@ -436,8 +450,8 @@ function handleSasLogon(user, pass, callback) {
 			while (self._pendingCalls.length > 0) {
 				var pendingCall = self._pendingCalls.shift();
 				var method = pendingCall.method || self.call.bind(self);
-				var sasProgram = pendingCall.options.sasProgram;
-				var callbackPending = pendingCall.options.callback;
+				var sasProgram = pendingCall.sasProgram;
+				var callbackPending = pendingCall.callback;
 				var params = pendingCall.params;
 				//update debug because it may change in the meantime
 				params._debug = self.debug ? 131 : 0;
@@ -550,23 +564,7 @@ module.exports._utils = require('./utils.js');
 
 
 // PROMISE FUNCTIONS
-module.exports.promiseLogin = function (user, pass) {
-	return new Promise((resolve, reject) => {
-		if (!user || !pass) {
-			reject(new h54sError('argumentError', 'Credentials not set'))
-		}
-		if (typeof user !== 'string' || typeof pass !== 'string') {
-			reject(new h54sError('argumentError', 'User and pass parameters must be strings'))
-		}
-		if (!this.RESTauth) {
-			customHandleSasLogon.call(this, user, pass, resolve);
-			// promiseHandleSasLogon.call(this, user, pass, resolve, reject);
-		} else {
-			customHandleRestLogon.call(this, user, pass, resolve);
-			// handleRestLogon.call(this, user, pass, resolve);
-		}
-	})
-}
+
 
 function customHandleSasLogon(user, pass, callback) {
 	const self = this;
@@ -631,7 +629,7 @@ function customHandleSasLogon(user, pass, callback) {
 			}
 		}
 		else {
-			self._disableCalls = false;
+			self._customDisableCalls = false;
 			callback(res.status);
 			while (self._customPendingCalls.length > 0) {
 				const pendingCall = self._customPendingCalls.shift()
@@ -649,17 +647,17 @@ function customHandleSasLogon(user, pass, callback) {
 			}
 
 			while (self._pendingCalls.length > 0) {
-				const pendingCall = self._pendingCalls.shift();
-				const method = pendingCall.method || self.call.bind(self);
-				const sasProgram = pendingCall.options.sasProgram;
-				const callbackPending = pendingCall.options.callback;
-				const params = pendingCall.params;
-				//update debug because it may change in the meantime
-				params._debug = self.debug ? 131 : 0;
-				if (self.retryAfterLogin) {
-					method(sasProgram, null, callbackPending, params);
-				}
-			}
+        const pendingCall = self._pendingCalls.shift();
+        const method = pendingCall.method || self.call.bind(self);
+        const sasProgram = pendingCall.options.sasProgram;
+        const callbackPending = pendingCall.options.callback;
+        const params = pendingCall.params;
+        //update debug because it may change in the meantime
+        params._debug = self.debug ? 131 : 0;
+        if (self.retryAfterLogin) {
+          method(sasProgram, null, callbackPending, params);
+        }
+      }
 		}
 	};
 }
@@ -703,107 +701,3 @@ function customHandleRestLogon(user, pass, callback, callbackUrl) {
 		}
 	});
 }
-
-
-// Utilility functioins for handling files and folders on VIYA
-module.exports.getFolderDetails = function (folderName, options) {
-	// First call to get folder's id
-	let url = "/folders/folders/@item?path=" + folderName
-	return this.managedRequest('get', url, options);
-}
-
-module.exports.getFileDetails = function (fileUri, options) {
-	const cacheBust = options.cacheBust
-	if (cacheBust) {
-		fileUri += '?cacheBust=' + new Date().getTime()
-	}
-	return this.managedRequest('get', fileUri, options);
-}
-
-module.exports.getFileContent = function (fileUri, options) {
-	const cacheBust = options.cacheBust
-	let uri = fileUri + '/content'
-	if (cacheBust) {
-		uri += '?cacheBust=' + new Date().getTime()
-	}
-	return this.managedRequest('get', uri, options);
-}
-
-
-// Util functions for working with files and folders
-// Returns details about folder it self and it's members with details
-module.exports.getFolderContents = async function (folderName, options) {
-	const self = this
-	const {callback} = options
-
-	// Second call to get folder's memebers
-	const _callback = (err, data) => {
-		let id = data.body.id
-		let membersUrl = '/folders/folders/' + id + '/members' + '/?limit=10000000';
-		return self.managedRequest('get', membersUrl, {callback})
-	}
-
-	// First call to get folder's id
-	let url = "/folders/folders/@item?path=" + folderName
-	this.managedRequest('get', url, {...options, callback: _callback});
-}
-
-module.exports.createNewFolder = function (parentUri, folderName, options) {
-	var headers = {
-		'Accept': 'application/json, text/javascript, */*; q=0.01',
-		'Content-Type': 'application/json',
-	}
-
-	var url = '/folders/folders?parentFolderUri=' + parentUri;
-	var data = {
-		'name': folderName,
-		'type': "folder"
-	}
-
-	return this.managedRequest('post', url, {
-		...options,
-		params: JSON.stringify(data),
-		headers,
-		useMultipartFormData: false
-	});
-}
-
-module.exports.deleteFolderById = function (folderId, options) {
-	var url = '/folders/folders/' + folderId;
-	return this.managedRequest('delete', url, options)
-}
-
-// TODO module.exports.deleteFolder = functino (folderId, optins)
-
-module.exports.createNewFile = function (fileName, fileBlob, parentFolderUri, options) {
-	let url = "/files/files#multipartUpload";
-	let dataObj = {
-		file: [fileBlob, fileName],
-		parentFolderUri
-	}
-	return this.managedRequest('post', url, {
-		params: dataObj,
-		useMultipartFormData: true,
-		...options
-	});
-}
-
-module.exports.deleteItem = function (itemUri, options) {
-	return this.managedRequest('delete', itemUri, options)
-}
-
-module.exports.updateFile = function (itemUri, fileBlob, lastModified, options) {
-	const url = itemUri + '/content'
-	console.log('URL', url)
-	let headers = {
-		'Content-Type': 'application/vnd.sas.file',
-		'If-Unmodified-Since': lastModified
-	}
-	return this.managedRequest('put', url, {
-		params: fileBlob,
-		headers,
-		useMultipartFormData: false,
-		...options
-	});
-}
-

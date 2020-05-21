@@ -93,7 +93,7 @@ SasData.prototype.addTable = function(table, macroName, specs) {
     }
   }
 
-  var i, j, //counters used later in code
+  var i, j, //counters used latter in code
       row, val, type,
       specKeys = [],
       specialChars = ['"', '\\', '/', '\n', '\t', '\f', '\r', '\b'];
@@ -161,10 +161,8 @@ SasData.prototype.addTable = function(table, macroName, specs) {
         if(val === true || val === false) {
           throw new h54sError('typeError', 'Boolean value in one of the values (columns) is not allowed');
         }
-        if(type === 'string' && val.indexOf('\r\n') !== -1) {
-          // replace CRLF with LF in data so that we can support newlines without throwing errors
-          // the adapter uses CRLF as a linefeed so if the data contains CRLF it will corrupt
-          val.replace('\r\n','\n')
+        if(type === 'string' && val.indexOf('\n') !== -1) {
+          throw new h54sError('typeError', 'New line character is not supported');
         }
 
         // convert null to '.' for numbers and to '' for strings
@@ -226,7 +224,7 @@ SasData.prototype.addTable = function(table, macroName, specs) {
             specs[key].colLength = Math.max(specs[key].colLength, colLength, 1);
             break;
           case 'object':
-            sasCsv += '"' + JSON.stringify(val).replace(/"/g, '""') + '"';
+            sasCsv += '"' + JSON.stringidy(val).replace(/"/g, '""') + '"';
             break;
         }
       }
@@ -236,7 +234,7 @@ SasData.prototype.addTable = function(table, macroName, specs) {
       }
     }
     if(i < table.length - 1) {
-      sasCsv += '\r\n';
+      sasCsv += '\n';
     }
   }
 
