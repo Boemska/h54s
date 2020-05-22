@@ -16,8 +16,8 @@
     "boemska"
   ],
   "bugs": {
-    "url": "https://github.com/Boemska/h54s/issues"
-    , "email" : "support@boemskats.com"
+    "url": "https://github.com/Boemska/h54s/issues",
+    "email": "support@boemskats.com"
   },
   "scripts": {
     "test-sas": "node test/sas/src/main.js"
@@ -49,5 +49,8 @@
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.6.1"
+  },
+  "resolutions": {
+    "graceful-fs": "4.2.3"
   }
 }

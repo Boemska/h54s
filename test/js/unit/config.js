@@ -17,12 +17,12 @@ describe('h54s unit -', function() {
       sasAdapter = new h54s({
         url: '/SASStoredProcess/someValue'
       });
-      assert.equal('/SASStoredProcess/someValue', sasAdapter.url, 'Url is not set with config');
+      assert.equal('/SASStoredProcess/someValue', sasAdapter.url, 'Url is not set with config1');
       sasAdapter = new h54s({
-        url: '/someValue',
-        hostUrl: serverData.url
+        url: 'someValue',
+        hostUrl: serverData.hostUrl
       });
-      assert.equal(serverData.url + 'someValue', sasAdapter.url, 'Full url is not correct');
+      assert.equal(serverData.hostUrl + 'someValue', sasAdapter.url, 'Full url is not correct');
       assert.isFalse(sasAdapter.debug, 'Debug option is not correct');
       sasAdapter = new h54s({
         debug: true

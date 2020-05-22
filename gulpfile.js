@@ -9,8 +9,8 @@ var karma = require('karma');
 var source = require('vinyl-source-stream');
 var flatten = require('gulp-flatten');
 var clean = require('gulp-clean');
-var jshint = require('gulp-jshint');
-var stylish = require('jshint-stylish');
+// var jshint = require('gulp-jshint');
+// var stylish = require('jshint-stylish');
 var replace = require('gulp-replace');
 var rename = require("gulp-rename");
 var gulpsync = require('gulp-sync')(gulp);
@@ -94,27 +94,27 @@ gulp.task('clean', function(cb) {
   }
 });
 
-gulp.task('jshint', function() {
-  return gulp.src([
-    'gulpfile.js',
-    filePaths.srcFiles,
-    filePaths.helperTestFiles,
-    filePaths.unitTestFiles,
-    filePaths.integrationTestFiles,
-    filePaths.browserifyTestFiles
-  ])
-  .pipe(jshint())
-  .pipe(jshint.reporter(stylish))
-  .pipe(jshint.reporter('fail'));
-});
+// gulp.task('jshint', function() {
+//   return gulp.src([
+//     'gulpfile.js',
+//     filePaths.srcFiles,
+//     filePaths.helperTestFiles,
+//     filePaths.unitTestFiles,
+//     filePaths.integrationTestFiles,
+//     filePaths.browserifyTestFiles
+//   ])
+//   .pipe(jshint())
+//   .pipe(jshint.reporter(stylish))
+//   .pipe(jshint.reporter('fail'));
+// });
 
 gulp.task('build-dev', ['clean'], bundle);
 
-gulp.task('build-production', ['jshint', 'set-production'], bundle);
-gulp.task('build-ugly', ['jshint', 'set-production', 'set-ugly'], bundle);
+gulp.task('build-production', [ 'set-production'], bundle);
+gulp.task('build-ugly', [ 'set-production', 'set-ugly'], bundle);
 
 //default build and test it
-gulp.task('default', ['jshint', 'unset-watch', 'build-dev'], function(done) {
+gulp.task('default', [ 'unset-watch', 'build-dev'], function(done) {
   new karma.Server({
     configFile: __dirname + '/karma.conf.js',
     files: [
@@ -176,7 +176,7 @@ gulp.task('watch-unit', ['build-dev'], function(done) {
   }, done).start();
 });
 
-gulp.task('test-release', ['jshint', 'build-production'], function(done) {
+gulp.task('test-release', [ 'build-production'], function(done) {
   new karma.Server({
     configFile: __dirname + '/karma.conf.js',
     files: [
@@ -192,7 +192,7 @@ gulp.task('test-release', ['jshint', 'build-production'], function(done) {
   }, done).start();
 });
 
-gulp.task('test-ugly', ['jshint', 'build-ugly'], function(done) {
+gulp.task('test-ugly', ['build-ugly'], function(done) {
   new karma.Server({
     configFile: __dirname + '/karma.conf.js',
     files: [

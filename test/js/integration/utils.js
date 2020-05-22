@@ -5,7 +5,7 @@ describe('h54s integration -', function() {
     it('Server response with errors', function(done) {
       this.timeout(10000);
       var sasAdapter = new h54s({
-        hostUrl: serverData.url
+        hostUrl: serverData.hostUrl,
       });
       sasAdapter.login(serverData.user, serverData.pass, function(status) {
         if(status === 200) {
@@ -37,7 +37,7 @@ describe('h54s integration -', function() {
     it('Application logs', function(done) {
       this.timeout(10000);
       var sasAdapter = new h54s({
-        hostUrl: serverData.url
+        hostUrl: serverData.hostUrl
       });
       sasAdapter.login(serverData.user, serverData.pass, function(status) {
         if(status === 200) {
@@ -46,7 +46,7 @@ describe('h54s integration -', function() {
               data: 'test'
             }
           ], 'data');
-          sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
+          sasAdapter.call('/AJAX/h54s_test/bounceData', table, function(err, res) {
             assert.isUndefined(err, 'We got error on sas program ajax call');
             var logs = sasAdapter.getApplicationLogs();
             assert.isArray(logs, 'getApplicationLogs() should return array');
@@ -68,10 +68,10 @@ describe('h54s integration -', function() {
     it('Test date send and receive', function(done) {
       this.timeout(10000);
       var sasAdapter = new h54s({
-        hostUrl: serverData.url,
+        hostUrl: serverData.hostUrl,
         debug: true
       });
-      var date = new Date();
+      var date = h54s.toSasDateTime(new Date());
       sasAdapter.login(serverData.user, serverData.pass, function(status) {
         if(status === 200) {
           var table = new h54s.Tables([
@@ -79,7 +79,7 @@ describe('h54s integration -', function() {
               dt_some_date: date // jshint ignore:line
             }
           ], 'data');
-          sasAdapter.call('/AJAX/h54s_test/BounceData', table, function(err, res) {
+          sasAdapter.call('/AJAX/h54s_test/bounceData', table, function(err, res) {
             //sas is outputing data in seconds, so we need to round those dates
             var resSeconds = Math.round(res.outputdata[0].DT_SOME_DATE.getTime() / 1000); // jshint ignore:line
             var dateSeconds = Math.round(date.getTime() / 1000);
@@ -96,7 +96,7 @@ describe('h54s integration -', function() {
     it('Set debug mode and get errors when first request fails', function(done) {
       this.timeout(20000);
       var sasAdapter = new h54s({
-        hostUrl: serverData.url
+        hostUrl: serverData.hostUrl
       });
       sasAdapter.login(serverData.user, serverData.pass, function(status) {
         if(status === 200) {

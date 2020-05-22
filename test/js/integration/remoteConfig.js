@@ -5,7 +5,7 @@ describe('h54s integration -', function() {
     it('Test config override with call', function(done) {
       this.timeout(6000);
       var sasAdapter = new h54s({
-        hostUrl: serverData.url,
+        hostUrl: serverData.hostUrl,
         isRemoteConfig: true
       });
 
