@@ -51,20 +51,17 @@ var h54s = module.exports = function(config) {
     var self = this;
 
     this._disableCalls = true;
-    this._customDisableCalls = true;
 
     // 'h54sConfig.json' is for the testing with karma
     //replaced with gulp in dev build
-    this._ajax.get('https://apps.boemskats.com/h54sConfig.json').success(function(res) {
+    this._ajax.get('h54sConfig.json').success(function(res) {
       var remoteConfig = JSON.parse(res.responseText);
 
-      console.log('REMOTE CONFIG', remoteConfig)
       for(var key in remoteConfig) {
-        if(remoteConfig.hasOwnProperty(key) && config[key] === undefined && key !== 'isRemoteConfig') {
+        if(remoteConfig.hasOwnProperty(key) && config[key] && key !== 'isRemoteConfig') {
           config[key] = remoteConfig[key];
         }
       }
-      console.log('REFINED CONFIG', config);
 
       _setConfig.call(self, config);
 
@@ -78,40 +75,40 @@ var h54s = module.exports = function(config) {
       //execute sas calls disabled while waiting for the config
       self._disableCalls = false;
       while(self._pendingCalls.length > 0) {
-        var pendingCall = self._pendingCalls.shift();
-        var sasProgram  = pendingCall.sasProgram;
-        var callback    = pendingCall.callback;
-        var params      = pendingCall.params;
+        const pendingCall = self._pendingCalls.shift();
+				const sasProgram = pendingCall.options.sasProgram;
+				const callbackPending = pendingCall.options.callback;
+				const params = pendingCall.params;
+				//update debug because it may change in the meantime
+				params._debug = self.debug ? 131 : 0;
 
         //update program with metadataRoot if it's not set
-        if(self.metadataRoot && pendingCall.params._program.indexOf(self.metadataRoot) === -1) {
-          pendingCall.params._program = self.metadataRoot.replace(/\/?$/, '/') + pendingCall.params._program.replace(/^\//, '');
+        if(self.metadataRoot && params._program.indexOf(self.metadataRoot) === -1) {
+          params._program = self.metadataRoot.replace(/\/?$/, '/') + params._program.replace(/^\//, '');
         }
 
         //update debug because it may change in the meantime
         params._debug = self.debug ? 131 : 0;
 
-        self.call(sasProgram, null, callback, params);
+        self.call(sasProgram, null, callbackPending, params);
       }
 
       //execute custom calls that we made while waitinf for the config
-      self._customDisableCalls = false;
-      while(self._pendingCalls.length > 0) {
-      	//TODO - Implement logic that will reflect managedRequest method
-        // const pendingCall = self._customPendingCalls.shift();
-        // const sasProgram  = pendingCall.sasProgram;
-        // const callback    = pendingCall.callback;
-        // const params      = pendingCall.params;
-				//
-        // //update program with metadataRoot if it's not set
-        // if(self.metadataRoot && pendingCall.params._program.indexOf(self.metadataRoot) === -1) {
-        //   pendingCall.params._program = self.metadataRoot.replace(/\/?$/, '/') + pendingCall.params._program.replace(/^\//, '');
-        // }
-				//
-        // //update debug because it may change in the meantime
-        // params._debug = self.debug ? 131 : 0;
-				//
-        // self.call(sasProgram, null, callback, params);
+       while(self._customPendingCalls.length > 0) {
+      	console.log('self._customPendingCalls.length', self._customPendingCalls.length)
+      	const pendingCall = self._customPendingCalls.shift()
+				const callMethod = pendingCall.callMethod
+				const _url = pendingCall._url
+				const options = pendingCall.options;
+				///update program with metadataRoot if it's not set
+        if(self.metadataRoot && options.params && options.params._program.indexOf(self.metadataRoot) === -1) {
+          options.params._program = self.metadataRoot.replace(/\/?$/, '/') + options.params._program.replace(/^\//, '');
+        }
+        //update debug because it may change in the meantime
+				if (options.params) {
+					options.params._debug = self.debug ? 131 : 0;
+				}
+				self.managedRequest(callMethod, _url, options);
       }
     }).error(function (err) {
       throw new h54sError('ajaxError', 'Remote config file cannot be loaded. Http status code: ' + err.status);
