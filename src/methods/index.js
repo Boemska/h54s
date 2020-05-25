@@ -745,8 +745,10 @@ module.exports.getFolderContents = async function (folderName, options) {
 
 	// First call to get folder's id
 	let url = "/folders/folders/@item?path=" + folderName
-	this.managedRequest('get', url, {...options, callback: _callback});
-}
+	const optionsObj = Object.assign({}, options, {
+		callback: _callback
+	})
+	this.managedRequest('get', url, optionsObj)
 
 module.exports.createNewFolder = function (parentUri, folderName, options) {
 	var headers = {
@@ -760,12 +762,13 @@ module.exports.createNewFolder = function (parentUri, folderName, options) {
 		'type': "folder"
 	}
 
-	return this.managedRequest('post', url, {
-		...options,
+	const optionsObj = Object.assign({}, options, {
 		params: JSON.stringify(data),
 		headers,
 		useMultipartFormData: false
-	});
+	})
+
+	return this.managedRequest('post', url, optionsObj;
 }
 
 module.exports.deleteFolderById = function (folderId, options) {
@@ -781,11 +784,12 @@ module.exports.createNewFile = function (fileName, fileBlob, parentFolderUri, op
 		file: [fileBlob, fileName],
 		parentFolderUri
 	}
-	return this.managedRequest('post', url, {
+
+	const optionsObj = Object.assign({}, options, {
 		params: dataObj,
 		useMultipartFormData: true,
-		...options
-	});
+	})
+	return this.managedRequest('post', url, optionsObj);
 }
 
 module.exports.deleteItem = function (itemUri, options) {
@@ -799,11 +803,11 @@ module.exports.updateFile = function (itemUri, fileBlob, lastModified, options) 
 		'Content-Type': 'application/vnd.sas.file',
 		'If-Unmodified-Since': lastModified
 	}
-	return this.managedRequest('put', url, {
+	const optionsObj = Object.assign({}, options, {
 		params: fileBlob,
 		headers,
-		useMultipartFormData: false,
-		...options
-	});
+		useMultipartFormData: false
+	})
+	return this.managedRequest('put', url, optionsObj);
 }
 
