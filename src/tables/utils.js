@@ -101,6 +101,8 @@ module.exports.convertTableObject = function(inObject, chunkThreshold) {
         }
         thisSpec.encodedLength = targetArray[currentTarget][j][key].length;
       } else if(thisValue instanceof Date) {
+      	console.log("ERROR VALUE ", thisValue)
+      	console.log("TYPEOF VALUE ", typeof thisValue)
         throw new h54sError('typeError', 'Date type not supported. Please use h54s.toSasDateTime function to convert it');
       } else if (thisType == 'object') {
         thisSpec.colName                    = key;

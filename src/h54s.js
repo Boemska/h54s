@@ -19,7 +19,7 @@ const sasVersionMap = {
 *
 */
 var h54s = module.exports = function(config) {
-	this.sasVersion = config.sasVersion || 'v9'
+	this.sasVersion = (config && config.sasVersion) || 'v9'
 
   // first thing first - set sas version config
   const sasVersionConfig = sasVersionMap[this.sasVersion] || sasVersionMap['v9'] //use v9 as default=
@@ -28,11 +28,11 @@ var h54s = module.exports = function(config) {
   this.maxXhrRetries        = 5;
   this.url                  = sasVersionConfig.url
   this.isViya								= this.url === '/SASJobExecution/'
-  this.debug                = true;
+  this.debug                = (config && config.debug) || false;
   this.loginUrl             = '/SASLogon/login.do';
   this.logoutUrl            = sasVersionConfig.logoutUrl
   this.retryAfterLogin      = true;
-  this.ajaxTimeout          = config.ajaxTimeout || 300000;
+  this.ajaxTimeout          = (config && config.ajaxTimeout) || 300000;
   this.useMultipartFormData = true;
   this.RESTauth             = false;
   this.RESTauthLoginUrl     = '/SASLogon/v1/tickets';
@@ -55,14 +55,16 @@ var h54s = module.exports = function(config) {
 
     // 'h54sConfig.json' is for the testing with karma
     //replaced with gulp in dev build
-    this._ajax.get('h54sConfig.json').success(function(res) {
+    this._ajax.get('https://apps.boemskats.com/h54sConfig.json').success(function(res) {
       var remoteConfig = JSON.parse(res.responseText);
 
+      console.log('REMOTE CONFIG', remoteConfig)
       for(var key in remoteConfig) {
         if(remoteConfig.hasOwnProperty(key) && config[key] === undefined && key !== 'isRemoteConfig') {
           config[key] = remoteConfig[key];
         }
       }
+      console.log('REFINED CONFIG', config);
 
       _setConfig.call(self, config);
 
@@ -141,10 +143,16 @@ var h54s = module.exports = function(config) {
       if(config.hostUrl.charAt(config.hostUrl.length - 1) === '/') {
         config.hostUrl = config.hostUrl.slice(0, -1);
       }
-      this.hostUrl          = config.hostUrl;
-      this.url              = config.hostUrl + this.url;
-      this.loginUrl         = config.hostUrl + this.loginUrl;
-      this.RESTauthLoginUrl = config.hostUrl + this.RESTauthLoginUrl;
+      this.hostUrl = config.hostUrl;
+      if (!this.url.includes(this.hostUrl)) {
+				this.url = config.hostUrl + this.url;
+			}
+			if (!this.loginUrl.includes(this.hostUrl)) {
+				this.loginUrl = config.hostUrl + this.loginUrl;
+			}
+			if (!this.RESTauthLoginUrl.includes(this.hostUrl)) {
+				this.RESTauthLoginUrl = config.hostUrl + this.RESTauthLoginUrl;
+			}
     }
 
     this._ajax.setTimeout(this.ajaxTimeout);

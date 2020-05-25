@@ -17,7 +17,7 @@ describe('h54s unit -', function() {
         ajaxTimeout: 1 //1ms
       });
 
-      sasAdapter._ajax.get('http://example.com/').success(function(res) {
+      sasAdapter._ajax.get(serverData.hostUrl).success(function(res) {
         assert.notOk(res, 'Ajax response is undefined');
         done();
       }).error(function() {
@@ -29,7 +29,7 @@ describe('h54s unit -', function() {
     it('Test get', function(done) {
       var sasAdapter = new h54s();
 
-      sasAdapter._ajax.get('http://example.com/', {
+      sasAdapter._ajax.get(serverData.hostUrl, {
         testParameter: 'test'
       }).success(function(res) {
         done();
@@ -42,7 +42,7 @@ describe('h54s unit -', function() {
     it('Test post', function(done) {
       var sasAdapter = new h54s();
 
-      sasAdapter._ajax.post('http://example.com/', {
+      sasAdapter._ajax.post(serverData.hostUrl, {
         testParameter: 'test'
       }).success(function(res) {
         done();

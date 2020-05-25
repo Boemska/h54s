@@ -6,5 +6,6 @@
   "retryAfterLogin": true,
   "sasApp": "Stored Process Web App 9.3",
   "ajaxTimeout": 20000,
-  "metadataRoot": "/AJAX/"
+  "metadataRoot": "/AJAX/",
+  "sasVersion": "v9"
 }

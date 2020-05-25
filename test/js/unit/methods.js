@@ -42,7 +42,7 @@ describe('h54s unit -', function() {
 
     it('Should throw error if credentials are missing', function(done) {
       var sasAdapter = new h54s({
-        hostUrl: serverData.url
+        hostUrl: serverData.hostUrl
       });
       proclaim.throws(function() {
         sasAdapter.login();
@@ -58,7 +58,7 @@ describe('h54s unit -', function() {
 
     it('Try to log in without credentials', function(done) {
       var sasAdapter = new h54s({
-        hostUrl: serverData.url
+        hostUrl: serverData.hostUrl
       });
       proclaim.throws(function() {
         sasAdapter.login();
