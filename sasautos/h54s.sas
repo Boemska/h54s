@@ -55,7 +55,10 @@
         length spec $32767;
         length lenspec $50;
         length varname $32;
-        spec=strip(scan(symget(symget(cats("_WEBIN_NAME","&baftn."))), 2, '()'));
+        spec=symget(symget(cats("_WEBIN_NAME","&baftn.")));
+        /* viya 3.5 */ 
+        spec=prxchange("s/\%([\'\""\%\(\)])/$1/", -1 , prxchange('s/^\%nrstr\((.*)\)/$1/s', -1, spec));
+        
         put spec=;
         colcount=countw(spec, '|');
 
@@ -87,7 +90,7 @@
 
       /* parse the actual input data */
 
-  options mprint mlogic symbolgen;
+  * options mprint mlogic symbolgen;
   %put h54s --- START DESERIALISING TABLE &&_WEBIN_name&baftn. ;
   %put h54s --- TABLE FILENAME IS &&_WEBIN_FILEURI&baftn. ;
 
@@ -156,7 +159,9 @@
         length spec $32767.;
         length lendef $50.;
         length lenspec $50.;
-        spec=scan(symget(symget(cats("_WEBIN_NAME","&baftn."))), 2, '()');
+        spec=symget(symget(cats("_WEBIN_NAME","&baftn.")));
+        /* viya 3.5 */ 
+        spec=prxchange("s/\%([\'\""\%\(\)])/$1/", -1 , prxchange('s/^\%nrstr\((.*)\)/$1/s', -1, spec));
         put spec=;
         colcount=countw(spec, '|');
 
