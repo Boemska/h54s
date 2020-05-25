@@ -19,20 +19,16 @@ module.exports.call = function (sasProgram, dataObj, callback, params) {
 	var csrf = this.csrf;
 
 	if (!callback || typeof callback !== 'function') {
-		// throw new h54sError('argumentError', 'You must provide callback');
-		throw new h54sError('argumentError', 'You must provide callback');
+		throw new h54sError('argumentError', 'You must provide a callback');
 	}
 	if (!sasProgram) {
-		// throw new h54sError('argumentError', 'You must provide Sas program file path');
-		console.log(new h54sError('argumentError', 'You must provide Sas program file path'))
+		throw new h54sError('argumentError', 'You must provide Sas program file path');
 	}
 	if (typeof sasProgram !== 'string') {
-		// throw new h54sError('argumentError', 'First parameter should be string');
-		console.log(new h54sError('argumentError', 'First parameter should be string'))
+		throw new h54sError('argumentError', 'First parameter should be string');
 	}
 	if (this.useMultipartFormData === false && !(dataObj instanceof Tables)) {
-		// throw new h54sError('argumentError', 'Cannot send files using application/x-www-form-urlencoded. Please use Tables or default value for useMultipartFormData');
-		console.log(new h54sError('argumentError', 'Cannot send files using application/x-www-form-urlencoded. Please use Tables or default value for useMultipartFormData'))
+		throw new h54sError('argumentError', 'Cannot send files using application/x-www-form-urlencoded. Please use Tables or default value for useMultipartFormData');
 	}
 
 	if (!params) {

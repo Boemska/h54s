@@ -96,8 +96,6 @@ module.exports = function () {
 
   return {
     get: function (url, data, multipartFormData, headers) {
-    	console.log('GET:', url)
-    	console.log('DATA:', data)
       var dataStr;
       if (typeof data === 'object') {
         dataStr = serialize(data);

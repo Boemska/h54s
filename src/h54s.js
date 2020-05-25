@@ -33,7 +33,7 @@ var h54s = module.exports = function(config) {
   this.logoutUrl            = sasVersionConfig.logoutUrl
   this.retryAfterLogin      = true;
   this.ajaxTimeout          = (config && config.ajaxTimeout) || 300000;
-  this.useMultipartFormData = true;
+  this.useMultipartFormData = (config && config.useMultipartFormData) || true;
   this.RESTauth             = false;
   this.RESTauthLoginUrl     = '/SASLogon/v1/tickets';
   this.csrf                 = ''
