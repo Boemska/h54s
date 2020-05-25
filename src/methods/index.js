@@ -749,6 +749,7 @@ module.exports.getFolderContents = async function (folderName, options) {
 		callback: _callback
 	})
 	this.managedRequest('get', url, optionsObj)
+}
 
 module.exports.createNewFolder = function (parentUri, folderName, options) {
 	var headers = {
@@ -768,7 +769,7 @@ module.exports.createNewFolder = function (parentUri, folderName, options) {
 		useMultipartFormData: false
 	})
 
-	return this.managedRequest('post', url, optionsObj;
+	return this.managedRequest('post', url, optionsObj);
 }
 
 module.exports.deleteFolderById = function (folderId, options) {
