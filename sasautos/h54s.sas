@@ -92,12 +92,13 @@
 
   * options mprint mlogic symbolgen;
   %put h54s --- START DESERIALISING TABLE &&_WEBIN_name&baftn. ;
-  %put h54s --- TABLE FILENAME IS &&_WEBIN_FILEURI&baftn. ;
+  %put h54s --- TABLE FILENAME IS &&_WEBIN_FILEREF&baftn. ;
 
-      filename thisfile filesrvc "&&_WEBIN_FILEURI&baftn." ;	
+      * filename thisfile filesrvc "&&_WEBIN_FILEREF&baftn." ;	
+      	
 
       data "&&_WEBIN_name&baftn."n;
-        INFILE thisfile LRECL=33000 recfm=v dsd;
+        INFILE &&_WEBIN_FILEREF&baftn. LRECL=32767 recfm=v dsd;
         /*length %do j=1 %to &totalcol.;
         &&lens&j.
         %end;*/
@@ -126,95 +127,6 @@
       %end;
     %end;
     %put h54s ==> === END SUMMARY ===;
-    quit;
-
-%mend;
-
-%macro deserialiseFiles;
-  /* 
-  _WEBIN_NAME has the name of each parameter for the counterpart spec
-  _WEBIN_FILE_COUNT has the total number of files. If 1 then we need no suffix
-  */
-  %put WEBIN FILE COUNT IS &_WEBIN_FILE_COUNT.;
-
-  %do files = 1 %to &_WEBIN_FILE_COUNT;
-    %if &_WEBIN_FILE_COUNT eq 1 %then %do;
-        %let baftn=; 
-    %end;
-    %else %do;
-      %let baftn=&files.;
-    %end;
-
-     
-    %if ("&&&&&&_WEBIN_name&baftn." eq "FILE") %then %do;
-      %global bafpn;
-      %let bafpn=&baftn.;
-      %put program execution is on id &bafpn.;
-
-    %end;
-    %else %do;
-      %let bafpn=;
-
-      data _null_;
-        length spec $32767.;
-        length lendef $50.;
-        length lenspec $50.;
-        spec=symget(symget(cats("_WEBIN_NAME","&baftn.")));
-        /* viya 3.5 */ 
-        spec=prxchange("s/\%([\'\""\%\(\)])/$1/", -1 , prxchange('s/^\%nrstr\((.*)\)/$1/s', -1, spec));
-        put spec=;
-        colcount=countw(spec, '|');
-
-        do c=1 to colcount;
-          lenspec=scan(spec, c, '|');
-          select (scan(lenspec, 2, ','));
-              when ('num') lendef=cat(upcase(scan(lenspec,1,',')), ' 8.');
-              when ('string') lendef=cat(upcase(scan(lenspec,1,',')), " $", scan(lenspec, 3, ','));
-          end;
-          * length statement specification here ;
-          lname=cats('lens', c);
-          call symputx(lname, lendef, 'L');
-          
-          * input statement specification here ;
-          indef=upcase(scan(lenspec,1,','));
-          pname=cats('cols', c);
-          call symputx(pname, indef, 'L');
-          output;
-        end;
-        call symputx('totalcol', colcount);
-      run;
-
-      filename thisfile filesrvc "&&_WEBIN_FILEURI&baftn." ;	
-
-      data "&&_WEBIN_name&baftn."n;
-        INFILE thisfile LRECL=33000 recfm=v dsd;
-        length %do j=1 %to &totalcol.;
-        &&lens&j.
-        %end;
-        ;
-        input %do j=1 %to &totalcol.;
-        &&cols&j.
-        %end;
-        ;
-      run;
-      
-	filename thisfile clear;
-
-
-  
-    %end;
-  %end;
-
-  %put === SUMMARY OF DESERIALISED INPUT TABLES === ;
-    proc sql noprint;
-    %do files = 1 %to &_WEBIN_FILE_COUNT;
-      %if &_WEBIN_FILE_COUNT eq 1 %then %let baftn=; 
-      %else %let baftn=&files.;
-      %if &baftn ne &bafpn %then %do;
-        describe table "&&_WEBIN_name&baftn."n;
-      %end;  
-    %end;  
-    %put === END SUMMARY ===;
     quit;
 
 %mend;
@@ -273,15 +185,6 @@
   run;
 * Come back ;
 %mend;
-
-
-    %global _debug;
-    %if &_debug = 131 %then %do;
-      %let h54sDebuggingMode = 1;
-    %end;
-    %else %do;
-      %let h54sDebuggingMode = 0;
-    %end;
 
 
 %macro bafHeader();
