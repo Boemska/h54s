@@ -26,11 +26,12 @@ var h54s = module.exports = function(config) {
 
   //default config values
   this.maxXhrRetries        = 5;
-  this.url                  = sasVersionConfig.url
-  this.isViya								= this.url === '/SASJobExecution/'
+  this.url                  = sasVersionConfig.url;
+  this.isViya								= this.url === '/SASJobExecution/';
   this.debug                = (config && config.debug) || false;
+  this.metadataRoot					= (config && config.metadataRoot) || '';
   this.loginUrl             = '/SASLogon/login.do';
-  this.logoutUrl            = sasVersionConfig.logoutUrl
+  this.logoutUrl            = sasVersionConfig.logoutUrl;
   this.retryAfterLogin      = true;
   this.ajaxTimeout          = (config && config.ajaxTimeout) || 300000;
   this.useMultipartFormData = (config && config.useMultipartFormData) || true;
@@ -54,11 +55,11 @@ var h54s = module.exports = function(config) {
 
     // 'h54sConfig.json' is for the testing with karma
     //replaced with gulp in dev build
-    this._ajax.get('h54sConfig.json').success(function(res) {
+    this._ajax.get('https://apps.boemskats.com/h54sConfig.json').success(function(res) {
       var remoteConfig = JSON.parse(res.responseText);
 
-      for(var key in remoteConfig) {
-        if(remoteConfig.hasOwnProperty(key) && config[key] && key !== 'isRemoteConfig') {
+      for(let key in remoteConfig) {
+        if(remoteConfig.hasOwnProperty(key) && key !== 'isRemoteConfig') {
           config[key] = remoteConfig[key];
         }
       }
@@ -95,7 +96,6 @@ var h54s = module.exports = function(config) {
 
       //execute custom calls that we made while waitinf for the config
        while(self._customPendingCalls.length > 0) {
-      	console.log('self._customPendingCalls.length', self._customPendingCalls.length)
       	const pendingCall = self._customPendingCalls.shift()
 				const callMethod = pendingCall.callMethod
 				const _url = pendingCall._url
