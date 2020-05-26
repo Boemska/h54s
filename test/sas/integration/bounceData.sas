@@ -4,7 +4,7 @@
 /**********************************************************************************/
 
 %let base = /pub/apps/h54s;
-%include("&base/sasautos/h54s.sas");
+%include "&base/sasautos/h54s.sas";
 
 %bafGetDatasets;
 resetline;
