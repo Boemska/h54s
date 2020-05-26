@@ -1,4 +1,4 @@
-%let base = /pub/apps/h54s
+%let base = /pub/apps/h54s;
 %include("&base/sasautos/h54s.sas");
 
 %bafheader;

@@ -3,7 +3,7 @@
 /*            validate that the adapter is returning the same data it's given     */
 /**********************************************************************************/
 
-%let base = /pub/apps/h54s
+%let base = /pub/apps/h54s;
 %include("&base/sasautos/h54s.sas");
 
 %bafGetDatasets;
