@@ -20,6 +20,13 @@ describe('h54s integration -', function () {
 
 			sasAdapter.login(serverData.user, serverData.pass, function () {
 				sasAdapter.call('/AJAX/h54s_test/bounceData', table, function (err, res) {
+					if (err) {
+						console.log('TEST:', 'Test json character escape')
+						console.log('ADAPTER ERROR: ', err.message)
+						console.log('-------------------------------------')
+						done()
+					}
+
 					assert.isUndefined(err, 'We got error on sas program ajax call');
 					assert.isDefined(res, 'Response is undefined');
 					assert.equal(res.outputdata[0].DATA0, data0, 'Bounce data is different - data0');
@@ -45,6 +52,12 @@ describe('h54s integration -', function () {
 
 			sasAdapter.login(serverData.user, serverData.pass, function () {
 				sasAdapter.call('/AJAX/h54s_test/bounceData', table, function (err, res) {
+					if (err) {
+						console.log('TEST:', 'Test ascii characters')
+						console.log('ADAPTER ERROR: ', err.message)
+						console.log('-------------------------------------')
+						done()
+					}
 					assert.isUndefined(err, 'We got error on sas program ajax call');
 					assert.isDefined(res, 'Response is undefined');
 					for (var i = 32; i < 128; i++) {
@@ -119,6 +132,12 @@ describe('h54s integration -', function () {
 
 				sasAdapter.login(serverData.user, serverData.pass, function () {
 					sasAdapter.call('/AJAX/h54s_test/bounceData', table, function (err, res) {
+						if (err) {
+							console.log('TEST:', 'Test big ascii string')
+							console.log('ADAPTER ERROR: ', err.message)
+							console.log('-------------------------------------')
+							done()
+						}
 						assert.isUndefined(err, 'We got error on sas program ajax call');
 						assert.isDefined(res, 'Response is undefined');
 						assert.equal(res.outputdata.length, 12, 'Received less rows than sent');
@@ -151,6 +170,12 @@ describe('h54s integration -', function () {
 
 			sasAdapter.login(serverData.user, serverData.pass, function () {
 				sasAdapter.call('/AJAX/h54s_test/bounceData', table, function (err, res) {
+					if (err) {
+						console.log('TEST:', 'Test big table')
+						console.log('ADAPTER ERROR: ', err.message)
+						console.log('-------------------------------------')
+						done()
+					}
 					assert.isUndefined(err, 'We got error on sas program ajax call');
 					assert.isDefined(res, 'Response is undefined');
 					assert.equal(res.outputdata.length, 700, 'Received less rows than sent');
