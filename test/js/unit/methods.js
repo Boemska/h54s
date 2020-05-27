@@ -18,7 +18,7 @@ describe('h54s unit -', function() {
         sasAdapter.call('test');
       });
       proclaim.throws(function() {
-        new h54s.Tables([]);
+        new h54s.SasData([]);
       });
 
       proclaim.doesNotThrow(function() {

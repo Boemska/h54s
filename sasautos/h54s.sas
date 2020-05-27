@@ -96,7 +96,7 @@
 
       * filename thisfile filesrvc "&&_WEBIN_FILEREF&baftn." ;	
       	
-
+      * TODO This needs be made 9.x and Viya compatible ;
       data "&&_WEBIN_name&baftn."n;
         INFILE &&_WEBIN_FILEREF&baftn. LRECL=32767 recfm=v dsd;
         /*length %do j=1 %to &totalcol.;
@@ -220,6 +220,8 @@
     %let h54src = success;
   %end;
 
+
+  * TODO: This needs to be made 9.x and Viya compatible ;
   data _null_;
     file thiscall mod;
     sasdatetime=datetime();

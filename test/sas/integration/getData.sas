@@ -5,12 +5,6 @@
 %let baseDir = /pub/apps/h54s;
 %include "&baseDir/sasautos/h54s.sas";
 
-/*
-%LET DATA=[{"colName":"libname","colType":"string","colLength":7},{"colName":"memname","colType":"string","colLength":5}];
-%LET DATA0=2;
-%LET DATA1=[{"colName":"libname","colType":"string","colLength":7},{"colName":"memname","colType":"string","colLength":5}];
-%LET DATA2=[{"libname":"SASHELP"},{"memname":"CLASS"}];*/
-
 %bafGetDatasets;
 resetline;
 
@@ -22,7 +16,8 @@ run;
 
 proc sql;
     * a sample output ;
-    create table myoutput as select * from &getlib..&getmem.;
+    create table myoutput as 
+      select * from &getlib..&getmem.;
 quit;
 
 %bafHeader;

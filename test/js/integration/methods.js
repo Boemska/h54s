@@ -60,48 +60,55 @@ describe('h54s integration -', function() {
       });
     });
 
+
+    //TODO this is just a badly written test
     it('Test concurent calls', function(done) {
-      this.timeout(10000);
+      this.timeout(100000);
       var sasAdapter = new h54s({
         hostUrl: serverData.hostUrl
       });
 
       var finishedRequests = 0;
 
-      var data1 = getRandomAsciiChars(1000);
-      var data2 = getRandomAsciiChars(10);
+      var data1 = getRandomAsciiChars(100);
+      var data2 = getRandomAsciiChars(100);
 
-      var table = new h54s.Tables([
+      var table = new h54s.SasData([
         {
-          data: data1
+          "data": data1
         }
       ], 'data');
 
-      sasAdapter.call('/AJAX/h54s_test/bounceData', table, function(err, res) {
-        assert.isUndefined(err, 'We got error on sas program ajax call');
-        assert.isDefined(res, 'Response is undefined');
-        assert.equal(res.outputdata[0].DATA, data1, 'data1 is not the same in response');
-        finishedRequests++;
-        if(finishedRequests === 2) {
-          done();
+      sasAdapter.login(serverData.user, serverData.pass, function(status) {
+        if(status === 200) {
+          sasAdapter.call('/AJAX/h54s_test/bounceData', table, function(err, res) {
+            assert.equal(res.outputdata[0].DATA, data1, 'data1 is not the same in response');
+            finishedRequests++;
+            if(finishedRequests === 2) {
+              done();
+            }
+          });
         }
       });
 
-      table = new h54s.Tables([
+      var table2 = new h54s.SasData([
         {
-          data: data2
+          "data": data2
         }
       ], 'data');
 
-      sasAdapter.call('/AJAX/h54s_test/bounceData', table, function(err, res) {
-        assert.isUndefined(err, 'We got error on sas program ajax call');
-        assert.isDefined(res, 'Response is undefined');
-        assert.equal(res.outputdata[0].DATA, data2, 'data2 is not the same in response');
-        finishedRequests++;
-        if(finishedRequests === 2) {
-          done();
+      sasAdapter.login(serverData.user, serverData.pass, function(status) {
+        if(status === 200) {
+          sasAdapter.call('/AJAX/h54s_test/bounceData', table2, function(err, res) {
+            assert.equal(res.outputdata[0].DATA, data2, 'data1 is not the same in response');
+            finishedRequests++;
+            if(finishedRequests === 2) {
+              done();
+            }
+          });
         }
       });
+
     });
 
     it('Test pending calls after login', function(done) {

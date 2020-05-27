@@ -3,6 +3,7 @@ describe('h54s integration -', function() {
   describe('Remote config tests:', function() {
 
     it('Test config override with call', function(done) {
+
       this.timeout(6000);
       var sasAdapter = new h54s({
         hostUrl: serverData.hostUrl,
