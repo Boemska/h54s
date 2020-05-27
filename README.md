@@ -1,7 +1,7 @@
 # HTML5 Data Adapter for SAS&reg; (H54S)
-[![npm version](https://img.shields.io/npm/v/axios.svg?style=flat-square)](https://www.npmjs.org/package/h54s)
-[![install size](https://packagephobia.now.sh/badge?p=axios)](https://packagephobia.now.sh/result?p=h54s)
-[![npm downloads](https://img.shields.io/npm/dm/axios.svg?style=flat-square)](http://npm-stat.com/charts.html?package=h54s)
+[![npm version](https://badge.fury.io/js/h54s.svg)](https://badge.fury.io/js/h54s)
+[![install size](https://packagephobia.now.sh/badge?p=h54s)](https://packagephobia.now.sh/result?p=h54s)
+[![npm downloads](https://img.shields.io/npm/dm/axios.svg?style=flat-square)](https://img.shields.io/npm/dm/h54s)
 [![gitter chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Boemska/h54s?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## What is H54S?
