@@ -149,9 +149,44 @@
 
 %mend;
 
-%macro bafGetDataset(inparam,outlib,outds);
+%GLOBAL h54sQuiet h54sDebug h54ssource h54ssource2 h54slrecl h54snotes h54starget;
 
-  %*put -placeholder-;
+* to enable quiet mode (minimal log output) set variable to blank 
+  otherwise set variable to *. See around 10 lines below for what it does 
+;
+%let h54sQuiet = ;
+
+* to enable debug log output set this variable to blank
+  otherwise set variable to * 
+;
+%let h54sDebug = *;
+
+%macro bafQuietenDown;
+  %&h54sQuiet.let h54ssource=%sysfunc(getoption(source));
+  %&h54sQuiet.let h54ssource2=%sysfunc(getoption(source2));
+  %&h54sQuiet.let h54slrecl=%sysfunc(getoption(lrecl));
+  %&h54sQuiet.let h54snotes=%sysfunc(getoption(notes));
+  &h54sQuiet.options nosource nosource2 nonotes;
+%mend;
+
+%macro bafQuietenUp;
+  &h54sQuiet.options &h54ssource &h54ssource2 lrecl=&h54slrecl &h54snotes; 
+%mend;
+
+* Go quiet and avoid all the garbage in the log ;
+%hfsQuietenDown;
+
+* check if we are in debug mode and delimit data with -h54s-- tags ;
+%global h54sDebuggingMode;
+%let h54sDebuggingMode = 0;
+
+%macro bafCheckDebug;
+  %if %symExist(_debug) %then %do;
+    %if &_debug = 131 %then %do;
+      %let h54sDebuggingMode = 1;
+    %end;
+  %end;
+
 %mend;
 
 %macro bafOutDataset(outputas, outlib, outdsn);
@@ -226,6 +261,8 @@
 
 %macro bafFooter();
   * keep quiet in the log;
+  %bafQuietenDown;
+
   %if (%symexist(usermessage) = 0) %then %do;
     %let usermessage = blank;
   %end;
@@ -278,14 +315,11 @@
       put '"status" : "' "&h54src." '"}';
       put;
 
-      %if &_debug = 131 %then %do;
+      %if &h54sDebuggingMode = 1 %then %do;
         put "--h54s-data-end--";
       %end;
     run;
   %end;
-
-
-  
 
 
   * http://support.sas.com/kb/20/784.html ;
@@ -298,8 +332,7 @@
      put data $char1. @@;
   run;
  
-
-
-* Come back ;
-
+  * Come back ;
+  %bafQuietenUp;
+  
 %mend;
