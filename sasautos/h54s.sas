@@ -94,20 +94,38 @@
   %put h54s --- START DESERIALISING TABLE &&_WEBIN_name&baftn. ;
   %put h54s --- TABLE FILENAME IS &&_WEBIN_FILEREF&baftn. ;
 
-      * filename thisfile filesrvc "&&_WEBIN_FILEREF&baftn." ;	
-      	
-      * TODO This needs be made 9.x and Viya compatible ;
+    data _null_;
+      sysver = symget("SYSVER");
+      pos1 = find(sysver, ".");
+      major = substr(sysver, 1, pos1-1);         
+      if major eq "V" then call symput('isviya', 1);
+      else call symput('isviya', 0);
+    run;
+
+    %if &isviya eq 1 %then %do;
+
+      filename thisfile filesrvc "&&_WEBIN_FILEURI&baftn." ;	
       data "&&_WEBIN_name&baftn."n;
-        INFILE &&_WEBIN_FILEREF&baftn. LRECL=32767 recfm=v dsd;
-        /*length %do j=1 %to &totalcol.;
-        &&lens&j.
-        %end;*/
-        ;
+        INFILE thisfile LRECL=32767 recfm=v dsd;
         input %do j=1 %to &totalcol.;
         &&cols&j.
         %end;
         ;
       run;
+
+    %end;
+    %else %do;
+
+      data "&&_WEBIN_name&baftn."n;
+        INFILE &&_WEBIN_FILEREF&baftn. LRECL=32767 recfm=v dsd;
+        input %do j=1 %to &totalcol.;
+        &&cols&j.
+        %end;
+        ;
+      run;
+      
+    %end;
+
   %put h54s --- FINISH DESERIALISING TABLE &&_WEBIN_name&baftn. ;
 
     %end;
@@ -221,23 +239,54 @@
   %end;
 
 
-  * TODO: This needs to be made 9.x and Viya compatible ;
   data _null_;
-    file thiscall mod;
-    sasdatetime=datetime();
-    put '"usermessage" : "' "&usermessage." '",';
-    put '"logmessage" : "' "&logmessage." '",';
-    put '"requestingUser" : "' "&SYS_COMPUTE_SESSION_OWNER." '",';
-    put '"requestingPerson" : "' "&SYS_COMPUTE_SESSION_OWNER." '",';
-    put '"executingPid" : ' "&sysjobid." ',';
-    put '"sasDatetime" : ' sasdatetime ',';
-    put '"status" : "' "&h54src." '"}';
-    put;
-
-    %if &_debug = 131 %then %do;
-      put "--h54s-data-end--";
-    %end;
+    sysver = symget("SYSVER");
+    pos1 = find(sysver, ".");
+    major = substr(sysver, 1, pos1-1);         
+    if major eq "V" then call symput('isviya', 1);
+    else call symput('isviya', 0);
   run;
+
+  %if &isviya eq 1 %then %do;
+    data _null_;
+      file thiscall mod;
+      sasdatetime=datetime();
+      put '"usermessage" : "' "&usermessage." '",';
+      put '"logmessage" : "' "&logmessage." '",';
+      put '"requestingUser" : "' "&SYS_COMPUTE_SESSION_OWNER." '",';
+      put '"requestingPerson" : "' "&SYS_COMPUTE_SESSION_OWNER." '",';
+      put '"executingPid" : ' "&sysjobid." ',';
+      put '"sasDatetime" : ' sasdatetime ',';
+      put '"status" : "' "&h54src." '"}';
+      put;
+
+      %if &_debug = 131 %then %do;
+        put "--h54s-data-end--";
+      %end;
+    run;
+  %end;
+  %else %do;
+    data _null_;
+      file thiscall mod;
+      sasdatetime=datetime();
+      put '"usermessage" : "' "&usermessage." '",';
+      put '"logmessage" : "' "&logmessage." '",';
+      put '"requestingUser" : "' "&_METAUSER." '",';
+      put '"requestingPerson" : "' "&_METAUSER." '",';
+      put '"executingPid" : ' "&sysjobid." ',';
+      put '"sasDatetime" : ' sasdatetime ',';
+      put '"status" : "' "&h54src." '"}';
+      put;
+
+      %if &_debug = 131 %then %do;
+        put "--h54s-data-end--";
+      %end;
+    run;
+  %end;
+
+
+  
+
 
   * http://support.sas.com/kb/20/784.html ;
 
