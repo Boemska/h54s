@@ -52,7 +52,7 @@ run;
 %mend;
 
 * Go quiet and avoid all the garbage in the log ;
-%hfsQuietenDown;
+%bafQuietenDown;
 
 %macro bafGetDatasets();
   /*
