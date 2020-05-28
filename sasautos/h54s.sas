@@ -53,6 +53,8 @@ run;
 
 * Go quiet and avoid all the garbage in the log ;
 %bafQuietenDown;
+* Go loud;
+%bafQuietenUp;
 
 %macro bafGetDatasets();
   /*
