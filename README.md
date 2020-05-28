@@ -205,66 +205,11 @@ Any queued `adapter.call()` calls should resume after a successful `adapter.logi
 
 ### What just happened? What did I do?
 
-First, we registered a SAS Stored Process based back-end service. We told it to expect a data structure called `datain` and to convert it to a temporary table called `WORK.ADDITIONS`. Then, using `%bafErrorCheck` we instructed it to halt processing the rest of the SAS program if the expected data wasn't sent by the client.
-
-When the table arrived as expected, the program would do some SAS-based stuff (which given the power and flexibility of SAS could have been anything, from a secured lookup into a legacy mainframe-based system so you can pre-populate a form, to an on-the-fly Hadoop query built into your app). For this example, we just told it to merge the input dataset with a few records from the good old `SASHELP.CLASS` into a new temporary dataset called `WORK.MYDATA`, sort it, and return the resulting dataset to the client as an object array called `processed`.
+First, we registered a SAS program as either an STP or Job as a back-end service. When the "service" is called the program would do some SAS-based stuff (which given the power and flexibility of SAS could have been anything, from a secured lookup into a legacy mainframe-based system so you can pre-populate a form, to an on-the-fly Hadoop query built into your app). For this example, we just told it to select records from the good old `SASHELP.CLASS` into a new temporary dataset called `WORK.MYDATA`, sort it, and return the resulting dataset to the client as an object array called `processed`.
 
 Then, from the Web side, we started a new project by creating an `index.html` page which sources the client-side `h54s.js` script. We then used the Chrome Dev Console to run some JavaScript code - to create a configured instance of the h54s Adapter, create a sample dataset, attach that dataset to a call to SAS as `datain`, fire it over, and use a simple function to either show us the dataset that was returned by SAS as `processed`, or have a look at any errors that might have occured.
 
-Easy, right? Read on.
-
-## Data Structures and Conventions
-
-The *Atomic Unit of Data transfer* for a H54S based App is the Dataset. This is a universal concept familiar to both JS and SAS programmers. In JavaScript Speak, a Dataset is an [object array](http://www.w3schools.com/js/js_json_syntax.asp), similar to the one created in the example above. Using [this terminology](http://www.w3schools.com/js/js_arrays.asp), each object in an array is the row of a dataset, and each of it's named members is the value of a variable of the same name.
-
-Data Types between the front-end and back-end are mapped as follows:
-
-#### JavaScript to SAS
-
-| JavaScript | SAS      | Notes                                                                   |
-|------------|----------|-------------------------------------------------------------------------|
-| String     | String   | ASCII only at the moment. Working on UTF support                        |
-| Numeric    | Numeric  | Same precision in both SAS and JS. Enforced.                            |
-| Boolean    |          | Not permitted by adapter. Throws typeError. Use numerics for bools.     |
-| Null       |          | Ignored. The value for the column is not included for that row.         |
-| Undefined  |          | Same as Null                                                            |
-
-To send dates to SAS, use `h54s.toSasDateTime(date)` to convert instance of `Date` object to numeric SAS date value.
-
-#### SAS to JavaScript
-
-| SAS      | JavaScript | Notes                                                                                               |
-|----------|------------|-----------------------------------------------------------------------------------------------------|
-| String   | String     | NewLine characters are stripped.                                                                    |
-| Numeric  | Numeric    | Same precision in both SAS and JS.                                                                  |
-| Datetime | Date()     | SAS Datetime columns are converted to Date() objects if their column name is prefixed with 'DT_' (by default, conditional can be edited [here](https://github.com/Boemska/h54s/blob/master/dist/h54s.js#L948))    |
-| Date     |            | Unsupported. You won't be able to transmit data as SAS Dates. Convert, use output views and DHMS()   |
-
-To parse numeric dates sent from SAS, use `h54s.fromSasDateTime(date)` to convert numeric SAS date value to JavaScript `Date` object
-
-### But what about Parameters? I'm used to Parameters
-
-Say goodbye to Parameters. For the purposes of H54S-based apps, Datasets supersede them. Input validation and typechecking should be done by your JavaScript app, and the Adapter ensures type safety and handles exceptions. If you're just looking to pass a single value back, you'll need to use a 'single-column, single-row table'. It might not seem like it to start with, but it's a blessing once you start working with multiple programmers and writing interface specifications.
-
-To get a control table with some parameters, your JS code would look like this:
-```javascript
-var paramsRow={};
-    paramsRow.myStringParam = 'stuff and things';
-    paramsRow.myNumericParam = 123.123;
-    paramsRow.myDatetimeParam = new Date();
-
-var paramTable = [paramsRow];
-
-    data.addTable(paramTable,'controlTable');
-```
-
-and the following SAS code would get you a table called `WORK.CONTROL` with three columns and one row:
-
-```sas
-%bafGetDataset(controlTable, WORK.CONTROL);
-```
-
-Voila.
+Easy, right? Want to know more, read our [docs](./docs/)
 
 ## Development and Testing of JS adapter code
 
