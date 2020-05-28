@@ -12,8 +12,8 @@ Yes. Unprecedented.
 
 #### Server Requirements
 
-- SAS&reg; BI Platform (v9.4 or later)
-- SAS&reg; Stored Process Web Application (Integration Technologies)
+- SAS BI Platform (v9.4) or SAS Viya (3.5 or later)
+- SAS Stored Process Web Application (Integration Technologies)
 
 #### Client Requirements
 
@@ -113,7 +113,17 @@ run;
 
 Now, the eagle-eyed among you will notice that this is exactly the same code as for SAS9. No code changes are required to deploy h54s apps across the two platforms. 
 
-4. Run your job by right clicking on it and selecting "Submit job"
+4. Right click on the job name and select properties. From the properties menu select "Parameters". Add the following parameter and then click save:
+  * Name: `_output_type`
+  * Default value: `html`
+  * Field type: `Character`
+  * Required: `false`
+
+5. Run your job by right clicking on it and selecting "Submit job". You should see some output like the following:
+
+```json
+{ "processed" : [{"Name":"Alfred","Sex":"M","Age":14,"Height":69,"Weight":112.5},{"Name":"Alice","Sex":"F","Age":13,"Height":56.5,"Weight":84},{"Name":"Barbara","Sex":"F","Age":13,"Height":65.3,"Weight":98},{"Name":"Carol","Sex":"F","Age":14,"Height":62.8,"Weight":102.5},{"Name":"Henry","Sex":"M","Age":14,"Height":63.5,"Weight":102.5},{"Name":"James","Sex":"M","Age":12,"Height":57.3,"Weight":83},{"Name":"Jane","Sex":"F","Age":12,"Height":59.8,"Weight":84.5},{"Name":"Janet","Sex":"F","Age":15,"Height":62.5,"Weight":112.5},{"Name":"Jeffrey","Sex":"M","Age":13,"Height":62.5,"Weight":84},{"Name":"John","Sex":"M","Age":12,"Height":59,"Weight":99.5},{"Name":"Joyce","Sex":"F","Age":11,"Height":51.3,"Weight":50.5},{"Name":"Judy","Sex":"F","Age":14,"Height":64.3,"Weight":90},{"Name":"Louise","Sex":"F","Age":12,"Height":56.3,"Weight":77},{"Name":"Mary","Sex":"F","Age":15,"Height":66.5,"Weight":112},{"Name":"Philip","Sex":"M","Age":16,"Height":72,"Weight":150},{"Name":"Robert","Sex":"M","Age":12,"Height":64.8,"Weight":128},{"Name":"Ronald","Sex":"M","Age":15,"Height":67,"Weight":133},{"Name":"Thomas","Sex":"M","Age":11,"Height":57.5,"Weight":85},{"Name":"William","Sex":"M","Age":15,"Height":66.5,"Weight":112}], "usermessage" : "blank", "logmessage" : "blank", "requestingUser" : "jimdemo", "requestingPerson" : "jimdemo", "executingPid" : 1054, "sasDatetime" : 1906323243.9 , "status" : "success"}
+```
 
 This is good enough for now. Time for some Front End Development.
 
@@ -262,5 +272,3 @@ We love contributions!  If you'd like to get involved, check out the [build inst
 
 
 ## Any questions or comments? Come join the chat. [![Join the chat at https://gitter.im/Boemska/h54s](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Boemska/h54s?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-![Analytics](https://ga-beacon.appspot.com/UA-40531601-4/Boemska/h54s)
