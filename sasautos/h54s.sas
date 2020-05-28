@@ -6,6 +6,13 @@
 * check if we are in debug mode and delimit data with -h54s-- tags ;
 %global h54sDebuggingMode;
 %let h54sDebuggingMode = 0;
+%global _debug;
+%if &_debug = 131 %then %do;
+  %let h54sDebuggingMode = 1;
+%end;
+%else %do;
+  %let h54sDebuggingMode = 0;
+%end;
 
 %global isSASViya;
 %let isSASViya = 0;
@@ -214,16 +221,6 @@ run;
      put data $char1. @@;
   run;
 
-  *  filename wtfdeb '/tmp/adapter_debug.json';
-  *
-  *  data _null_;
-  *     length data $1;
-  *     INFILE thiscall recfm=n;
-  *     file wtfdeb recfm=n mod;
-  *     input data  $char1. @@;
-  *     put data $char1. @@;
-  *  run;
-
   filename thisjson clear;
 
   data _null_;
@@ -265,7 +262,7 @@ run;
 
 %macro bafFooter();
   * keep quiet in the log;
-  %bafQuietenDown;
+  /* %bafQuietenDown; */
 
   %if (%symexist(usermessage) = 0) %then %do;
     %let usermessage = blank;
@@ -298,6 +295,16 @@ run;
         put "--h54s-data-end--";
       %end;
     run;
+
+    * http://support.sas.com/kb/20/784.html ;
+    data _null_;
+      length data $1;
+      INFILE thiscall recfm=n;
+      file _webout  recfm=n mod;
+      input data  $char1. @@;
+      put data $char1. @@;
+    run;  
+
   %end;
   %else %do;
     data _null_;
@@ -316,19 +323,17 @@ run;
         put "--h54s-data-end--";
       %end;
     run;
+
+    * http://support.sas.com/kb/20/784.html ;
+    data _null_;
+      length data $1;
+      INFILE thiscall recfm=n;
+      file _webout  recfm=n mod;
+      input data  $char1. @@;
+      put data $char1. @@;
+    run;
   %end;
 
-
-  * http://support.sas.com/kb/20/784.html ;
-
-  data _null_;
-     length data $1;
-     INFILE thiscall recfm=n;
-     file _webout  recfm=n mod;
-     input data  $char1. @@;
-     put data $char1. @@;
-  run;
- 
   * Come back ;
   %bafQuietenUp;
 
