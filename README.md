@@ -33,9 +33,11 @@ Clone this repository to somewhere local:
 git clone https://github.com/Boemska/h54s
 ```
 
-Then put your SAS hat on.
+Then put your SAS hat on. 
 
-### SAS Back End
+Depending on what version you are running you can either use SAS9 or Viya
+
+### SAS9
 
 1. Copy the `sasautos` directory to your SAS Application Server. For this example we copied ours to `/pub/sasautos`.
 
@@ -45,14 +47,15 @@ Then put your SAS hat on.
 
 ```sas
 * get H54s (from wherever you placed it in step 1) ;
-%include '/pub/sasautos/h54s.sas';
+%include '/pub/apps/h54s/sasautos/h54s.sas';
 
 * Process and receive datasets from the client ;
-%bafgetdatasets()
+%bafgetdatasets();
+resetline;
 
 * Do some SAS. Can be Anything. Merge and sort as an example ;
 data mydata;
-  set sashelp.class (obs=3 keep=name sex weight) work.additions;
+  set sashelp.class;
 run;
 
 proc sort data=mydata;
@@ -65,22 +68,52 @@ run;
 %bafFooter()
 ```
 
-4. Save your Stored Process.  If you are using Enterprise Guide to do this, be sure to check "Global Macro Variables" under the "Include code for" dropdown.
+4. Save your Stored Process.  If you are using Enterprise Guide to do this, be sure to check "Global Macro Variables" and uncheck "Include STP Macros" under the "Include code for" dropdown.
 
 5. Log on to your SAS Stored Process Web Application and run the STP. It should produce something like this output:
 
 ```json
-{
-  "usermessage" : "blank",
-  "logmessage" : "H54S Exception - Input object datain was not found",
-  "errormessage" : "blank",
-  "executingUser" : "sasdemo",
-  "executingPerson" : "SAS Demo User",
-  "executingPid" : 1337,
-  "sasDatetime" : 1764789146.3,
-  "status" : "inputTableNotFound"
-}
+{ "processed" : [{"Name":"Alfred","Sex":"M","Age":14,"Height":69,"Weight":112.5},{"Name":"Alice","Sex":"F","Age":13,"Height":56.5,"Weight":84},{"Name":"Barbara","Sex":"F","Age":13,"Height":65.3,"Weight":98},{"Name":"Carol","Sex":"F","Age":14,"Height":62.8,"Weight":102.5},{"Name":"Henry","Sex":"M","Age":14,"Height":63.5,"Weight":102.5},{"Name":"James","Sex":"M","Age":12,"Height":57.3,"Weight":83},{"Name":"Jane","Sex":"F","Age":12,"Height":59.8,"Weight":84.5},{"Name":"Janet","Sex":"F","Age":15,"Height":62.5,"Weight":112.5},{"Name":"Jeffrey","Sex":"M","Age":13,"Height":62.5,"Weight":84},{"Name":"John","Sex":"M","Age":12,"Height":59,"Weight":99.5},{"Name":"Joyce","Sex":"F","Age":11,"Height":51.3,"Weight":50.5},{"Name":"Judy","Sex":"F","Age":14,"Height":64.3,"Weight":90},{"Name":"Louise","Sex":"F","Age":12,"Height":56.3,"Weight":77},{"Name":"Mary","Sex":"F","Age":15,"Height":66.5,"Weight":112},{"Name":"Philip","Sex":"M","Age":16,"Height":72,"Weight":150},{"Name":"Robert","Sex":"M","Age":12,"Height":64.8,"Weight":128},{"Name":"Ronald","Sex":"M","Age":15,"Height":67,"Weight":133},{"Name":"Thomas","Sex":"M","Age":11,"Height":57.5,"Weight":85},{"Name":"William","Sex":"M","Age":15,"Height":66.5,"Weight":112}], "usermessage" : "blank", "logmessage" : "blank", "requestingUser" : "jim", "requestingPerson" : "Dr Jim", "executingPid" : 22087, "sasDatetime" : 1906249007.8 , "status" : "success"}
 ```
+
+This is good enough for now. Time for some Front End Development.
+
+### SAS Viya
+
+1. Copy the `sasautos` directory to your SPRE node. For this example we copied ours to `/pub/sasautos`.
+
+2. Register a new SAS Job Definition in a folder that you can write to. I created mine in my users' home folder and called it `myFirstService`:
+
+![job defintion](docs/img/job_def.png)
+
+3. Right click on the job and select Edit > Source code. Paste in the following code:
+
+```sas
+* get H54s (from wherever you placed it in step 1) ;
+%include '/pub/apps/h54s/sasautos/h54s.sas';
+
+* Process and receive datasets from the client ;
+%bafgetdatasets();
+resetline;
+
+* Do some SAS. Can be Anything. Merge and sort as an example ;
+data mydata;
+  set sashelp.class;
+run;
+
+proc sort data=mydata;
+  by name;
+run;
+
+* Return a resulting dataset to the client ;
+%bafheader()
+  %bafOutDataset(processed, work, myData)
+%bafFooter()
+```
+
+Now, the eagle-eyed among you will notice that this is exactly the same code as for SAS9. No code changes are required to deploy h54s apps across the two platforms. 
+
+4. Run your job by right clicking on it and selecting "Submit job"
 
 This is good enough for now. Time for some Front End Development.
 
