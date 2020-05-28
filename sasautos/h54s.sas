@@ -3,6 +3,56 @@
 /*                                                                      */
 /************************************************************************/
 
+* check if we are in debug mode and delimit data with -h54s-- tags ;
+%global h54sDebuggingMode;
+%let h54sDebuggingMode = 0;
+
+%global isSASViya;
+%let isSASViya = 0;
+
+data _null_;
+  major = substr(symget("SYSVER"), 1, find(symget("SYSVER"), ".")-1);         
+  if major eq "V" then call symput('isSASViya', 1);
+  else call symput('isSASViya', 0);
+run;
+
+
+%macro bafCheckDebug;
+  %if %symExist(_debug) %then %do;
+    %if &_debug = 131 %then %do;
+      %let h54sDebuggingMode = 1;
+    %end;
+  %end;
+%mend;
+
+%bafCheckDebug;
+
+%GLOBAL h54sQuiet h54sDebug h54ssource h54ssource2 h54slrecl h54snotes h54starget;
+
+* to enable quiet mode (minimal log output) set variable to blank 
+  otherwise set variable to *. See around 10 lines below for what it does 
+;
+%let h54sQuiet = ;
+
+* to enable debug log output set this variable to blank
+  otherwise set variable to * 
+;
+%let h54sDebug = *;
+
+%macro bafQuietenDown;
+  %&h54sQuiet.let h54ssource=%sysfunc(getoption(source));
+  %&h54sQuiet.let h54ssource2=%sysfunc(getoption(source2));
+  %&h54sQuiet.let h54slrecl=%sysfunc(getoption(lrecl));
+  %&h54sQuiet.let h54snotes=%sysfunc(getoption(notes));
+  &h54sQuiet.options nosource nosource2 nonotes;
+%mend;
+
+%macro bafQuietenUp;
+  &h54sQuiet.options &h54ssource &h54ssource2 lrecl=&h54slrecl &h54snotes; 
+%mend;
+
+* Go quiet and avoid all the garbage in the log ;
+%hfsQuietenDown;
 
 %macro bafGetDatasets();
   /*
@@ -94,15 +144,7 @@
   %put h54s --- START DESERIALISING TABLE &&_WEBIN_name&baftn. ;
   %put h54s --- TABLE FILENAME IS &&_WEBIN_FILEREF&baftn. ;
 
-    data _null_;
-      sysver = symget("SYSVER");
-      pos1 = find(sysver, ".");
-      major = substr(sysver, 1, pos1-1);         
-      if major eq "V" then call symput('isviya', 1);
-      else call symput('isviya', 0);
-    run;
-
-    %if &isviya eq 1 %then %do;
+    %if &isSASViya eq 1 %then %do;
 
       filename thisfile filesrvc "&&_WEBIN_FILEURI&baftn." ;	
       data "&&_WEBIN_name&baftn."n;
@@ -146,46 +188,6 @@
     %end;
     %put h54s ==> === END SUMMARY ===;
     quit;
-
-%mend;
-
-%GLOBAL h54sQuiet h54sDebug h54ssource h54ssource2 h54slrecl h54snotes h54starget;
-
-* to enable quiet mode (minimal log output) set variable to blank 
-  otherwise set variable to *. See around 10 lines below for what it does 
-;
-%let h54sQuiet = ;
-
-* to enable debug log output set this variable to blank
-  otherwise set variable to * 
-;
-%let h54sDebug = *;
-
-%macro bafQuietenDown;
-  %&h54sQuiet.let h54ssource=%sysfunc(getoption(source));
-  %&h54sQuiet.let h54ssource2=%sysfunc(getoption(source2));
-  %&h54sQuiet.let h54slrecl=%sysfunc(getoption(lrecl));
-  %&h54sQuiet.let h54snotes=%sysfunc(getoption(notes));
-  &h54sQuiet.options nosource nosource2 nonotes;
-%mend;
-
-%macro bafQuietenUp;
-  &h54sQuiet.options &h54ssource &h54ssource2 lrecl=&h54slrecl &h54snotes; 
-%mend;
-
-* Go quiet and avoid all the garbage in the log ;
-%hfsQuietenDown;
-
-* check if we are in debug mode and delimit data with -h54s-- tags ;
-%global h54sDebuggingMode;
-%let h54sDebuggingMode = 0;
-
-%macro bafCheckDebug;
-  %if %symExist(_debug) %then %do;
-    %if &_debug = 131 %then %do;
-      %let h54sDebuggingMode = 1;
-    %end;
-  %end;
 
 %mend;
 
@@ -249,7 +251,7 @@
     *put "Content-type: text/html";
     *put;
     %*hfsCheckDebug;
-    %if &_debug = 131 %then %do;
+    %if &h54sDebuggingMode = 1 %then %do;
       put "--h54s-data-start--";
     %end;
     put '{';
@@ -276,15 +278,8 @@
   %end;
 
 
-  data _null_;
-    sysver = symget("SYSVER");
-    pos1 = find(sysver, ".");
-    major = substr(sysver, 1, pos1-1);         
-    if major eq "V" then call symput('isviya', 1);
-    else call symput('isviya', 0);
-  run;
 
-  %if &isviya eq 1 %then %do;
+  %if &isSASViya eq 1 %then %do;
     data _null_;
       file thiscall mod;
       sasdatetime=datetime();
@@ -297,7 +292,7 @@
       put '"status" : "' "&h54src." '"}';
       put;
 
-      %if &_debug = 131 %then %do;
+      %if &h54sDebuggingMode = 1 %then %do;
         put "--h54s-data-end--";
       %end;
     run;
@@ -309,7 +304,7 @@
       put '"usermessage" : "' "&usermessage." '",';
       put '"logmessage" : "' "&logmessage." '",';
       put '"requestingUser" : "' "&_METAUSER." '",';
-      put '"requestingPerson" : "' "&_METAUSER." '",';
+      put '"requestingPerson" : "' "&_metaperson." '",';
       put '"executingPid" : ' "&sysjobid." ',';
       put '"sasDatetime" : ' sasdatetime ',';
       put '"status" : "' "&h54src." '"}';
@@ -334,5 +329,5 @@
  
   * Come back ;
   %bafQuietenUp;
-  
+
 %mend;
