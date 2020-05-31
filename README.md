@@ -1,92 +1,54 @@
 # HTML5 Data Adapter for SAS&reg; (H54S)
 [![npm version](https://badge.fury.io/js/h54s.svg)](https://badge.fury.io/js/h54s)
 [![install size](https://packagephobia.now.sh/badge?p=h54s)](https://packagephobia.now.sh/result?p=h54s)
-[![npm downloads](https://img.shields.io/npm/dm/axios.svg?style=flat-square)](https://img.shields.io/npm/dm/h54s)
+[![npm downloads](https://img.shields.io/npm/dm/h54s.svg?style=flat-square)](https://img.shields.io/npm/dm/h54s)
 [![gitter chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Boemska/h54s?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## What is H54S?
 
-H54S is a library that facilitates and manages seamless bi-directional communication between a HTML5 (JavaScript) based Web Application and back-end data services written in SAS and deployed on the SAS Enterprise BI platform. It lets Web Programmers and SAS Developers collaborate easily to build general purpose Web Applications with unprecedented speed and agility.
+H54S facilitates and manages bi-directional communication between JavaScript based HTML5 Web Applications (Single Page Web Applications and Progressive Web Apps) and back-end services written in SAS, that execute on either SAS Viya or SAS v9. The purpose of the library is to facilitate a workflow between Front-end Web UI developers and SAS developers to enable them to build and deploy secure, enterprise-production-ready Web Applications with as little friction as possible.
 
-Yes. Unprecedented.
+H54S is a Vanilla JavaScript library. If you are a React or Angular developer, you may want to look at the specific React or Angular seed applications.
 
 #### Server Requirements
 
-- SAS BI Platform (v9.4) or SAS Viya (3.5 or later)
-- SAS Stored Process Web Application (Integration Technologies)
+An instance of either:
+
+- SAS Viya (3.4 or later, full deployment); or 
+- SAS v9 Platform (v9.4) with Integration Technologies and a SAS Web Tier
 
 #### Client Requirements
 
-- A decent Web Browser. It'll work on IE8, but spare yourself the pain
-- Your Web Application Framework or Library of choice
-- Bower.js and Google Chrome recommended. Having Git installed is also useful.
+- A modern Web Browser (Chrome, Firefox, Safari, IE11+)
+
+Google Chrome or Firefox are strongly recommended. For development, having Git installed is also useful.
 
 ## Why is it called H54S?
 
-While we're reasonably decent with technology, we are seemingly terrible with names. If anyone can think of a name that doesn't sound like a strain of Bird Flu, we're open to suggestions.
+Marketing isn't our strong point. We know it sounds like a strain of Bird Flu, but the project has had a lot of use under this name for a few years now so we're sticking to it. It's almost a memorable name.
+
 
 ## Great. How do I get started?
 
-Clone this repository to somewhere local:
+Using [git](https://git-scm.com/), clone this repository to somewhere local:
 
 ```
 git clone https://github.com/Boemska/h54s
 ```
 
-Then put your SAS hat on. 
+Then if you're a SAS developer, put your SAS hat on, and follow the instructions according which flavour of SAS you're working with.
 
-Depending on what version you are running you can either use SAS9 or Viya
+## SAS Back End
 
-### SAS9
-
-1. Copy the `sasautos` directory to your SAS Application Server. For this example we copied ours to `/pub/sasautos`.
-
-2. Register a new SAS Stored Process, with Streaming output enabled. We called our Stored Process `/Apps/myFirstService`.
-
-3. Set this to be the body of your program:
-
-```sas
-* get H54s (from wherever you placed it in step 1) ;
-%include '/pub/apps/h54s/sasautos/h54s.sas';
-
-* Process and receive datasets from the client ;
-%bafgetdatasets();
-resetline;
-
-* Do some SAS. Can be Anything. Merge and sort as an example ;
-data mydata;
-  set sashelp.class;
-run;
-
-proc sort data=mydata;
-  by name;
-run;
-
-* Return a resulting dataset to the client ;
-%bafheader()
-  %bafOutDataset(processed, work, myData)
-%bafFooter()
-```
-
-4. Save your Stored Process.  If you are using Enterprise Guide to do this, be sure to check "Global Macro Variables" and uncheck "Include STP Macros" under the "Include code for" dropdown.
-
-5. Log on to your SAS Stored Process Web Application and run the STP. It should produce something like this output:
-
-```json
-{ "processed" : [{"Name":"Alfred","Sex":"M","Age":14,"Height":69,"Weight":112.5},{"Name":"Alice","Sex":"F","Age":13,"Height":56.5,"Weight":84},{"Name":"Barbara","Sex":"F","Age":13,"Height":65.3,"Weight":98},{"Name":"Carol","Sex":"F","Age":14,"Height":62.8,"Weight":102.5},{"Name":"Henry","Sex":"M","Age":14,"Height":63.5,"Weight":102.5},{"Name":"James","Sex":"M","Age":12,"Height":57.3,"Weight":83},{"Name":"Jane","Sex":"F","Age":12,"Height":59.8,"Weight":84.5},{"Name":"Janet","Sex":"F","Age":15,"Height":62.5,"Weight":112.5},{"Name":"Jeffrey","Sex":"M","Age":13,"Height":62.5,"Weight":84},{"Name":"John","Sex":"M","Age":12,"Height":59,"Weight":99.5},{"Name":"Joyce","Sex":"F","Age":11,"Height":51.3,"Weight":50.5},{"Name":"Judy","Sex":"F","Age":14,"Height":64.3,"Weight":90},{"Name":"Louise","Sex":"F","Age":12,"Height":56.3,"Weight":77},{"Name":"Mary","Sex":"F","Age":15,"Height":66.5,"Weight":112},{"Name":"Philip","Sex":"M","Age":16,"Height":72,"Weight":150},{"Name":"Robert","Sex":"M","Age":12,"Height":64.8,"Weight":128},{"Name":"Ronald","Sex":"M","Age":15,"Height":67,"Weight":133},{"Name":"Thomas","Sex":"M","Age":11,"Height":57.5,"Weight":85},{"Name":"William","Sex":"M","Age":15,"Height":66.5,"Weight":112}], "usermessage" : "blank", "logmessage" : "blank", "requestingUser" : "jim", "requestingPerson" : "Dr Jim", "executingPid" : 22087, "sasDatetime" : 1906249007.8 , "status" : "success"}
-```
-
-This is good enough for now. Time for some Front End Development.
+_Note: The eagle-eyed among you may notice that while the process differs, the code is exactly the same for both SAS Viya and SAS v9. **The design of H54S ensuress that all applications built with it are portable between SAS v9 and SAS Viya, with no changes in code required to deploy or promote applications across the two platforms** (assuming the SAS code itself is compatible)._ 
 
 ### SAS Viya
 
-1. Copy the `sasautos` directory to your SPRE node. For this example we copied ours to `/pub/sasautos`.
+1. Copy the `sasautos` directory to your SAS server. **On Viya** this is your Compute Server node, **on SAS v9** this is your Application Server context (e.g. SASApp) compute node. In this example we copied it to `/pub/sasautos` on the compute node filesystem.
 
-2. Register a new SAS Job Definition in a folder that you can write to. I created mine in my users' home folder and called it `myFirstService`:
+2. Register a new back-end code object. **On Viya** this is a File of type Job Definition, and can be registered through the SASJobExecution WebApp (`https://[yourViyaServer]/SASJobExecution/`). **On SAS v9** this is a Stored Process and can be registered through SAS Management Console or Enterprise Guide. In both cases you'll be registering the code object to a SAS folder that you have permission to write to. In both Viya and v9, I created mine in my user's `My Folder` location and called it `myFirstService`:
 
-![job defintion](docs/img/job_def.png)
-
-3. Right click on the job and select Edit > Source code. Paste in the following code:
+3. Edit the code for the newly registered code object, and register the following code:
 
 ```sas
 * get H54s (from wherever you placed it in step 1) ;
@@ -94,9 +56,8 @@ This is good enough for now. Time for some Front End Development.
 
 * Process and receive datasets from the client ;
 %bafgetdatasets();
-resetline;
 
-* Do some SAS. Can be Anything. Merge and sort as an example ;
+* Do some SAS. Can be Anything. Just get some data;
 data mydata;
   set sashelp.class;
 run;
@@ -111,25 +72,34 @@ run;
 %bafFooter()
 ```
 
-Now, the eagle-eyed among you will notice that this is exactly the same code as for SAS9. No code changes are required to deploy h54s apps across the two platforms. 
+4. Configure the output type for your newly registered code object.  
 
-4. Right click on the job name and select properties. From the properties menu select "Parameters". Add the following parameter and then click save:
+**On Viya**, right click on the job name and select properties. From the properties menu select "Parameters". Add the following parameter and then click save:
   * Name: `_output_type`
   * Default value: `html`
   * Field type: `Character`
   * Required: `false`
 
-5. Run your job by right clicking on it and selecting "Submit job". You should see some output like the following:
+**On SAS v9**, make sure you enable Streaming Output as the output type. If you are using Enterprise Guide to do this, also be sure to check "Global Macro Variables" and uncheck "Include STP Macros" under the "Include code for" dropdown.
+
+5. Execute the newly registered code. **On Viya** do this through the same SASJobExecution WebApp, by right clicking on the Job and selecting "Submit job". **On SAS v9** do this through the Stored Process WebApp, by logging on to [yourserver]/SASStoredProcess/, locating the job in the UI and clicking on it.
+
+In both cases, you should see output similar to the following:
 
 ```json
-{ "processed" : [{"Name":"Alfred","Sex":"M","Age":14,"Height":69,"Weight":112.5},{"Name":"Alice","Sex":"F","Age":13,"Height":56.5,"Weight":84},{"Name":"Barbara","Sex":"F","Age":13,"Height":65.3,"Weight":98},{"Name":"Carol","Sex":"F","Age":14,"Height":62.8,"Weight":102.5},{"Name":"Henry","Sex":"M","Age":14,"Height":63.5,"Weight":102.5},{"Name":"James","Sex":"M","Age":12,"Height":57.3,"Weight":83},{"Name":"Jane","Sex":"F","Age":12,"Height":59.8,"Weight":84.5},{"Name":"Janet","Sex":"F","Age":15,"Height":62.5,"Weight":112.5},{"Name":"Jeffrey","Sex":"M","Age":13,"Height":62.5,"Weight":84},{"Name":"John","Sex":"M","Age":12,"Height":59,"Weight":99.5},{"Name":"Joyce","Sex":"F","Age":11,"Height":51.3,"Weight":50.5},{"Name":"Judy","Sex":"F","Age":14,"Height":64.3,"Weight":90},{"Name":"Louise","Sex":"F","Age":12,"Height":56.3,"Weight":77},{"Name":"Mary","Sex":"F","Age":15,"Height":66.5,"Weight":112},{"Name":"Philip","Sex":"M","Age":16,"Height":72,"Weight":150},{"Name":"Robert","Sex":"M","Age":12,"Height":64.8,"Weight":128},{"Name":"Ronald","Sex":"M","Age":15,"Height":67,"Weight":133},{"Name":"Thomas","Sex":"M","Age":11,"Height":57.5,"Weight":85},{"Name":"William","Sex":"M","Age":15,"Height":66.5,"Weight":112}], "usermessage" : "blank", "logmessage" : "blank", "requestingUser" : "jimdemo", "requestingPerson" : "jimdemo", "executingPid" : 1054, "sasDatetime" : 1906323243.9 , "status" : "success"}
+{ "processed" : [{"Name":"Alfred","Sex":"M","Age":14,"Height":69,"Weight":112.5},{"Name":"Alice","Sex":"F","Age":13,"Height":56.5,"Weight":84},{"Name":"Barbara","Sex":"F","Age":13,"Height":65.3,"Weight":98},{"Name":"Carol","Sex":"F","Age":14,"Height":62.8,"Weight":102.5},{"Name":"Henry","Sex":"M","Age":14,"Height":63.5,"Weight":102.5},{"Name":"James","Sex":"M","Age":12,"Height":57.3,"Weight":83},{"Name":"Jane","Sex":"F","Age":12,"Height":59.8,"Weight":84.5},{"Name":"Janet","Sex":"F","Age":15,"Height":62.5,"Weight":112.5},{"Name":"Jeffrey","Sex":"M","Age":13,"Height":62.5,"Weight":84},{"Name":"John","Sex":"M","Age":12,"Height":59,"Weight":99.5},{"Name":"Joyce","Sex":"F","Age":11,"Height":51.3,"Weight":50.5},{"Name":"Judy","Sex":"F","Age":14,"Height":64.3,"Weight":90},{"Name":"Louise","Sex":"F","Age":12,"Height":56.3,"Weight":77},{"Name":"Mary","Sex":"F","Age":15,"Height":66.5,"Weight":112},{"Name":"Philip","Sex":"M","Age":16,"Height":72,"Weight":150},{"Name":"Robert","Sex":"M","Age":12,"Height":64.8,"Weight":128},{"Name":"Ronald","Sex":"M","Age":15,"Height":67,"Weight":133},{"Name":"Thomas","Sex":"M","Age":11,"Height":57.5,"Weight":85},{"Name":"William","Sex":"M","Age":15,"Height":66.5,"Weight":112}], "usermessage" : "blank", "logmessage" : "blank", "requestingUser" : "chris", "requestingPerson" : "Chris", "executingPid" : 1054, "sasDatetime" : 1906323243.9 , "status" : "success"}
 ```
 
 This is good enough for now. Time for some Front End Development.
 
+
+
 ## HTML5 Front End
 
-Assuming that you have a local Web Server installed for development:
+### ReactJS, or another 
+### Vanilla Javascript
+
+This is the most basic approach. Assuming that you have a local Web Server installed for development:
 
 1. Create an `index.html` or start a new project in your chosen IDE.
 
@@ -162,8 +132,8 @@ When you see this warning, you're in business:
 
 ```javascript
 // Instantiate adapter. If SPWA was located at
-// http://myServer:8080/SASStoredProcess/, you would do a
-var adapter = new h54s({hostUrl: 'http://myServer:8080/'});
+// http://myServer:7980/SASStoredProcess/, you would do a
+var adapter = new h54s({hostUrl: 'http://myServer:80/'});
 // (note trailing slash)
 
 // then create a dataset to send to SAS, which in JS is an
