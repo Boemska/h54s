@@ -274,3 +274,11 @@ module.exports.getObjOfTable = function (table, key, value = null) {
 	})
 	return obj
 }
+
+// Returns self uri out of links array
+module.exports.getSelfUri = function (links) {
+	return links
+		.filter(e => e.rel === 'self')
+		.map(e => e.uri)
+		.shift();
+}
