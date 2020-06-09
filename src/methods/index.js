@@ -4,11 +4,13 @@ var Tables = require('../tables');
 var SasData = require('../sasData.js');
 var Files = require('../files');
 
-/*
+/** 
 * Call Sas program
 *
 * @param {string} sasProgram - Path of the sas program
+* @param {Object} dataObj - Instance of Tables object with data added
 * @param {function} callback - Callback function called when ajax call is finished
+* @param {Object} params - object containing additional program parameters
 *
 */
 // TODO add url as a param - it will be /SASJobExecution/ most of the time
@@ -209,7 +211,7 @@ module.exports.call = function (sasProgram, dataObj, callback, params) {
 	});
 };
 
-/*
+/** 
 * Login method
 *
 * @param {string} user - Login username
@@ -221,7 +223,8 @@ module.exports.call = function (sasProgram, dataObj, callback, params) {
 * @param {function} callback - Callback function called when ajax call is finished
 *
 */
-//TODO Create login funciton with promises for proper login feature
+// TODO: what does this TODO mean
+// TODO Create login function with promises for proper login feature
 module.exports.login = function (user, pass, callback) {
 	if (!user || !pass) {
 		throw new h54sError('argumentError', 'Credentials not set');
@@ -241,15 +244,13 @@ module.exports.login = function (user, pass, callback) {
 	}
 };
 
-/*
-* ManagedPost method
+/** 
+* ManagedRequest method
 *
-* @param {string} callMethod - get, post
-* @param {string} _url
-* @param {json} params - must be empty object
+* @param {string} callMethod - get, post, 
+* @param {string} _url - URL to make request to
 * @param {json} options - must to carry on callback function
-*
-*
+* // TODO: what does this options comment mean, needs clarification
 */
 module.exports.managedRequest = function (callMethod = 'get', _url, options = {
 	callback: () => console.log('Missing callback funciton')
@@ -260,6 +261,7 @@ module.exports.managedRequest = function (callMethod = 'get', _url, options = {
 	const {useMultipartFormData, sasProgram, dataObj, params, callback, headers} = options
 
 	// TODO - Extend managedRequest method to accept regular call with params sasProgram and dataObj
+	// TODO: is this TODO done?
 	if (sasProgram) {
 		return self.call(sasProgram, dataObj, callback, params)
 	}
@@ -307,6 +309,7 @@ module.exports.managedRequest = function (callMethod = 'get', _url, options = {
 			let done = false;
 
 			try {
+				// TODO: NM are we really publishing code with stuff like this in
 				// todo: check that this returns valid json or something
 				// resObj = res.responseText;
 				// done = true;
@@ -348,13 +351,13 @@ module.exports.managedRequest = function (callMethod = 'get', _url, options = {
 	}).error(function (res) {
 		let _csrf
 		if (res.status == 449 || (res.status == 403 && (res.responseText.includes('_csrf') || res.getResponseHeader('X-Forbidden-Reason') === 'CSRF') && (_csrf = res.getResponseHeader(res.getResponseHeader('X-CSRF-HEADER'))))) {
-			// if ((res.status == 403 || res.status == 449) && (res.responseText.includes('_csrf') || res.getResponseHeader('X-Forbidden-Reason') === 'CSRF') && (_csrf = res.getResponseHeader(res.getResponseHeader('X-CSRF-HEADER')))) {
 			self.csrf = _csrf
 			const _headers = Object.assign({}, headers, {[res.getResponseHeader('X-CSRF-HEADER')]: _csrf})
 			if (retryCount < self.maxXhrRetries) {
 				self._ajax[callMethod](url, params, useMultipartFormData, _headers).success(this.success).error(this.error);
 				retryCount++;
 			} else {
+				// TODO: NM are we adding this fail condition before we publish
 				// todo: add fail condition that is not related to data call
 				callback(new h54sError('parseError', 'Unable to parse response json'));
 			}
@@ -366,7 +369,12 @@ module.exports.managedRequest = function (callMethod = 'get', _url, options = {
 	});
 }
 
-
+/**
+ * Log on to SAS if we are asked to 
+ * @param {String} user - Username of user
+ * @param {String} pass - Password of user
+ * @param {function} callback - what to do after 
+ */
 function handleSasLogon(user, pass, callback) {
 	var self = this;
 
@@ -444,7 +452,12 @@ function handleSasLogon(user, pass, callback) {
 		}
 	};
 }
-
+/**
+ * REST logon for 9.4 v1 ticket based auth
+ * @param {String} user -
+ * @param {String} pass 
+ * @param {callback} callback 
+ */
 function handleRestLogon(user, pass, callback) {
 	var self = this;
 
@@ -484,10 +497,10 @@ function handleRestLogon(user, pass, callback) {
 	});
 }
 
-/*
+/** 
 * Logout method
 *
-* @param {function} callback - Callback function called when ajax call is finished
+* @param {function} callback - Callback function called when logout is done
 *
 */
 
@@ -513,7 +526,7 @@ module.exports.setDebugMode = function () {
 };
 
 /*
-* Exit debug mode
+* Exit debug mode and clear logs
 *
 */
 module.exports.unsetDebugMode = function () {
@@ -544,8 +557,11 @@ module.exports.onRemoteConfigUpdate = function (callback) {
 
 module.exports._utils = require('./utils.js');
 
-
-// PROMISE FUNCTIONS
+/**
+ * Login call which returns a promise
+ * @param {String} user - Username
+ * @param {String} pass - Password
+ */
 module.exports.promiseLogin = function (user, pass) {
 	return new Promise((resolve, reject) => {
 		if (!user || !pass) {
@@ -564,6 +580,12 @@ module.exports.promiseLogin = function (user, pass) {
 	})
 }
 
+/**
+ * 
+ * @param {String} user - Username 
+ * @param {String} pass - Password
+ * @param {function} callback - function to call when successful
+ */
 function customHandleSasLogon(user, pass, callback) {
 	const self = this;
 	let loginParams = {
@@ -660,7 +682,13 @@ function customHandleSasLogon(user, pass, callback) {
 	};
 }
 
-
+/**
+ * To be used with future managed metadata calls 
+ * @param {String} user - Username
+ * @param {String} pass - Password
+ * @param {function} callback - what to call after 
+ * @param {String} callbackUrl - where to navigate after getting ticket
+ */
 function customHandleRestLogon(user, pass, callback, callbackUrl) {
 	var self = this;
 
@@ -701,13 +729,24 @@ function customHandleRestLogon(user, pass, callback, callbackUrl) {
 }
 
 
-// Utilility functioins for handling files and folders on VIYA
+// Utilility functions for handling files and folders on VIYA
+/**
+ * Returns the details of a folder from folder service
+ * @param {String} folderName - Full path of folder to be found
+ * @param {Object} options - Options object for managedRequest
+ */
 module.exports.getFolderDetails = function (folderName, options) {
 	// First call to get folder's id
 	let url = "/folders/folders/@item?path=" + folderName
 	return this.managedRequest('get', url, options);
 }
 
+/**
+ * Returns the details of a file from files service
+ * @param {String} fileUri - Full path of file to be found
+ * @param {Object} options - Options object for managedRequest
+ */
+// TODO: NM are we keeping the cachebusting if we are able to disable cache in xhr object
 module.exports.getFileDetails = function (fileUri, options) {
 	const cacheBust = options.cacheBust
 	if (cacheBust) {
@@ -716,6 +755,12 @@ module.exports.getFileDetails = function (fileUri, options) {
 	return this.managedRequest('get', fileUri, options);
 }
 
+/**
+ * Returns the contents of a file from files service
+ * @param {String} fileUri - Full path of file to be downloaded
+ * @param {Object} options - Options object for managedRequest
+ */
+// TODO: NM are we keeping the cachebusting if we are able to disable cache in xhr object
 module.exports.getFileContent = function (fileUri, options) {
 	const cacheBust = options.cacheBust
 	let uri = fileUri + '/content'
@@ -727,7 +772,11 @@ module.exports.getFileContent = function (fileUri, options) {
 
 
 // Util functions for working with files and folders
-// Returns details about folder it self and it's members with details
+/**
+ * Returns details about folder it self and it's members with details
+ * @param {String} folderName - Full path of folder to be found
+ * @param {Object} options - Options object for managedRequest
+ */
 module.exports.getFolderContents = async function (folderName, options) {
 	const self = this
 	const {callback} = options
@@ -747,6 +796,12 @@ module.exports.getFolderContents = async function (folderName, options) {
 	this.managedRequest('get', url, optionsObj)
 }
 
+/**
+ * Creates a folder 
+ * @param {String} parentUri - The uri of the folder where the new child is being created
+ * @param {String} folderName - Full path of folder to be found
+ * @param {Object} options - Options object for managedRequest
+ */
 module.exports.createNewFolder = function (parentUri, folderName, options) {
 	var headers = {
 		'Accept': 'application/json, text/javascript, */*; q=0.01',
@@ -768,13 +823,27 @@ module.exports.createNewFolder = function (parentUri, folderName, options) {
 	return this.managedRequest('post', url, optionsObj);
 }
 
+/**
+ * Deletes a folder 
+ * @param {String} folderId - Full URI of folder to be deleted
+ * @param {Object} options - Options object for managedRequest
+ */
+
 module.exports.deleteFolderById = function (folderId, options) {
 	var url = '/folders/folders/' + folderId;
 	return this.managedRequest('delete', url, options)
 }
 
+// TODO: NM what is this todo below for
 // TODO module.exports.deleteFolder = functino (folderId, optins)
 
+/**
+ * Creates a new file
+ * @param {String} fileName - Name of the file being created
+ * @param {String} fileBlob - Content of the file
+ * @param {String} parentFOlderUri - URI of the parent folder where the file is to be created
+ * @param {Object} options - Options object for managedRequest
+ */
 module.exports.createNewFile = function (fileName, fileBlob, parentFolderUri, options) {
 	let url = "/files/files#multipartUpload";
 	let dataObj = {
@@ -789,10 +858,22 @@ module.exports.createNewFile = function (fileName, fileBlob, parentFolderUri, op
 	return this.managedRequest('post', url, optionsObj);
 }
 
+/**
+ * Generic delete function that deletes by URI
+ * @param {String} itemUri - Name of the item being deleted
+ * @param {Object} options - Options object for managedRequest
+ */
 module.exports.deleteItem = function (itemUri, options) {
 	return this.managedRequest('delete', itemUri, options)
 }
 
+/**
+ * Updates contents of a file
+ * @param {String} fileName - Name of the file being updated
+ * @param {String} fileBlob - New content of the file
+ * @param {String} lastModified - the last-modified header string that matches that of file being overwritten
+ * @param {Object} options - Options object for managedRequest
+ */
 module.exports.updateFile = function (itemUri, fileBlob, lastModified, options) {
 	const url = itemUri + '/content'
 	console.log('URL', url)

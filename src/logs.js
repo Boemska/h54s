@@ -56,10 +56,11 @@ module.exports.clear = {
   }
 };
 
-/*
-* Adds application logs to an array of logs
+/** 
+*  Adds application logs to an array of logs
 *
-* @param {string} res - server response
+* @param {String} message - Message to add to applicationLogs
+* @param {String} sasProgram - Header - which request did message come from
 *
 */
 module.exports.addApplicationLog = function(message, sasProgram) {
@@ -78,10 +79,13 @@ module.exports.addApplicationLog = function(message, sasProgram) {
   }
 };
 
-/*
+/** 
 * Adds debug data to an array of logs
 *
-* @param {string} res - server response
+* @param {String} htmlData - Full html log from executor
+* @param {String} debugText - Debug text that came after data output
+* @param {String} sasProgram - Which program request did message come from
+* @param {String} params - Web app params that were received 
 *
 */
 module.exports.addDebugData = function(htmlData, debugText, sasProgram, params) {
@@ -98,10 +102,12 @@ module.exports.addDebugData = function(htmlData, debugText, sasProgram, params) 
   }
 };
 
-/*
-* Adds failed requests to an array of logs
+/** 
+* Adds failed requests to an array of failed request logs
 *
-* @param {string} res - server response
+* @param {String} responseText - Full html output from executor
+* @param {String} debugText - Debug text that came after data output
+* @param {String} sasProgram - Which program request did message come from
 *
 */
 module.exports.addFailedRequest = function(responseText, debugText, sasProgram) {
@@ -118,10 +124,10 @@ module.exports.addFailedRequest = function(responseText, debugText, sasProgram) 
   }
 };
 
-/*
+/** 
 * Adds SAS errors to an array of logs
 *
-* @param {string} res - server response
+* @param {Array} errors - Array of errors to concat to main log 
 *
 */
 module.exports.addSasErrors = function(errors) {

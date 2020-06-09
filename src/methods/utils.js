@@ -1,6 +1,7 @@
 var logs = require('../logs.js');
 var h54sError = require('../error.js');
 
+// TODO NM: we have some of these as consts, we have some of these as vars, whats the correct way of doing it?
 var programNotFoundPatt = /<title>(Stored Process Error|SASStoredProcess)<\/title>[\s\S]*<h2>(Stored process not found:.*|.*not a valid stored process path.)<\/h2>/;
 var badJobDefinition = "<h2>Parameter Error <br/>Unable to get job definition.</h2>";
 
@@ -8,7 +9,7 @@ var responseReplace = function(res) {
   return res.replace(/(\r\n|\r|\n)/g, '').replace(/\\\\(n|r|t|f|b)/g, '\\$1').replace(/\\"\\"/g, '\\"');
 };
 
-/*
+/** 
 * Parse response from server
 *
 * @param {object} responseText - response html from the server
@@ -26,14 +27,14 @@ module.exports.parseRes = function(responseText, sasProgram, params) {
   return JSON.parse(responseReplace(responseText));
 };
 
-/*
+/** 
 * Parse response from server in debug mode
 *
 * @param {object} responseText - response html from the server
 * @param {string} sasProgram - sas program path
 * @param {object} params - params sent to sas program with addTable
-* @param {string} hostUrl
-* @param {bool} isViya
+* @param {string} hostUrl - same as in h54s constructor
+* @param {bool} isViya - same as in h54s constructor
 *
 */
 module.exports.parseDebugRes = function (responseText, sasProgram, params, hostUrl, isViya) {
@@ -49,7 +50,7 @@ module.exports.parseDebugRes = function (responseText, sasProgram, params, hostU
 		}
 	}
 
-	//find json
+	//find the data segment of the response
 	let patt = isViya ? /^(.?<iframe.*src=")([^"]+)(.*iframe>)/m : /^(.?--h54s-data-start--)([\S\s]*?)(--h54s-data-end--)/m;
 	matches = responseText.match(patt);
 
@@ -74,7 +75,8 @@ module.exports.parseDebugRes = function (responseText, sasProgram, params, hostU
 		const xhttp = new XMLHttpRequest();
 		const baseUrl = hostUrl || "";
 
-		xhttp.open("GET", baseUrl + matches[2], false);
+    xhttp.open("GET", baseUrl + matches[2], false);
+    // TODO: NM I thought this was made async? 
 		xhttp.send();
 		const response = xhttp.responseText;
 		jsonObj = JSON.parse(response.replace(/(\r\n|\r|\n)/g, ''));
@@ -96,7 +98,7 @@ module.exports.parseDebugRes = function (responseText, sasProgram, params, hostU
 	}
 };
 
-/*
+/** 
 * Add failed response to logs - used only if debug=false
 *
 * @param {object} responseText - response html from the server
@@ -114,7 +116,7 @@ module.exports.addFailedResponse = function(responseText, sasProgram) {
   logs.addFailedRequest(responseText, debugText, sasProgram);
 };
 
-/*
+/** 
 * Unescape all string values in returned object
 *
 * @param {object} obj
@@ -131,11 +133,11 @@ module.exports.unescapeValues = function(obj) {
   return obj;
 };
 
-/*
+/** 
 * Parse error response from server and save errors in memory
 *
 * @param {string} res - server response
-* #param {string} sasProgram - sas program which returned the response
+* @param {string} sasProgram - sas program which returned the response
 *
 */
 module.exports.parseErrorResponse = function(res, sasProgram) {
@@ -162,8 +164,8 @@ module.exports.parseErrorResponse = function(res, sasProgram) {
   return true;
 };
 
-/*
-* Decode HTML entities
+/** 
+* Decode HTML entities - old utility function
 *
 * @param {string} res - server response
 *
@@ -180,7 +182,7 @@ module.exports.decodeHTMLEntities = function (html) {
   return str;
 };
 
-/*
+/**
 * Convert sas time to javascript date
 *
 * @param {number} sasDate - sas Tate object
@@ -206,6 +208,11 @@ module.exports.fromSasDateTime = function (sasDate) {
   return jsDate;
 };
 
+/**
+ * Checks whether response object is a login redirect
+ * TODO: this can be changed to use xhr.Url once we know that is reliable, parses responseText now
+ * @param {Object} responseObj xhr response to be checked for logon redirect
+ */
 module.exports.needToLogin = function(responseObj) {
   var patt = /<form.+action="(.*Logon[^"]*).*>/;
   var matches = patt.exec(responseObj.responseText);
@@ -253,7 +260,7 @@ module.exports.needToLogin = function(responseObj) {
   }
 };
 
-/*
+/** 
 * Get full program path from metadata root and relative path
 *
 * @param {string} metadataRoot - Metadata root (path where all programs for the project are located)
@@ -264,9 +271,7 @@ module.exports.getFullProgramPath = function(metadataRoot, sasProgramPath) {
   return metadataRoot ? metadataRoot.replace(/\/?$/, '/') + sasProgramPath.replace(/^\//, '') : sasProgramPath;
 };
 
-/*
-* Returns object where table rows are groupped by key
- */
+// Returns object where table rows are groupped by key
 module.exports.getObjOfTable = function (table, key, value = null) {
 	const obj = {}
 	table.forEach(row => {

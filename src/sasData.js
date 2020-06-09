@@ -4,6 +4,10 @@ var Tables    = require('./tables');
 var Files     = require('./files');
 var toSasDateTime = require('./tables/utils.js').toSasDateTime;
 
+/**
+ * Checks whether a given table name is a valid SAS macro name
+ * @param {String} macroName The SAS macro name to be given to this table
+ */
 function validateMacro(macroName) {
   if(macroName.length > 32) {
     throw new h54sError('argumentError', 'Table name too long. Maximum is 32 characters');
@@ -28,13 +32,13 @@ function validateMacro(macroName) {
   }
 }
 
-/*
+/** 
 * h54s SAS data object constructor
 * @constructor
 *
-*@param {array|file} data - Table or file added when object is created
-*@param {string} macroName - macro name
-*@param {number} parameterThreshold - size of data objects sent to SAS
+* @param {array|file} data - Table or file added when object is created
+* @param {String} macroName The SAS macro name to be given to this table
+* @param {number} parameterThreshold - size of data objects sent to SAS (legacy)
 *
 */
 function SasData(data, macroName, specs) {
@@ -48,10 +52,10 @@ function SasData(data, macroName, specs) {
   }
 }
 
-/*
+/** 
 * Add table to tables object
 * @param {array} table - Array of table objects
-* @param {string} macroName - Sas macro name
+* @param {String} macroName The SAS macro name to be given to this table
 *
 */
 SasData.prototype.addTable = function(table, macroName, specs) {
@@ -249,6 +253,11 @@ SasData.prototype.addTable = function(table, macroName, specs) {
   ];
 };
 
+/**
+ * Add file as a verbatim blob file uplaod 
+ * @param {Blob} file - the blob that will be uploaded as file
+ * @param {String} macroName - the SAS webin name given to this file
+ */
 SasData.prototype.addFile  = function(file, macroName) {
   Files.prototype.add.call(this, file, macroName);
 };

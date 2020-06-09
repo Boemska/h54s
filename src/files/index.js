@@ -1,6 +1,6 @@
 var h54sError = require('../error.js');
 
-/*
+/** 
 * h54s SAS Files object constructor
 * @constructor
 *
@@ -14,7 +14,7 @@ function Files(file, macroName) {
   Files.prototype.add.call(this, file, macroName);
 }
 
-/*
+/** 
 * Add file to files object
 * @param {file} file - Instance of JavaScript File object
 * @param {string} macroName - Sas macro name

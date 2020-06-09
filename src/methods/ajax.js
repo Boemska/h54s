@@ -1,3 +1,5 @@
+// TODO: NM this needs _some_ explanation probably
+
 module.exports = function () {
   var timeout = 30000;
   var timeoutHandle;
@@ -16,7 +18,7 @@ module.exports = function () {
     request.open(type, url, true);
 
     //multipart/form-data is set automatically so no need for else block
-    // Content-Type header has to be explicitly setted up
+    // Content-Type header has to be explicitly set up
     if (!multipartFormData) {
       if (headers['Content-Type']) {
         request.setRequestHeader('Content-Type', headers['Content-Type'])
