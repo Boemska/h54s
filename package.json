@@ -34,7 +34,7 @@
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^0.5.4",
     "gulp-sync": "^0.1.4",
-    "gulp-uglify": "^1.5.1",
+    "gulp-uglify-es": "^2.0.0",
     "gulp-util": "^3.0.7",
     "gulp-webserver": "^0.9.1",
     "jshint": "^2.8.0",
@@ -54,5 +54,6 @@
   },
   "resolutions": {
     "graceful-fs": "4.2.3"
-  }
+  },
+  "dependencies": {}
 }
