@@ -179,8 +179,7 @@ var h54s = module.exports = function(config) {
   }
 };
 
-//replaced with gulp
-// TODO: NM what does this replaced with gulp mean
+// replaced by gulp with real version at build time
 h54s.version = '__version__';
 
 

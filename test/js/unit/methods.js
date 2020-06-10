@@ -66,39 +66,6 @@ describe('h54s unit -', function() {
       done();
     });
 
-    it('Try to log in with credentials and callback', function(done) {
-      this.timeout(300);
-      var sasAdapter = new h54s({
-        loginUrl: '/SASLogon/login'
-      });
-
-      // using test double function to return fake HTTP response
-      var ajaxPostDouble = td.replace(sasAdapter._ajax, 'post');
-      var getAjaxResponseObj = function(response) {
-        return {
-          success: function(callback) {
-            callback({
-              responseText: response === 'fail' ? sasResponses.loginFail : sasResponses.loginSuccess,
-              status: 200
-            });
-            return this;
-          },
-          error: function() {}
-        };
-      };
-      td.when(ajaxPostDouble(td.matchers.anything(), td.matchers.contains({username: '*'}))).thenReturn(getAjaxResponseObj('fail'));
-      td.when(ajaxPostDouble(td.matchers.anything(), td.matchers.contains({username: '***'}))).thenReturn(getAjaxResponseObj('success'));
-
-      sasAdapter.login('*', '*', function(status) {
-        assert.equal(status, -1, "We got wrong status code");
-        sasAdapter.login('***', '***', function(status) {
-          assert.equal(status, 200, "We got wrong status code");
-          td.reset();
-          done();
-        });
-      });
-    });
-
     it('Call sas program without logging in', function(done) {
       this.timeout(300);
       var sasAdapter = new h54s();
@@ -147,29 +114,6 @@ describe('h54s unit -', function() {
       });
     });
 
-    // it('Log out fail', function(done) {
-    //   var sasAdapter = new h54s();
-
-    //   var fakeFunction = function (url, data, multipartFormData, headers) {
-    //     return {
-    //       success: function () {},
-    //       error: function (callback) {
-    //         callback({
-    //           status: 200
-    //         });
-    //         return this;
-    //       }
-    //     };        
-    //   }
-
-    //   td.replace(sasAdapter._ajax, 'get', fakeFunction);
-
-    //   sasAdapter.logout(function(errStatus) {
-    //     assert.isDefined(errStatus, 'Wrong status on logout')
-    //     td.reset();
-    //     done();
-    //   });
-    // });
 
     it('Test pending calls after login', function(done) {
       this.timeout(300);

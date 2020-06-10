@@ -33,7 +33,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress'],
+    reporters: ['spec'],
 
 
     // web server port
@@ -55,15 +55,21 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
+    // Headless sucks still. We use headed chrome for now.
+    // https://github.com/karma-runner/karma-chrome-launcher/issues/154
+    // browsers: ['Chrome_headless'],
     browsers: ['Chrome_without_security'],
 
     //for ie8 - browsers: ['IE']
     browserNoActivityTimeout: 50000,
 
     customLaunchers: {
-      Chrome_without_security: {
+      Chrome_headless: {
         base: 'ChromeHeadless',
-        // base: 'Chrome',
+        flags: ['--no-sandbox']
+      },
+      Chrome_without_security: {
+        base: 'Chrome',
         flags: ['--disable-web-security']
       }
     },

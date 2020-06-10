@@ -66,50 +66,14 @@ describe('h54s unit -', function() {
       done();
     });
 
-    //TODO: This needs re-writing for the new SasData method
-    // it('Convert table object test', function(done) {
-    //   var expectedTable = {data: ['[{"colName":"prop1","colType":"string","colLength":3},{"colName":"prop2","colType":"num","colLength":8}]', '[{"prop1":"one","prop2":2}]']};
-    //   var table = new h54s.SasData([{prop1: 'one', prop2: 2}], 'data');
 
-    //   assert.deepEqual(table._tables, expectedTable, 'Wrong table');
-    //   done();
-    // });
+    it('Test Files object', function(done) {
+      var file = new File(['test'], 'testName', {type: 'text/plain;charset=UTF-8'});
+      var files = new h54s.Files(file, 'macroName');
 
-
-    //TODO: This needs re-writing for the new SasData method
-    // it('Test parameter threshold', function(done) {
-    //   var rows = [];
-
-    //   //around 30kb after json stringivy
-    //   for(var i = 0; i < 260; i++) {
-    //     rows.push({
-    //       data: getRandomAsciiLettersAndNumbers(100)
-    //     });
-    //   }
-
-    //   var table = new h54s.SasData(rows, 'data');
-    //   assert.equal(table._parameterThreshold, 30000, 'Threshold default value incorrect');
-    //   assert.equal(table._tables.data.length, 2, 'Tables length not correct');
-
-    //   table = new h54s.SasData(rows, 'data', 10000);
-    //   assert.equal(table._tables.data.length, 4, 'Tables length not correct');
-
-    //   table = new h54s.SasData(rows, 'data', 5000);
-    //   assert.equal(table._tables.data.length, 7, 'Tables length not correct');
-
-    //   table = new h54s.SasData(rows, 'data', 50000);
-    //   assert.equal(table._tables.data.length, 2, 'Tables length not correct');
-
-    //   done();
-    // });
-
-    // it('Test Files object', function(done) {
-    //   var file = new File(['test'], 'testName', {type: 'text/plain;charset=UTF-8'});
-    //   var files = new h54s.Files(file, 'macroName');
-
-    //   assert.isDefined(files._files.macroName, 'File not set');
-    //   done();
-    // });
+      assert.isDefined(files._files.macroName, 'File not set');
+      done();
+    });
 
     it('Test SasData object constructor with File', function(done) {
       var file = new File(['test'], 'testName', {type: 'text/plain;charset=UTF-8'});
@@ -134,7 +98,7 @@ describe('h54s unit -', function() {
 
       var reader = new FileReader();
       reader.onload = function() {
-        assert.equal(reader.result, '1,\n,"str"', 'Wrong csv string');
+        assert.equal(reader.result, '1,\r\n,"str"', 'Wrong csv string');
         done();
       };
       reader.readAsText(sasData._files.macroName[1]);

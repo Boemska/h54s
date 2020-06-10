@@ -96,19 +96,19 @@ gulp.task('clean', function(cb) {
   }
 });
 
-// gulp.task('jshint', function() {
-//   return gulp.src([
-//     'gulpfile.js',
-//     filePaths.srcFiles,
-//     filePaths.helperTestFiles,
-//     filePaths.unitTestFiles,
-//     filePaths.integrationTestFiles,
-//     filePaths.browserifyTestFiles
-//   ])
-//   .pipe(jshint())
-//   .pipe(jshint.reporter(stylish))
-//   .pipe(jshint.reporter('fail'));
-// });
+gulp.task('jshint', function() {
+  return gulp.src([
+    'gulpfile.js',
+    filePaths.srcFiles,
+    filePaths.helperTestFiles,
+    filePaths.unitTestFiles,
+    filePaths.integrationTestFiles,
+    filePaths.browserifyTestFiles
+  ])
+  .pipe(jshint())
+  .pipe(jshint.reporter(stylish))
+  .pipe(jshint.reporter('fail'));
+});
 
 gulp.task('build-dev', ['clean'], bundle);
 
@@ -139,7 +139,7 @@ gulp.task('watch', ['build-dev'], function(done) {
   new karma.Server({
     configFile: __dirname + '/karma.conf.js',
     files: [
-      {pattern: 'test/*.json', served: true, included: false},
+      {pattern: filePaths.testRemoteConfigFile, served: true, included: false},
       {pattern: filePaths.devBuild, served: true},
       {pattern: filePaths.helperTestFiles},
       {pattern: filePaths.sasResponses},
@@ -150,6 +150,9 @@ gulp.task('watch', ['build-dev'], function(done) {
     frameworks: ['browserify', 'mocha', 'proclaim', 'testdouble'],
     preprocessors: {
       './test/js/browserify/**/*.js': [ 'browserify' ]
+    },
+    proxies: {
+      "/h54sConfig.json": "/base/test/h54sConfig.json"
     },
     browserify: {
       debug: true

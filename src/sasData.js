@@ -165,7 +165,7 @@ SasData.prototype.addTable = function(table, macroName, specs) {
         if(val === true || val === false) {
           throw new h54sError('typeError', 'Boolean value in one of the values (columns) is not allowed');
         }
-        if(type === 'string' && val.indexOf('\n') !== -1) {
+        if(type === 'string' && val.indexOf('\r\n') !== -1) {
           throw new h54sError('typeError', 'New line character is not supported');
         }
 
@@ -228,7 +228,7 @@ SasData.prototype.addTable = function(table, macroName, specs) {
             specs[key].colLength = Math.max(specs[key].colLength, colLength, 1);
             break;
           case 'object':
-            sasCsv += '"' + JSON.stringidy(val).replace(/"/g, '""') + '"';
+            sasCsv += '"' + JSON.stringify(val).replace(/"/g, '""') + '"';
             break;
         }
       }
@@ -238,7 +238,7 @@ SasData.prototype.addTable = function(table, macroName, specs) {
       }
     }
     if(i < table.length - 1) {
-      sasCsv += '\n';
+      sasCsv += '\r\n';
     }
   }
 

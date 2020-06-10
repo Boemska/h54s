@@ -6,7 +6,7 @@ var programNotFoundPatt = /<title>(Stored Process Error|SASStoredProcess)<\/titl
 var badJobDefinition = "<h2>Parameter Error <br/>Unable to get job definition.</h2>";
 
 var responseReplace = function(res) {
-  return res.replace(/(\r\n|\r|\n)/g, '').replace(/\\\\(n|r|t|f|b)/g, '\\$1').replace(/\\"\\"/g, '\\"');
+  return res;
 };
 
 /** 
