@@ -1,7 +1,7 @@
 # Build Instructions
 
 1. Clone the project.
-2. Run `npm install`
+2. Run `yarn install`
 3. Install gulp-cli if it's not installed already - `npm install -g gulp-cli`.
 4. Edit the host URL, user and pass in /test/js/_server_data.js.
 5. Run `gulp`. It will run jshint and karma tests and creates build in dev/ directory. There are more gulp tasks.
