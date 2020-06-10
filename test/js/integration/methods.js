@@ -8,7 +8,7 @@ describe('h54s integration -', function() {
         hostUrl: serverData.hostUrl
       });
       sasAdapter._ajax.get( serverData.hostUrl + 'SASStoredProcess/do', {_action: 'logoff'}).success(function(res) {
-        assert.equal(res.status, 200, 'Log out is not successful');
+        assert.equal(res.status, 200, 'Log out not successful');
 
         sasAdapter.login(serverData.user, serverData.pass, function(status) {
           assert.equal(status, 200, "We got wrong status code");
