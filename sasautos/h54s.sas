@@ -7,12 +7,6 @@
 %global h54sDebuggingMode;
 %let h54sDebuggingMode = 0;
 %global _debug;
-%if &_debug = 131 %then %do;
-  %let h54sDebuggingMode = 1;
-%end;
-%else %do;
-  %let h54sDebuggingMode = 0;
-%end;
 
 %global isSASViya;
 %let isSASViya = 0;
