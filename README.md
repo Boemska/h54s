@@ -4,11 +4,16 @@
 [![npm downloads](https://img.shields.io/npm/dm/h54s.svg?style=flat-square)](https://img.shields.io/npm/dm/h54s)
 [![gitter chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Boemska/h54s?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+
 ## What is H54S?
 
-H54S facilitates and manages bi-directional communication between JavaScript based HTML5 Web Applications (Single Page Web Applications and Progressive Web Apps) and back-end services written in SAS, that execute on either SAS Viya or SAS v9. The purpose of the library is to facilitate a workflow between Front-end Web UI developers and SAS developers to enable them to build and deploy secure, enterprise-production-ready Web Applications with as little friction as possible.
+H54S facilitates and manages bi-directional communication between JavaScript based HTML5 Web Applications (Single Page Web Applications, Progressive Web Apps) and back-end services written in SAS, that execute on either SAS Viya or SAS v9. The library aims to facilitate communication between Javascript-based UI developers and SAS developers, enabling them  to build and deploy secure, production ready Web Applications with as little friction as possible.
 
-H54S is a Vanilla JavaScript library. If you are a React or Angular developer, you may want to look at the specific React or Angular seed applications.
+
+## Quick Start
+
+This repository contains the **core H54S JavaScript library**. If you understand what this does, and just want to start creating an App, head over to our our **H54S React Seed App repository** for a choice of pre-integrated Create React App-based template applications that will make your development much, much easier.
+
 
 #### Server Requirements
 
@@ -17,15 +22,17 @@ An instance of either:
 - SAS Viya (3.4 or later, full deployment); or 
 - SAS v9 Platform (v9.4) with Integration Technologies and a SAS Web Tier
 
+
 #### Client Requirements
 
 - A modern Web Browser (Chrome, Firefox, Safari, IE11+)
 
-Google Chrome or Firefox are strongly recommended. For development, having Git installed is also useful.
+Google Chrome or Firefox are strongly recommended. For development, having Git and Node installed is also very useful.
+
 
 ## Why is it called H54S?
 
-Marketing isn't our strong point. We know it sounds like a strain of Bird Flu, but the project has had a lot of use under this name for a few years now so we're sticking to it. It's almost a memorable name.
+It started out as an abbreviation of 'HTML5 4 SAS'. Marketing isn't our strong point. We know it sounds like a strain of Bird Flu, but the project has been active under this name for a few years now so we're sticking to it. It's _almost_ memorable now.
 
 
 ## Great. How do I get started?
@@ -40,7 +47,7 @@ Then if you're a SAS developer, put your SAS hat on, and follow the instructions
 
 ## SAS Back End
 
-_Note: The eagle-eyed among you may notice that while the process differs, the code is exactly the same for both SAS Viya and SAS v9. **The design of H54S ensuress that all applications built with it are portable between SAS v9 and SAS Viya, with no changes in code required to deploy or promote applications across the two platforms** (assuming the SAS code itself is compatible)._ 
+_Note: You may notice that while the process differs, the code is exactly the same for both SAS Viya and SAS v9. **The design of H54S ensures that all applications built with it are portable between SAS v9 and SAS Viya, with no changes in code required to deploy or promote applications across the two platforms**_ 
 
 ### SAS Viya
 
