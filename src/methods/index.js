@@ -726,7 +726,7 @@ module.exports.getFolderDetails = function (folderName, options) {
 /**
  * Returns the details of a file from files service
  * @param {String} fileUri - Full path of file to be found
- * @param {Object} options - Options object for managedRequest
+ * @param {Object} options - Options object for managedRequest: cacheBust forces browser to fetch new file
  */
 module.exports.getFileDetails = function (fileUri, options) {
 	const cacheBust = options.cacheBust
@@ -739,7 +739,7 @@ module.exports.getFileDetails = function (fileUri, options) {
 /**
  * Returns the contents of a file from files service
  * @param {String} fileUri - Full path of file to be downloaded
- * @param {Object} options - Options object for managedRequest
+ * @param {Object} options - Options object for managedRequest: cacheBust forces browser to fetch new file
  */
 module.exports.getFileContent = function (fileUri, options) {
 	const cacheBust = options.cacheBust
