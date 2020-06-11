@@ -127,6 +127,9 @@ gulp.task('default', [ 'unset-watch', 'build-dev'], function(done) {
       {pattern: filePaths.unitTestFiles},
       {pattern: filePaths.integrationTestFiles}
     ],
+    proxies: {
+      "/h54sConfig.json": "/base/test/h54sConfig.json"
+    },
     singleRun: true
   }, function() {
     done();
