@@ -190,7 +190,6 @@ module.exports.call = function (sasProgram, dataObj, callback, params) {
 	}).error(function (res) {
 		let _csrf
 		if (res.status == 449 || (res.status == 403 && (res.responseText.includes('_csrf') || res.getResponseHeader('X-Forbidden-Reason') === 'CSRF') && (_csrf = res.getResponseHeader(res.getResponseHeader('X-CSRF-HEADER'))))) {
-			// if ((res.status == 403 || res.status == 449) && (res.responseText.includes('_csrf') || res.getResponseHeader('X-Forbidden-Reason') === 'CSRF') && (_csrf = res.getResponseHeader(res.getResponseHeader('X-CSRF-HEADER')))) {
 			params['_csrf'] = _csrf;
 			self.csrf = _csrf
 			if (retryCount < self.maxXhrRetries) {
@@ -557,10 +556,8 @@ module.exports.promiseLogin = function (user, pass) {
 		}
 		if (!this.RESTauth) {
 			customHandleSasLogon.call(this, user, pass, resolve);
-			// promiseHandleSasLogon.call(this, user, pass, resolve, reject);
 		} else {
 			customHandleRestLogon.call(this, user, pass, resolve);
-			// handleRestLogon.call(this, user, pass, resolve);
 		}
 	})
 }
