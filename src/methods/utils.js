@@ -75,7 +75,7 @@ module.exports.parseDebugRes = function (responseText, sasProgram, params, hostU
 	const promise = new Promise(function (resolve, reject) {
 		let jsonObj
 		if (isViya) {
-			var xhr = new XMLHttpRequest();
+			const xhr = new XMLHttpRequest();
 			const baseUrl = hostUrl || "";
 			xhr.open("GET", baseUrl + matches[2]);
 			xhr.onload = function () {
