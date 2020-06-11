@@ -102,7 +102,6 @@ This is good enough for now. Time for some Front End Development.
 
 ## HTML5 Front End
 
-### ReactJS, or another 
 ### Vanilla Javascript
 
 This is the most basic approach. Assuming that you have a local Web Server installed for development:
