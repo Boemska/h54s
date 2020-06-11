@@ -1,7 +1,6 @@
 const logs = require('../logs.js');
 const h54sError = require('../error.js');
 
-// TODO NM: we have some of these as consts, we have some of these as vars, whats the correct way of doing it?
 const programNotFoundPatt = /<title>(Stored Process Error|SASStoredProcess)<\/title>[\s\S]*<h2>(Stored process not found:.*|.*not a valid stored process path.)<\/h2>/;
 const badJobDefinition = "<h2>Parameter Error <br/>Unable to get job definition.</h2>";
 
@@ -221,7 +220,6 @@ module.exports.fromSasDateTime = function (sasDate) {
 
 /**
  * Checks whether response object is a login redirect
- * TODO: this can be changed to use xhr.Url once we know that is reliable, parses responseText now
  * @param {Object} responseObj xhr response to be checked for logon redirect
  */
 module.exports.needToLogin = function(responseObj) {

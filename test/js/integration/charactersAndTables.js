@@ -123,7 +123,6 @@ describe('h54s integration -', function () {
 		});
 
 
-		//TODO this test causes Karma timeout issues
 		it('Test big table', function (done) {
 			this.timeout(30000);
 			var sasAdapter = new h54s({

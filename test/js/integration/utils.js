@@ -1,7 +1,6 @@
 /* global describe, it, assert, serverData, h54s, proclaim */
 describe('h54s integration -', function() {
   describe('Utils test:', function() {
-    //TODO this test fails because the error object doesn't get set 
     it('Server response with errors', function(done) {
       this.timeout(10000);
       var sasAdapter = new h54s({

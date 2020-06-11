@@ -1,4 +1,3 @@
-// TODO: can we move these into the constructor or something?
 const h54sError = require('./error.js');
 
 const sasVersionMap = {
@@ -19,7 +18,6 @@ const sasVersionMap = {
 /**
 *
 * @constructor
-* // TODO: NM some of these do not override the params in the constructor, we need to decide what to include in JSDoc
 * @param {Object} config - Configuration object for the H54S SAS Adapter
 * @param {String} config.sasVersion - Version of SAS, either 'v9' or 'viya'
 * @param {Boolean} config.debug - Whether debug mode is enabled, sets _debug=131
@@ -38,8 +36,6 @@ const sasVersionMap = {
 *
 */
 const h54s = module.exports = function(config) {
-
-  // TODO: NM there should be a way to make this more elegant, it's the first thing anyone sees
   // Default config values, overridden by anything in the config object
 	this.sasVersion           = (config && config.sasVersion) || 'v9' //use v9 as default=
   this.debug                = (config && config.debug) || false;
@@ -72,9 +68,7 @@ const h54s = module.exports = function(config) {
     this._disableCalls = true;
 
     // 'h54sConfig.json' is for the testing with karma
-    // TODO: figure out what this actually means, replaced with gulp in dev build
-    //       does gulp displace this config with its _server_data object?
-    //replaced with gulp in dev build
+    //replaced by gulp in dev build (defined in gulpfile under proxies)
     this._ajax.get('h54sConfig.json').success(function(res) {
       const remoteConfig = JSON.parse(res.responseText)
 
@@ -124,7 +118,6 @@ const h54s = module.exports = function(config) {
 				const _url = pendingCall._url
 				const options = pendingCall.options;
         ///update program with metadataRoot if it's not set
-        // TODO: same as before, do we want to look for indexOf old metadata path to replace it?
         if(self.metadataRoot && options.params && options.params._program.indexOf(self.metadataRoot) === -1) {
           options.params._program = self.metadataRoot.replace(/\/?$/, '/') + options.params._program.replace(oldMetadataRoot, '').replace(/^\//, '');
         }

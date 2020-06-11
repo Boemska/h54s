@@ -1,5 +1,3 @@
-// TODO: NM this needs _some_ explanation probably
-
 module.exports = function () {
   let timeout = 30000;
   let timeoutHandle;

@@ -246,8 +246,8 @@ module.exports.login = function (user, pass, callback) {
 *
 * @param {string} callMethod - get, post,
 * @param {string} _url - URL to make request to
-* @param {object} options - must to carry on callback function
-* // TODO: what does this options comment mean, needs clarification
+* @param {object} options - callback function as callback paramter in options object is required
+*
 */
 module.exports.managedRequest = function (callMethod = 'get', _url, options = {
 	callback: () => console.log('Missing callback function')
@@ -344,14 +344,12 @@ module.exports.managedRequest = function (callMethod = 'get', _url, options = {
 				self._ajax[callMethod](url, params, useMultipartFormData, _headers).success(this.success).error(this.error);
 				retryCount++;
 			} else {
-				// TODO: NM are we adding this fail condition before we publish
-				// todo: add fail condition that is not related to data call
 				callback(new h54sError('parseError', 'Unable to parse response json'));
 			}
 		} else {
 			logs.addApplicationLog('Managed request failed with status: ' + res.status, _url);
 			// if request has error text else callback
-			callback(new h54sError('httpError1', res.responseText, res.status));
+			callback(new h54sError('httpError', res.responseText, res.status));
 		}
 	});
 }
@@ -623,9 +621,6 @@ function customHandleSasLogon(user, pass, callback) {
 					});
 				}
 				self._ajax.post(self.loginUrl, loginParams).success(function () {
-					//we need this get request because of the sas 9.4 security checks
-					//TODO Is this necessary ???? because all pending calls should be calld after this howerver.
-					// self._ajax[callMethod](url).success(handleSasLogonSuccess).error(handleSasLogonError);
 					handleSasLogonSuccess()
 				}).error(handleSasLogonError);
 			}
@@ -733,7 +728,6 @@ module.exports.getFolderDetails = function (folderName, options) {
  * @param {String} fileUri - Full path of file to be found
  * @param {Object} options - Options object for managedRequest
  */
-// TODO: NM are we keeping the cachebusting if we are able to disable cache in xhr object
 module.exports.getFileDetails = function (fileUri, options) {
 	const cacheBust = options.cacheBust
 	if (cacheBust) {
@@ -747,7 +741,6 @@ module.exports.getFileDetails = function (fileUri, options) {
  * @param {String} fileUri - Full path of file to be downloaded
  * @param {Object} options - Options object for managedRequest
  */
-// TODO: NM are we keeping the cachebusting if we are able to disable cache in xhr object
 module.exports.getFileContent = function (fileUri, options) {
 	const cacheBust = options.cacheBust
 	let uri = fileUri + '/content'
