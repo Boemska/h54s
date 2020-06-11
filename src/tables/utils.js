@@ -1,5 +1,5 @@
-var h54sError = require('../error.js');
-var logs = require('../logs.js');
+const h54sError = require('../error.js');
+const logs = require('../logs.js');
 
 /*
 * Convert table object to Sas readable object
@@ -8,7 +8,7 @@ var logs = require('../logs.js');
 *
 */
 module.exports.convertTableObject = function(inObject, chunkThreshold) {
-  var self            = this;
+  const self            = this;
 
   if(chunkThreshold > 30000) {
     console.warn('You should not set threshold larger than 30kb because of the SAS limitations');
@@ -19,12 +19,12 @@ module.exports.convertTableObject = function(inObject, chunkThreshold) {
     throw new h54sError('argumentError', 'The parameter passed to checkAndGetTypeObject is not an object');
   }
 
-  var arrayLength = inObject.length;
+  const arrayLength = inObject.length;
   if (typeof (arrayLength) !== 'number') {
     throw new h54sError('argumentError', 'The parameter passed to checkAndGetTypeObject does not have a valid length and is most likely not an array');
   }
 
-  var existingCols = {}; // this is just to make lookup easier rather than traversing array each time. Will transform after
+  const existingCols = {}; // this is just to make lookup easier rather than traversing array each time. Will transform after
 
   // function checkAndSetArray - this will check an inObject current key against the existing typeArray and either return -1 if there
   // is a type mismatch or add an element and update/increment the length if needed
@@ -46,18 +46,18 @@ module.exports.convertTableObject = function(inObject, chunkThreshold) {
       return 0;
     }
   }
-  var chunkArrayCount         = 0; // this is for keeping tabs on how long the current array string would be
-  var targetArray             = []; // this is the array of target arrays
-  var currentTarget           = 0;
+  let chunkArrayCount         = 0; // this is for keeping tabs on how long the current array string would be
+  const targetArray           = []; // this is the array of target arrays
+  let currentTarget           = 0;
   targetArray[currentTarget]  = [];
-  var j                       = 0;
-  for (var i = 0; i < inObject.length; i++) {
+  let j                       = 0;
+  for (let i = 0; i < inObject.length; i++) {
     targetArray[currentTarget][j] = {};
-    var chunkRowCount             = 0;
+    let chunkRowCount             = 0;
 
-    for (var key in inObject[i]) {
-      var thisSpec  = {};
-      var thisValue = inObject[i][key];
+    for (let key in inObject[i]) {
+      const thisSpec  = {};
+      const thisValue = inObject[i][key];
 
       //skip undefined values
       if(thisValue === undefined || thisValue === null) {
@@ -78,7 +78,7 @@ module.exports.convertTableObject = function(inObject, chunkThreshold) {
       }
 
       // get type... if it is an object then convert it to json and store as a string
-      var thisType  = typeof (thisValue);
+      const thisType  = typeof (thisValue);
 
       if (thisType === 'number') { // straightforward number
         if(thisValue < Number.MIN_SAFE_INTEGER || thisValue > Number.MAX_SAFE_INTEGER) {
@@ -129,7 +129,7 @@ module.exports.convertTableObject = function(inObject, chunkThreshold) {
       throw new h54sError('argumentError', 'Row ' + j + ' exceeds size limit of 32kb');
     } else if(chunkArrayCount + chunkRowCount > chunkThreshold) {
       //create new array if this one is full and move the last item to the new array
-      var lastRow = targetArray[currentTarget].pop(); // get rid of that last row
+      const lastRow = targetArray[currentTarget].pop(); // get rid of that last row
       currentTarget++; // move onto the next array
       targetArray[currentTarget]  = [lastRow]; // make it an array
       j                           = 0; // initialise new row counter for new array - it will be incremented at the end of the function
@@ -141,8 +141,8 @@ module.exports.convertTableObject = function(inObject, chunkThreshold) {
   }
 
   // reformat existingCols into an array so sas can parse it;
-  var specArray = [];
-  for (var k in existingCols) {
+  const specArray = [];
+  for (let k in existingCols) {
     specArray.push(existingCols[k]);
   }
   return {
@@ -160,18 +160,18 @@ module.exports.convertTableObject = function(inObject, chunkThreshold) {
 *
 */
 module.exports.toSasDateTime = function (jsDate) {
-  var basedate = new Date("January 1, 1960 00:00:00");
-  var currdate = jsDate;
+  const basedate = new Date("January 1, 1960 00:00:00");
+  const currdate = jsDate;
 
   // offsets for UTC and timezones and BST
-  var baseOffset = basedate.getTimezoneOffset(); // in minutes
-  var currOffset = currdate.getTimezoneOffset(); // in minutes
+  const baseOffset = basedate.getTimezoneOffset(); // in minutes
+  const currOffset = currdate.getTimezoneOffset(); // in minutes
 
   // convert currdate to a sas datetime
-  var offsetSecs    = (currOffset - baseOffset) * 60; // offsetDiff is in minutes to start with
-  var baseDateSecs  = basedate.getTime() / 1000; // get rid of ms
-  var currdateSecs  = currdate.getTime() / 1000; // get rid of ms
-  var sasDatetime   = Math.round(currdateSecs - baseDateSecs - offsetSecs); // adjust
+  const offsetSecs    = (currOffset - baseOffset) * 60; // offsetDiff is in minutes to start with
+  const baseDateSecs  = basedate.getTime() / 1000; // get rid of ms
+  const currdateSecs  = currdate.getTime() / 1000; // get rid of ms
+  const sasDatetime   = Math.round(currdateSecs - baseDateSecs - offsetSecs); // adjust
 
   return sasDatetime;
 };

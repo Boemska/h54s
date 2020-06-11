@@ -1,19 +1,19 @@
 // TODO: NM this needs _some_ explanation probably
 
 module.exports = function () {
-  var timeout = 30000;
-  var timeoutHandle;
+  let timeout = 30000;
+  let timeoutHandle;
 
-  var xhr = function (type, url, data, multipartFormData, headers = {}) {
-    var methods = {
+  const xhr = function (type, url, data, multipartFormData, headers = {}) {
+    const methods = {
       success: function () {
       },
       error: function () {
       }
     };
 
-    var XHR = XMLHttpRequest;
-    var request = new XHR('MSXML2.XMLHTTP.3.0');
+    const XHR = XMLHttpRequest;
+    const request = new XHR('MSXML2.XMLHTTP.3.0');
 
     request.open(type, url, true);
 
@@ -63,11 +63,11 @@ module.exports = function () {
   };
 
   const serialize = function (obj) {
-    var str = [];
-    for (var p in obj) {
+    const str = [];
+    for (let p in obj) {
       if (obj.hasOwnProperty(p)) {
         if (obj[p] instanceof Array) {
-          for (var i = 0, n = obj[p].length; i < n; i++) {
+          for (let i = 0, n = obj[p].length; i < n; i++) {
             str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p][i]));
           }
         } else {
@@ -78,12 +78,12 @@ module.exports = function () {
     return str.join("&");
   };
 
-  var createMultipartFormDataPayload = function (obj) {
-    var data = new FormData();
-    for (var p in obj) {
+  const createMultipartFormDataPayload = function (obj) {
+    let data = new FormData();
+    for (let p in obj) {
       if (obj.hasOwnProperty(p)) {
         if (obj[p] instanceof Array && p !== 'file') {
-          for (var i = 0, n = obj[p].length; i < n; i++) {
+          for (let i = 0, n = obj[p].length; i < n; i++) {
             data.append(p, obj[p][i]);
           }
         } else if (p === 'file') {
@@ -98,11 +98,11 @@ module.exports = function () {
 
   return {
     get: function (url, data, multipartFormData, headers) {
-      var dataStr;
+      let dataStr;
       if (typeof data === 'object') {
         dataStr = serialize(data);
       }
-      var urlWithParams = dataStr ? (url + '?' + dataStr) : url;
+      const urlWithParams = dataStr ? (url + '?' + dataStr) : url;
       return xhr('GET', urlWithParams, null, multipartFormData, headers);
     },
 		post: function(url, data, multipartFormData, headers) {

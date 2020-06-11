@@ -1,10 +1,10 @@
-var h54sError = require('../error.js');
-var logs = require('../logs.js');
-var Tables = require('../tables');
-var SasData = require('../sasData.js');
-var Files = require('../files');
+const h54sError = require('../error.js');
+const logs = require('../logs.js');
+const Tables = require('../tables');
+const SasData = require('../sasData.js');
+const Files = require('../files');
 
-/** 
+/**
 * Call Sas program
 *
 * @param {string} sasProgram - Path of the sas program
@@ -15,10 +15,10 @@ var Files = require('../files');
 */
 // TODO add url as a param - it will be /SASJobExecution/ most of the time
 module.exports.call = function (sasProgram, dataObj, callback, params) {
-	var self = this;
-	var retryCount = 0;
-	var dbg = this.debug;
-	var csrf = this.csrf;
+	const self = this;
+	let retryCount = 0;
+	const dbg = this.debug
+	const csrf = this.csrf;
 
 	if (!callback || typeof callback !== 'function') {
 		throw new h54sError('argumentError', 'You must provide a callback');
@@ -45,7 +45,7 @@ module.exports.call = function (sasProgram, dataObj, callback, params) {
 	}
 
 	if (dataObj) {
-		var key, dataProvider;
+		let key, dataProvider;
 		if (dataObj instanceof Tables) {
 			dataProvider = dataObj._tables;
 		} else if (dataObj instanceof Files || dataObj instanceof SasData) {
@@ -93,8 +93,8 @@ module.exports.call = function (sasProgram, dataObj, callback, params) {
 
 			callback(new h54sError('notLoggedinError', 'You are not logged in'));
 		} else {
-			var resObj, unescapedResObj, err;
-			var done = false;
+			let resObj, unescapedResObj, err;
+			let done = false;
 
 			if (!dbg) {
 				try {
@@ -211,7 +211,7 @@ module.exports.call = function (sasProgram, dataObj, callback, params) {
 	});
 };
 
-/** 
+/**
 * Login method
 *
 * @param {string} user - Login username
@@ -244,12 +244,12 @@ module.exports.login = function (user, pass, callback) {
 	}
 };
 
-/** 
+/**
 * ManagedRequest method
 *
-* @param {string} callMethod - get, post, 
+* @param {string} callMethod - get, post,
 * @param {string} _url - URL to make request to
-* @param {json} options - must to carry on callback function
+* @param {object} options - must to carry on callback function
 * // TODO: what does this options comment mean, needs clarification
 */
 module.exports.managedRequest = function (callMethod = 'get', _url, options = {
@@ -370,22 +370,22 @@ module.exports.managedRequest = function (callMethod = 'get', _url, options = {
 }
 
 /**
- * Log on to SAS if we are asked to 
+ * Log on to SAS if we are asked to
  * @param {String} user - Username of user
  * @param {String} pass - Password of user
- * @param {function} callback - what to do after 
+ * @param {function} callback - what to do after
  */
 function handleSasLogon(user, pass, callback) {
-	var self = this;
+	const self = this;
 
-	var loginParams = {
+	const loginParams = {
 		_service: 'default',
 		//for SAS 9.4,
 		username: user,
 		password: pass
 	};
 
-	for (var key in this._aditionalLoginParams) {
+	for (let key in this._aditionalLoginParams) {
 		loginParams[key] = this._aditionalLoginParams[key];
 	}
 
@@ -416,10 +416,10 @@ function handleSasLogon(user, pass, callback) {
 			//but if login url is not different, we are checking if there are aditional parameters
 			if (self._loginChanged || (self._isNewLoginPage && !self._aditionalLoginParams)) {
 				delete self._loginChanged;
-				var inputs = res.responseText.match(/<input.*"hidden"[^>]*>/g);
+				const inputs = res.responseText.match(/<input.*"hidden"[^>]*>/g);
 				if (inputs) {
 					inputs.forEach(function (inputStr) {
-						var valueMatch = inputStr.match(/name="([^"]*)"\svalue="([^"]*)/);
+						const valueMatch = inputStr.match(/name="([^"]*)"\svalue="([^"]*)/);
 						loginParams[valueMatch[1]] = valueMatch[2];
 					});
 				}
@@ -438,11 +438,11 @@ function handleSasLogon(user, pass, callback) {
 			self._disableCalls = false;
 			callback(res.status);
 			while (self._pendingCalls.length > 0) {
-				var pendingCall = self._pendingCalls.shift();
-				var method = pendingCall.method || self.call.bind(self);
-				var sasProgram = pendingCall.options.sasProgram;
-				var callbackPending = pendingCall.options.callback;
-				var params = pendingCall.params;
+				const pendingCall = self._pendingCalls.shift();
+				const method = pendingCall.method || self.call.bind(self);
+				const sasProgram = pendingCall.options.sasProgram;
+				const callbackPending = pendingCall.options.callback;
+				const params = pendingCall.params;
 				//update debug because it may change in the meantime
 				params._debug = self.debug ? 131 : 0;
 				if (self.retryAfterLogin) {
@@ -450,24 +450,24 @@ function handleSasLogon(user, pass, callback) {
 				}
 			}
 		}
-	};
+	}
 }
 /**
  * REST logon for 9.4 v1 ticket based auth
  * @param {String} user -
- * @param {String} pass 
- * @param {callback} callback 
+ * @param {String} pass
+ * @param {function} callback
  */
 function handleRestLogon(user, pass, callback) {
-	var self = this;
+	const self = this;
 
-	var loginParams = {
+	const loginParams = {
 		username: user,
 		password: pass
 	};
 
 	this._ajax.post(this.RESTauthLoginUrl, loginParams).success(function (res) {
-		var location = res.getResponseHeader('Location');
+		const location = res.getResponseHeader('Location');
 
 		self._ajax.post(location, {
 			service: self.url
@@ -497,7 +497,7 @@ function handleRestLogon(user, pass, callback) {
 	});
 }
 
-/** 
+/**
 * Logout method
 *
 * @param {function} callback - Callback function called when logout is done
@@ -505,8 +505,8 @@ function handleRestLogon(user, pass, callback) {
 */
 
 module.exports.logout = function (callback) {
-	var baseUrl = this.hostUrl || '';
-	var url = baseUrl + this.logoutUrl;
+	const baseUrl = this.hostUrl || '';
+	const url = baseUrl + this.logoutUrl;
 
 	this._ajax.get(url).success(function (res) {
 		this._disableCalls = true
@@ -533,13 +533,13 @@ module.exports.unsetDebugMode = function () {
 	this.debug = false;
 };
 
-for (var key in logs.get) {
+for (let key in logs.get) {
 	if (logs.get.hasOwnProperty(key)) {
 		module.exports[key] = logs.get[key];
 	}
 }
 
-for (var key in logs.clear) {
+for (let key in logs.clear) {
 	if (logs.clear.hasOwnProperty(key)) {
 		module.exports[key] = logs.clear[key];
 	}
@@ -581,8 +581,8 @@ module.exports.promiseLogin = function (user, pass) {
 }
 
 /**
- * 
- * @param {String} user - Username 
+ *
+ * @param {String} user - Username
  * @param {String} pass - Password
  * @param {function} callback - function to call when successful
  */
@@ -683,22 +683,22 @@ function customHandleSasLogon(user, pass, callback) {
 }
 
 /**
- * To be used with future managed metadata calls 
+ * To be used with future managed metadata calls
  * @param {String} user - Username
  * @param {String} pass - Password
- * @param {function} callback - what to call after 
+ * @param {function} callback - what to call after
  * @param {String} callbackUrl - where to navigate after getting ticket
  */
 function customHandleRestLogon(user, pass, callback, callbackUrl) {
-	var self = this;
+	const self = this;
 
-	var loginParams = {
+	const loginParams = {
 		username: user,
 		password: pass
 	};
 
 	this._ajax.post(this.RESTauthLoginUrl, loginParams).success(function (res) {
-		var location = res.getResponseHeader('Location');
+		const location = res.getResponseHeader('Location');
 
 		self._ajax.post(location, {
 			service: callbackUrl
@@ -797,19 +797,19 @@ module.exports.getFolderContents = async function (folderName, options) {
 }
 
 /**
- * Creates a folder 
+ * Creates a folder
  * @param {String} parentUri - The uri of the folder where the new child is being created
  * @param {String} folderName - Full path of folder to be found
  * @param {Object} options - Options object for managedRequest
  */
 module.exports.createNewFolder = function (parentUri, folderName, options) {
-	var headers = {
+	const headers = {
 		'Accept': 'application/json, text/javascript, */*; q=0.01',
 		'Content-Type': 'application/json',
 	}
 
-	var url = '/folders/folders?parentFolderUri=' + parentUri;
-	var data = {
+	const url = '/folders/folders?parentFolderUri=' + parentUri;
+	const data = {
 		'name': folderName,
 		'type': "folder"
 	}
@@ -824,13 +824,13 @@ module.exports.createNewFolder = function (parentUri, folderName, options) {
 }
 
 /**
- * Deletes a folder 
+ * Deletes a folder
  * @param {String} folderId - Full URI of folder to be deleted
  * @param {Object} options - Options object for managedRequest
  */
 
 module.exports.deleteFolderById = function (folderId, options) {
-	var url = '/folders/folders/' + folderId;
+	const url = '/folders/folders/' + folderId;
 	return this.managedRequest('delete', url, options)
 }
 

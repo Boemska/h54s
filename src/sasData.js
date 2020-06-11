@@ -1,8 +1,8 @@
-var h54sError = require('./error.js');
-var logs      = require('./logs.js');
-var Tables    = require('./tables');
-var Files     = require('./files');
-var toSasDateTime = require('./tables/utils.js').toSasDateTime;
+const h54sError = require('./error.js');
+const logs      = require('./logs.js');
+const Tables    = require('./tables');
+const Files     = require('./files');
+const toSasDateTime = require('./tables/utils.js').toSasDateTime;
 
 /**
  * Checks whether a given table name is a valid SAS macro name
@@ -13,14 +13,14 @@ function validateMacro(macroName) {
     throw new h54sError('argumentError', 'Table name too long. Maximum is 32 characters');
   }
 
-  var charCodeAt0 = macroName.charCodeAt(0);
+  const charCodeAt0 = macroName.charCodeAt(0);
   // validate it starts with A-Z, a-z, or _
   if((charCodeAt0 < 65 || charCodeAt0 > 90) && (charCodeAt0 < 97 || charCodeAt0 > 122) && macroName[0] !== '_') {
     throw new h54sError('argumentError', 'Table name starting with number or special characters');
   }
 
-  for(var i = 0; i < macroName.length; i++) {
-    var charCode = macroName.charCodeAt(i);
+  for(let i = 0; i < macroName.length; i++) {
+    const charCode = macroName.charCodeAt(i);
 
     if((charCode < 48 || charCode > 57) &&
       (charCode < 65 || charCode > 90) &&
@@ -32,7 +32,7 @@ function validateMacro(macroName) {
   }
 }
 
-/** 
+/**
 * h54s SAS data object constructor
 * @constructor
 *
@@ -52,14 +52,14 @@ function SasData(data, macroName, specs) {
   }
 }
 
-/** 
+/**
 * Add table to tables object
 * @param {array} table - Array of table objects
 * @param {String} macroName The SAS macro name to be given to this table
 *
 */
 SasData.prototype.addTable = function(table, macroName, specs) {
-  var isSpecsProvided = !!specs;
+  const isSpecsProvided = !!specs;
   if(table && macroName) {
     if(!(table instanceof Array)) {
       throw new h54sError('argumentError', 'First argument must be array');
@@ -77,7 +77,7 @@ SasData.prototype.addTable = function(table, macroName, specs) {
     throw new h54sError('argumentError', 'Table argument is not an array');
   }
 
-  var key;
+  let key;
   if(specs) {
     if(specs.constructor !== Object) {
       throw new h54sError('argumentError', 'Specs data type wrong. Object expected.');
@@ -97,10 +97,10 @@ SasData.prototype.addTable = function(table, macroName, specs) {
     }
   }
 
-  var i, j, //counters used latter in code
+  let i, j, //counters used latter in code
       row, val, type,
-      specKeys = [],
-      specialChars = ['"', '\\', '/', '\n', '\t', '\f', '\r', '\b'];
+      specKeys = [];
+	const specialChars = ['"', '\\', '/', '\n', '\t', '\f', '\r', '\b'];
 
   if(!specs) {
     specs = {};
@@ -145,7 +145,7 @@ SasData.prototype.addTable = function(table, macroName, specs) {
     specKeys = Object.keys(specs);
   }
 
-  var sasCsv = '';
+  let sasCsv = '';
 
   // we need two loops - the first one is creating specs and validating
   for (i = 0; i < table.length; i++) {
@@ -209,12 +209,12 @@ SasData.prototype.addTable = function(table, macroName, specs) {
             break;
           case 'string':
             sasCsv += '"' + val.replace(/"/g, '""') + '"';
-            var colLength = val.length;
-            for(var k = 0; k < val.length; k++) {
+            let colLength = val.length;
+            for(let k = 0; k < val.length; k++) {
               if(specialChars.indexOf(val[k]) !== -1) {
                 colLength++;
               } else {
-                var code = val.charCodeAt(k);
+                let code = val.charCodeAt(k);
                 if(code > 0xffff) {
                   colLength += 3;
                 } else if(code > 0x7ff) {
@@ -243,7 +243,7 @@ SasData.prototype.addTable = function(table, macroName, specs) {
   }
 
   //convert specs to csv with pipes
-  var specString = specKeys.map(function(key) {
+  const specString = specKeys.map(function(key) {
     return key + ',' + specs[key].colType + ',' + specs[key].colLength;
   }).join('|');
 
@@ -254,7 +254,7 @@ SasData.prototype.addTable = function(table, macroName, specs) {
 };
 
 /**
- * Add file as a verbatim blob file uplaod 
+ * Add file as a verbatim blob file uplaod
  * @param {Blob} file - the blob that will be uploaded as file
  * @param {String} macroName - the SAS webin name given to this file
  */
