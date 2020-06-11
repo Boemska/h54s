@@ -1,6 +1,6 @@
 Welcome to the documentation for h54s from Boemska. If you are looking for a specific reference guide for either SAS or JS you'll want to jump straight to either the [SAS API Reference](./sas-api-reference.md) or the [JavaScript API Reference](./js-api-reference.md) guide.
 
-Below you'll find an overview of how h54s works, the data structres and the conventions, as well as the data type mappings. If you have previously built SAS&reg; Stored Process based web applications you might have user parameters. We do things slightly differently around here and you'll find our explanation for that below too.
+Below you'll find an overview of how h54s works, the data structures and the conventions, as well as the data type mappings. If you have previously built SAS&reg; Stored Process based web applications you might have used parameters. We do things slightly differently around here and you'll find our explanation for that below too.
 
 As always, if you have any questions don't hesitate to reach out to a member of the team or create an issue on the repository.
 

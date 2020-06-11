@@ -24,8 +24,10 @@ The default configuration looks like this:
   useMultipartFormData: true,
   RESTauth: false,
   RESTauthLoginUrl: '/SASLogon/v1/tickets'
+  sasVersion: v9
 }
 ```
+
 `url` is the URI of the SAS Stored Process Web Application (SPWA), as configured on your SAS server.
 
 `debug` sets or unsets the H54S debug mode by default.
@@ -36,7 +38,7 @@ The default configuration looks like this:
 
 Paused calls will be executed automatically after login if `retryAfterLogin` is set to true. If one request fails with `err.type = 'notLoggedinError'`, other calls will be paused, and subsequently executed (or not) based on the `retryAfterLogin` property.
 
-`sasApp` is the version of SAS - maps to _sasapp parameter returned on on SASLogon redirect
+`sasVersion` is the version of SAS - maps to _sasapp parameter returned on on SASLogon redirect
 
 `ajaxTimeout` is the duration, in seconds, that an adapter instance will wait for a call before considering it a failure.
 
@@ -45,6 +47,8 @@ Paused calls will be executed automatically after login if `retryAfterLogin` is 
 `metadataRoot` is the root metadata directory where your SAS programs for this application reside. With this set, the _program parameter passed to SAS will be `metadataRoot + sasProgram` for all calls made by that adapter instance.
 
 `useMultipartFormData` - default is `false`. Set to `true` if you want to send data using `application/x-www-form-urlencoded` type of form. In case it's true, data should be passed to `adapter.call` method as instance of `h54s.Tables` (deprecated) object. Otherwise, it will throw an error.
+
+
 
 If your SAS instance is on another domain to the one you are developing on, you can provide the SAS `hostUrl`:
 ```js
