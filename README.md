@@ -7,7 +7,7 @@
 
 ## What is H54S?
 
-H54S facilitates and manages bi-directional communication between JavaScript based HTML5 Web Applications (Single Page Web Applications, Progressive Web Apps) and back-end services written in SAS, that execute on either SAS Viya or SAS v9. The library aims to facilitate communication between Javascript-based UI developers and SAS developers, enabling them  to build and deploy secure, production ready Web Applications with as little friction as possible.
+H54S facilitates and manages bi-directional communication between JavaScript based HTML5 Web Applications (Single Page Web Applications, Progressive Web Apps) and back-end services written in SAS that execute on either SAS Viya or SAS v9. The library aims to facilitate communication between Javascript-based UI developers and SAS developers, enabling them  to build and deploy secure, production ready Web Applications with as little friction as possible.
 
 
 ## Quick Start
@@ -49,11 +49,10 @@ Then if you're a SAS developer, put your SAS hat on, and follow the instructions
 
 _Note: You may notice that while the process differs, the code is exactly the same for both SAS Viya and SAS v9. **The design of H54S ensures that all applications built with it are portable between SAS v9 and SAS Viya, with no changes in code required to deploy or promote applications across the two platforms**_ 
 
-### SAS Viya
 
-1. Copy the `sasautos` directory to your SAS server. **On Viya** this is your Compute Server node, **on SAS v9** this is your Application Server context (e.g. SASApp) compute node. In this example we copied it to `/pub/sasautos` on the compute node filesystem.
+1. Copy the `sasautos` directory to your SAS server. **On Viya** this is your Compute Server node, **on SAS v9** this is your Application Server context (e.g. SASApp) compute node. In this example we copied it to `/pub/apps/h54s/sasautos` on the compute node filesystem.
 
-2. Register a new back-end code object. **On Viya** this is a File of type Job Definition, and can be registered through the SASJobExecution WebApp (`https://[yourViyaServer]/SASJobExecution/`). **On SAS v9** this is a Stored Process and can be registered through SAS Management Console or Enterprise Guide. In both cases you'll be registering the code object to a SAS folder that you have permission to write to. In both Viya and v9, I created mine in my user's `My Folder` location and called it `myFirstService`:
+2. Register a new back-end code object. **On Viya** this is a File of type Job Definition, and can be registered through the SASJobExecution WebApp (`https://[yourViyaServer]/SASJobExecution/`). **On SAS v9** this is a Stored Process and can be registered through SAS Management Console or Enterprise Guide. In both cases you'll be registering the code object to a SAS folder that you have permission to write to. In both Viya and v9, I created mine in my user's `My Folder` location ("chris") and called it `myFirstService`:
 
 3. Edit the code for the newly registered code object, and register the following code:
 
@@ -140,8 +139,7 @@ When you see this warning, you're in business:
 ```javascript
 // Instantiate adapter. If SPWA was located at
 // http://myServer:7980/SASStoredProcess/, you would do a
-var adapter = new h54s({hostUrl: 'http://myServer:80/'});
-// (note trailing slash)
+var adapter = new h54s({hostUrl: 'http://myServer:7980'});
 
 // then create a dataset to send to SAS, which in JS is an
 // object array that looks a bit like this
@@ -154,7 +152,7 @@ var myFirstTable = [
 var data = new h54s.SasData(myFirstTable, 'datain');
 
 // make your first call to SAS
-adapter.call('/Apps/myFirstService', data, function(err, res) {
+adapter.call('/User Folders/Christopher Blake/My Folder/myFirstService', data, function(err, res) {
   if(err) {
     //Houston we have a problem
     console.log(err);
@@ -166,13 +164,13 @@ adapter.call('/Apps/myFirstService', data, function(err, res) {
 ```
 If you're logged into your SPWA and have a session cookie already, you should see this:
 
-   ![Chrome console animation](https://cloud.githubusercontent.com/assets/1783133/11691306/aff89f10-9e9a-11e5-9edd-f9a4d4e8c1b1.gif)
+   ![h54s example](https://user-images.githubusercontent.com/1965454/84392706-9e084980-abf2-11ea-93d8-176521a749a6.gif)
 
 Otherwise, if you're not logged in yet, you should see this:
 
-   ![Chrome console animation](https://cloud.githubusercontent.com/assets/1783133/11691314/b763135c-9e9a-11e5-9e2a-cad9c4b50bd4.png)
+   ![h54s logon error message](https://user-images.githubusercontent.com/1965454/84391619-2128a000-abf1-11ea-844e-f391e1e2c96a.png)
 
-The easist thing to do at this point is to log into your SPWA in another tab, refresh your page and try running the code again. However, if you're feeling adventurous you could skip ahead and try this in the console:
+The easiest thing to do at this point is to log into your SPWA in another tab, refresh your page and try running the code again. However, if you're feeling adventurous you could skip ahead and try this in the console:
 
 ```javascript
 adapter.login('mysasusername','mysaspassword'); // More on this later
