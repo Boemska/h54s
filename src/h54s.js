@@ -76,12 +76,14 @@ const h54s = module.exports = function(config) {
     //       does gulp displace this config with its _server_data object?
     //replaced with gulp in dev build
     this._ajax.get('h54sConfig.json').success(function(res) {
-      const remoteConfig = JSON.parse(res.responseText);
+      const remoteConfig = JSON.parse(res.responseText)
+
+			// Save local config before updating it with remote config
+			const localConfig = Object.assign({}, config)
+			const oldMetadataRoot = localConfig.metadataRoot;
 
       for(let key in remoteConfig) {
         if(remoteConfig.hasOwnProperty(key) && key !== 'isRemoteConfig') {
-          // TODO: should we remember metadataRoot from original object here so we can
-          //       look for it when we replace metadataRoot in the queued programs?
           config[key] = remoteConfig[key];
         }
       }
@@ -105,9 +107,8 @@ const h54s = module.exports = function(config) {
 				params._debug = self.debug ? 131 : 0;
 
         // Update program path with metadataRoot if it's not set
-        // TODO: does this replace make sense if we have a previous metadataRoot prepended?
         if(self.metadataRoot && params._program.indexOf(self.metadataRoot) === -1) {
-          params._program = self.metadataRoot.replace(/\/?$/, '/') + params._program.replace(/^\//, '');
+          params._program = self.metadataRoot.replace(/\/?$/, '/') + params._program.replace(oldMetadataRoot, '').replace(/^\//, '');
         }
 
         // Update debug because it may change in the meantime
@@ -125,7 +126,7 @@ const h54s = module.exports = function(config) {
         ///update program with metadataRoot if it's not set
         // TODO: same as before, do we want to look for indexOf old metadata path to replace it?
         if(self.metadataRoot && options.params && options.params._program.indexOf(self.metadataRoot) === -1) {
-          options.params._program = self.metadataRoot.replace(/\/?$/, '/') + options.params._program.replace(/^\//, '');
+          options.params._program = self.metadataRoot.replace(/\/?$/, '/') + options.params._program.replace(oldMetadataRoot, '').replace(/^\//, '');
         }
         //update debug because it also may have changed from remoteConfig
 				if (options.params) {

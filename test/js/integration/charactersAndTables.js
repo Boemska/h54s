@@ -32,6 +32,7 @@ describe('h54s integration -', function () {
 
 		 it('Test ascii characters', function (done) {
 		 	this.timeout(10000);
+
 		 	var sasAdapter = new h54s({
 		 		hostUrl: serverData.hostUrl,
 		 		debug: true

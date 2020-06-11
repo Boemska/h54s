@@ -102,7 +102,7 @@ describe('h54s unit -', function() {
             return this;
           },
           error: function () {}
-        };        
+        };
       }
 
       td.replace(sasAdapter._ajax, 'get', fakeFunction);
@@ -214,31 +214,5 @@ describe('h54s unit -', function() {
         done();
       });
     });
-
-    it('Status error debug', function(done) {
-      this.timeout(300);
-      var sasAdapter = new h54s({debug: true});
-
-      var ajaxPostDouble = td.replace(sasAdapter._ajax, 'post');
-      td.when(ajaxPostDouble(sasAdapter.url, td.matchers.anything(), td.matchers.anything())).thenReturn({
-        success: function(callback) {
-          callback({
-            responseText: sasResponses.callErrorDebug,
-            status: 200
-          });
-          return this;
-        },
-        error: function() {}
-      });
-
-      sasAdapter.call('*', null, function(err, res) {
-        assert.equal(err.type, 'programError', 'Wrong error message type');
-        assert.equal(err.message, 'err msg property value', 'Wrong error message value');
-        assert.equal(err.status, 'sasError', 'Wrong error message status');
-        td.reset();
-        done();
-      });
-    });
-
   });
 });

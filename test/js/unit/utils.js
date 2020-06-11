@@ -3,7 +3,7 @@ describe('h54s unit -', function() {
   describe('Utils test:', function() {
 
     it('Server response with errors', function(done) {
-      this.timeout(300);
+      this.timeout(3000);
       var sasAdapter = new h54s({
         maxXhrRetries: 3,
       });
@@ -48,7 +48,7 @@ describe('h54s unit -', function() {
     });
 
     it('Application logs', function(done) {
-      this.timeout(300);
+      this.timeout(3000);
       var sasAdapter = new h54s();
       // logs are static for h54s object and shared across all instances
       sasAdapter.clearAllLogs();
@@ -95,7 +95,7 @@ describe('h54s unit -', function() {
     });
 
     it('Set debug mode and get errors when first request fails', function(done) {
-      this.timeout(300);
+      this.timeout(3000);
       var sasAdapter = new h54s();
 
       function getAjaxResponseObj(type) {

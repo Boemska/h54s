@@ -38,6 +38,7 @@ module.exports.parseRes = function(responseText, sasProgram, params) {
 *
 */
 module.exports.parseDebugRes = function (responseText, sasProgram, params, hostUrl, isViya) {
+	const self = this
 	let matches = responseText.match(programNotFoundPatt);
 	if (matches) {
 		throw new h54sError('programNotFound', 'Sas program completed with errors');
@@ -50,7 +51,7 @@ module.exports.parseDebugRes = function (responseText, sasProgram, params, hostU
 		}
 	}
 
-	//find the data segment of the response
+	//find json
 	let patt = isViya ? /^(.?<iframe.*src=")([^"]+)(.*iframe>)/m : /^(.?--h54s-data-start--)([\S\s]*?)(--h54s-data-end--)/m;
 	matches = responseText.match(patt);
 
@@ -70,32 +71,42 @@ module.exports.parseDebugRes = function (responseText, sasProgram, params, hostU
 		throw new h54sError('parseError', 'Unable to parse response json');
 	}
 
-  let jsonObj
-	if (isViya) {
-		const xhttp = new XMLHttpRequest();
-		const baseUrl = hostUrl || "";
 
-    xhttp.open("GET", baseUrl + matches[2], false);
-    // TODO: NM I thought this was made async?
-		xhttp.send();
-		const response = xhttp.responseText;
-		jsonObj = JSON.parse(response.replace(/(\r\n|\r|\n)/g, ''));
-		return jsonObj;
-	}
+	const promise = new Promise(function (resolve, reject) {
+		let jsonObj
+		if (isViya) {
+			var xhr = new XMLHttpRequest();
+			const baseUrl = hostUrl || "";
+			xhr.open("GET", baseUrl + matches[2]);
+			xhr.onload = function () {
+				if (this.status >= 200 && this.status < 300) {
+					resolve(JSON.parse(xhr.responseText.replace(/(\r\n|\r|\n)/g, '')));
+				} else {
+					reject(new h54sError('fetchError', xhr.statusText, this.status))
+				}
+			};
+			xhr.onerror = function () {
+				reject(new h54sError('fetchError', xhr.statusText))
+			};
+			xhr.send();
+		} else {
+			try {
+				jsonObj = JSON.parse(responseReplace(matches[2]));
+			} catch (e) {
+				reject(new h54sError('parseError', 'Unable to parse response json'))
+			}
 
-	// v9 support code
-	try {
-		jsonObj = JSON.parse(responseReplace(matches[2]));
-	} catch (e) {
-		throw new h54sError('parseError', 'Unable to parse response json');
-	}
-	if (jsonObj && jsonObj.h54sAbort) {
-		return jsonObj;
-	} else if (this.parseErrorResponse(responseText, sasProgram)) {
-		throw new h54sError('sasError', 'Sas program completed with errors');
-	} else {
-		return jsonObj;
-	}
+			if (jsonObj && jsonObj.h54sAbort) {
+				resolve(jsonObj);
+			} else if (self.parseErrorResponse(responseText, sasProgram)) {
+				reject(new h54sError('sasError', 'Sas program completed with errors'))
+			} else {
+				resolve(jsonObj);
+			}
+		}
+	});
+
+	return promise;
 };
 
 /**
@@ -214,6 +225,11 @@ module.exports.fromSasDateTime = function (sasDate) {
  * @param {Object} responseObj xhr response to be checked for logon redirect
  */
 module.exports.needToLogin = function(responseObj) {
+	const isSASLogon = responseObj.responseURL && responseObj.responseURL.includes('SASLogon')
+	if (isSASLogon === false) {
+		return false
+	}
+
   const patt = /<form.+action="(.*Logon[^"]*).*>/;
   const matches = patt.exec(responseObj.responseText);
   let newLoginUrl;

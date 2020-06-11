@@ -13,7 +13,6 @@ const Files = require('../files');
 * @param {Object} params - object containing additional program parameters
 *
 */
-// TODO add url as a param - it will be /SASJobExecution/ most of the time
 module.exports.call = function (sasProgram, dataObj, callback, params) {
 	const self = this;
 	let retryCount = 0;
@@ -144,7 +143,7 @@ module.exports.call = function (sasProgram, dataObj, callback, params) {
 				}
 			} else {
 				try {
-					resObj = await self._utils.parseDebugRes(res.responseText, sasProgram, params, self.hostUrl, self.isViya, self.managedRequest.bind(self));
+					resObj = await self._utils.parseDebugRes(res.responseText, sasProgram, params, self.hostUrl, self.isViya);
 					logs.addApplicationLog(resObj.logmessage, sasProgram);
 
 					if (dataObj instanceof Tables) {
@@ -223,8 +222,6 @@ module.exports.call = function (sasProgram, dataObj, callback, params) {
 * @param {function} callback - Callback function called when ajax call is finished
 *
 */
-// TODO: what does this TODO mean
-// TODO Create login function with promises for proper login feature
 module.exports.login = function (user, pass, callback) {
 	if (!user || !pass) {
 		throw new h54sError('argumentError', 'Credentials not set');
@@ -253,15 +250,13 @@ module.exports.login = function (user, pass, callback) {
 * // TODO: what does this options comment mean, needs clarification
 */
 module.exports.managedRequest = function (callMethod = 'get', _url, options = {
-	callback: () => console.log('Missing callback funciton')
+	callback: () => console.log('Missing callback function')
 }) {
 	const self = this;
 	const csrf = this.csrf;
 	let retryCount = 0;
 	const {useMultipartFormData, sasProgram, dataObj, params, callback, headers} = options
 
-	// TODO - Extend managedRequest method to accept regular call with params sasProgram and dataObj
-	// TODO: is this TODO done?
 	if (sasProgram) {
 		return self.call(sasProgram, dataObj, callback, params)
 	}
@@ -309,11 +304,6 @@ module.exports.managedRequest = function (callMethod = 'get', _url, options = {
 			let done = false;
 
 			try {
-				// TODO: NM are we really publishing code with stuff like this in
-				// todo: check that this returns valid json or something
-				// resObj = res.responseText;
-				// done = true;
-
 				const arr = res.getAllResponseHeaders().split('\r\n');
 				const resHeaders = arr.reduce(function (acc, current, i) {
 					let parts = current.split(': ');
@@ -334,8 +324,6 @@ module.exports.managedRequest = function (callMethod = 'get', _url, options = {
 					})
 					done = true;
 				}
-
-
 			} catch (e) {
 				err = new h54sError('unknownError', e.message);
 				err.stack = e.stack;
@@ -345,7 +333,6 @@ module.exports.managedRequest = function (callMethod = 'get', _url, options = {
 				if (done) {
 					callback(err, resObj)
 				}
-
 			}
 		}
 	}).error(function (res) {
@@ -828,14 +815,10 @@ module.exports.createNewFolder = function (parentUri, folderName, options) {
  * @param {String} folderId - Full URI of folder to be deleted
  * @param {Object} options - Options object for managedRequest
  */
-
 module.exports.deleteFolderById = function (folderId, options) {
 	const url = '/folders/folders/' + folderId;
 	return this.managedRequest('delete', url, options)
 }
-
-// TODO: NM what is this todo below for
-// TODO module.exports.deleteFolder = functino (folderId, optins)
 
 /**
  * Creates a new file
