@@ -55,6 +55,5 @@
   },
   "resolutions": {
     "graceful-fs": "4.2.3"
-  },
-  "dependencies": {}
+  }
 }

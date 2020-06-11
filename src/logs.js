@@ -1,11 +1,11 @@
-var logs = {
+const logs = {
   applicationLogs: [],
   debugData: [],
   sasErrors: [],
   failedRequests: []
 };
 
-var limits = {
+const limits = {
   applicationLogs: 100,
   debugData: 20,
   failedRequests: 20,
@@ -56,7 +56,7 @@ module.exports.clear = {
   }
 };
 
-/** 
+/**
 *  Adds application logs to an array of logs
 *
 * @param {String} message - Message to add to applicationLogs
@@ -67,7 +67,7 @@ module.exports.addApplicationLog = function(message, sasProgram) {
   if(message === 'blank') {
     return;
   }
-  var log = {
+  const log = {
     message:    message,
     time:       new Date(),
     sasProgram: sasProgram
@@ -79,13 +79,13 @@ module.exports.addApplicationLog = function(message, sasProgram) {
   }
 };
 
-/** 
+/**
 * Adds debug data to an array of logs
 *
 * @param {String} htmlData - Full html log from executor
 * @param {String} debugText - Debug text that came after data output
 * @param {String} sasProgram - Which program request did message come from
-* @param {String} params - Web app params that were received 
+* @param {String} params - Web app params that were received
 *
 */
 module.exports.addDebugData = function(htmlData, debugText, sasProgram, params) {
@@ -102,7 +102,7 @@ module.exports.addDebugData = function(htmlData, debugText, sasProgram, params) 
   }
 };
 
-/** 
+/**
 * Adds failed requests to an array of failed request logs
 *
 * @param {String} responseText - Full html output from executor
@@ -124,10 +124,10 @@ module.exports.addFailedRequest = function(responseText, debugText, sasProgram) 
   }
 };
 
-/** 
+/**
 * Adds SAS errors to an array of logs
 *
-* @param {Array} errors - Array of errors to concat to main log 
+* @param {Array} errors - Array of errors to concat to main log
 *
 */
 module.exports.addSasErrors = function(errors) {

@@ -1,4 +1,4 @@
-var h54sError = require('../error.js');
+const h54sError = require('../error.js');
 
 /*
 * h54s tables object constructor
@@ -37,12 +37,12 @@ Tables.prototype.add = function(table, macroName) {
     throw new h54sError('argumentError', 'Missing arguments');
   }
 
-  var result = this._utils.convertTableObject(table, this._parameterThreshold);
+  const result = this._utils.convertTableObject(table, this._parameterThreshold);
 
-  var tableArray = [];
+  const tableArray = [];
   tableArray.push(JSON.stringify(result.spec));
-  for (var numberOfTables = 0; numberOfTables < result.data.length; numberOfTables++) {
-    var outString = JSON.stringify(result.data[numberOfTables]);
+  for (let numberOfTables = 0; numberOfTables < result.data.length; numberOfTables++) {
+    const outString = JSON.stringify(result.data[numberOfTables]);
     tableArray.push(outString);
   }
   this._tables[macroName] = tableArray;

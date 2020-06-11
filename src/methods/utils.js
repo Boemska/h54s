@@ -1,15 +1,15 @@
-var logs = require('../logs.js');
-var h54sError = require('../error.js');
+const logs = require('../logs.js');
+const h54sError = require('../error.js');
 
 // TODO NM: we have some of these as consts, we have some of these as vars, whats the correct way of doing it?
-var programNotFoundPatt = /<title>(Stored Process Error|SASStoredProcess)<\/title>[\s\S]*<h2>(Stored process not found:.*|.*not a valid stored process path.)<\/h2>/;
-var badJobDefinition = "<h2>Parameter Error <br/>Unable to get job definition.</h2>";
+const programNotFoundPatt = /<title>(Stored Process Error|SASStoredProcess)<\/title>[\s\S]*<h2>(Stored process not found:.*|.*not a valid stored process path.)<\/h2>/;
+const badJobDefinition = "<h2>Parameter Error <br/>Unable to get job definition.</h2>";
 
-var responseReplace = function(res) {
-  return res;
+const responseReplace = function(res) {
+  return res
 };
 
-/** 
+/**
 * Parse response from server
 *
 * @param {object} responseText - response html from the server
@@ -18,7 +18,7 @@ var responseReplace = function(res) {
 *
 */
 module.exports.parseRes = function(responseText, sasProgram, params) {
-  var matches = responseText.match(programNotFoundPatt);
+  const matches = responseText.match(programNotFoundPatt);
   if(matches) {
     throw new h54sError('programNotFound', 'You have not been granted permission to perform this action, or the STP is missing.');
   }
@@ -27,7 +27,7 @@ module.exports.parseRes = function(responseText, sasProgram, params) {
   return JSON.parse(responseReplace(responseText));
 };
 
-/** 
+/**
 * Parse response from server in debug mode
 *
 * @param {object} responseText - response html from the server
@@ -76,7 +76,7 @@ module.exports.parseDebugRes = function (responseText, sasProgram, params, hostU
 		const baseUrl = hostUrl || "";
 
     xhttp.open("GET", baseUrl + matches[2], false);
-    // TODO: NM I thought this was made async? 
+    // TODO: NM I thought this was made async?
 		xhttp.send();
 		const response = xhttp.responseText;
 		jsonObj = JSON.parse(response.replace(/(\r\n|\r|\n)/g, ''));
@@ -98,32 +98,32 @@ module.exports.parseDebugRes = function (responseText, sasProgram, params, hostU
 	}
 };
 
-/** 
+/**
 * Add failed response to logs - used only if debug=false
 *
-* @param {object} responseText - response html from the server
+* @param {string} responseText - response html from the server
 * @param {string} sasProgram - sas program path
 *
 */
 module.exports.addFailedResponse = function(responseText, sasProgram) {
-  var patt      = /<script([\s\S]*)\/form>/;
-  var patt2     = /display\s?:\s?none;?\s?/;
+  const patt      = /<script([\s\S]*)\/form>/;
+  const patt2     = /display\s?:\s?none;?\s?/;
   //remove script with form for toggling the logs and "display:none" from style
   responseText  = responseText.replace(patt, '').replace(patt2, '');
-  var debugText = responseText.replace(/<[^>]*>/g, '');
+  let debugText = responseText.replace(/<[^>]*>/g, '');
   debugText = this.decodeHTMLEntities(debugText);
 
   logs.addFailedRequest(responseText, debugText, sasProgram);
 };
 
-/** 
+/**
 * Unescape all string values in returned object
 *
 * @param {object} obj
 *
 */
 module.exports.unescapeValues = function(obj) {
-  for (var key in obj) {
+  for (let key in obj) {
     if (typeof obj[key] === 'string') {
       obj[key] = decodeURIComponent(obj[key]);
     } else if(typeof obj === 'object') {
@@ -133,7 +133,7 @@ module.exports.unescapeValues = function(obj) {
   return obj;
 };
 
-/** 
+/**
 * Parse error response from server and save errors in memory
 *
 * @param {string} res - server response
@@ -142,14 +142,14 @@ module.exports.unescapeValues = function(obj) {
 */
 module.exports.parseErrorResponse = function(res, sasProgram) {
   //capture 'ERROR: [text].' or 'ERROR xx [text].'
-  var patt    = /^ERROR(:\s|\s\d\d)(.*\.|.*\n.*\.)/gm;
-  var errors  = res.replace(/(<([^>]+)>)/ig, '').match(patt);
+  const patt    = /^ERROR(:\s|\s\d\d)(.*\.|.*\n.*\.)/gm;
+  let errors  = res.replace(/(<([^>]+)>)/ig, '').match(patt);
   if(!errors) {
     return;
   }
 
-  var errMessage;
-  for(var i = 0, n = errors.length; i < n; i++) {
+  let errMessage;
+  for(let i = 0, n = errors.length; i < n; i++) {
     errMessage  = errors[i].replace(/<[^>]*>/g, '').replace(/(\n|\s{2,})/g, ' ');
     errMessage  = this.decodeHTMLEntities(errMessage);
     errors[i]   = {
@@ -164,18 +164,18 @@ module.exports.parseErrorResponse = function(res, sasProgram) {
   return true;
 };
 
-/** 
+/**
 * Decode HTML entities - old utility function
 *
 * @param {string} res - server response
 *
 */
 module.exports.decodeHTMLEntities = function (html) {
-  var tempElement = document.createElement('span');
-  var str         = html.replace(/&(#(?:x[0-9a-f]+|\d+)|[a-z]+);/gi,
+  const tempElement = document.createElement('span');
+  let str	= html.replace(/&(#(?:x[0-9a-f]+|\d+)|[a-z]+);/gi,
     function (str) {
       tempElement.innerHTML = str;
-      str                   = tempElement.textContent || tempElement.innerText;
+      str = tempElement.textContent || tempElement.innerText;
       return str;
     }
   );
@@ -189,21 +189,21 @@ module.exports.decodeHTMLEntities = function (html) {
 *
 */
 module.exports.fromSasDateTime = function (sasDate) {
-  var basedate = new Date("January 1, 1960 00:00:00");
-  var currdate = sasDate;
+  const basedate = new Date("January 1, 1960 00:00:00");
+  const currdate = sasDate;
 
   // offsets for UTC and timezones and BST
-  var baseOffset = basedate.getTimezoneOffset(); // in minutes
+  const baseOffset = basedate.getTimezoneOffset(); // in minutes
 
   // convert sas datetime to a current valid javascript date
-  var basedateMs  = basedate.getTime(); // in ms
-  var currdateMs  = currdate * 1000; // to ms
-  var sasDatetime = currdateMs + basedateMs;
-  var jsDate      = new Date();
+  const basedateMs  = basedate.getTime(); // in ms
+  const currdateMs  = currdate * 1000; // to ms
+  const sasDatetime = currdateMs + basedateMs;
+  const jsDate      = new Date();
   jsDate.setTime(sasDatetime); // first time to get offset BST daylight savings etc
-  var currOffset  = jsDate.getTimezoneOffset(); // adjust for offset in minutes
-  var offsetVar   = (baseOffset - currOffset) * 60 * 1000; // difference in milliseconds
-  var offsetTime  = sasDatetime - offsetVar; // finding BST and daylight savings
+  const currOffset  = jsDate.getTimezoneOffset(); // adjust for offset in minutes
+  const offsetVar   = (baseOffset - currOffset) * 60 * 1000; // difference in milliseconds
+  const offsetTime  = sasDatetime - offsetVar; // finding BST and daylight savings
   jsDate.setTime(offsetTime); // update with offset
   return jsDate;
 };
@@ -214,15 +214,15 @@ module.exports.fromSasDateTime = function (sasDate) {
  * @param {Object} responseObj xhr response to be checked for logon redirect
  */
 module.exports.needToLogin = function(responseObj) {
-  var patt = /<form.+action="(.*Logon[^"]*).*>/;
-  var matches = patt.exec(responseObj.responseText);
-  var newLoginUrl;
+  const patt = /<form.+action="(.*Logon[^"]*).*>/;
+  const matches = patt.exec(responseObj.responseText);
+  let newLoginUrl;
 
   if(!matches) {
     //there's no form, we are in. hooray!
     return false;
   } else {
-    var actionUrl = matches[1].replace(/\?.*/, '');
+    const actionUrl = matches[1].replace(/\?.*/, '');
     if(actionUrl.charAt(0) === '/') {
       newLoginUrl = this.hostUrl ? this.hostUrl + actionUrl : actionUrl;
       if(newLoginUrl !== this.loginUrl) {
@@ -232,9 +232,9 @@ module.exports.needToLogin = function(responseObj) {
     } else {
       //relative path
 
-      var lastIndOfSlash = responseObj.responseURL.lastIndexOf('/') + 1;
+      const lastIndOfSlash = responseObj.responseURL.lastIndexOf('/') + 1;
       //remove everything after the last slash, and everything until the first
-      var relativeLoginUrl = responseObj.responseURL.substr(0, lastIndOfSlash).replace(/.*\/{2}[^\/]*/, '') + actionUrl;
+      const relativeLoginUrl = responseObj.responseURL.substr(0, lastIndOfSlash).replace(/.*\/{2}[^\/]*/, '') + actionUrl;
       newLoginUrl = this.hostUrl ? this.hostUrl + relativeLoginUrl : relativeLoginUrl;
       if(newLoginUrl !== this.loginUrl) {
         this._loginChanged = true;
@@ -243,10 +243,10 @@ module.exports.needToLogin = function(responseObj) {
     }
 
     //save parameters from hidden form fields
-    var parser = new DOMParser();
-    var doc = parser.parseFromString(responseObj.responseText,"text/html");
-    var res = doc.querySelectorAll("input[type='hidden']");
-    var hiddenFormParams = {};
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(responseObj.responseText,"text/html");
+    const res = doc.querySelectorAll("input[type='hidden']");
+    const hiddenFormParams = {};
     if(res) {
       //it's new login page if we have these additional parameters
       this._isNewLoginPage = true;
@@ -255,12 +255,11 @@ module.exports.needToLogin = function(responseObj) {
       });
       this._aditionalLoginParams = hiddenFormParams;
     }
-
     return true;
   }
 };
 
-/** 
+/**
 * Get full program path from metadata root and relative path
 *
 * @param {string} metadataRoot - Metadata root (path where all programs for the project are located)

@@ -1,5 +1,5 @@
 // TODO: can we move these into the constructor or something?
-var h54sError = require('./error.js');
+const h54sError = require('./error.js');
 
 const sasVersionMap = {
 	v9: {
@@ -16,28 +16,28 @@ const sasVersionMap = {
 	}
 }
 
-/** 
+/**
 *
 * @constructor
 * // TODO: NM some of these do not override the params in the constructor, we need to decide what to include in JSDoc
 * @param {Object} config - Configuration object for the H54S SAS Adapter
-* @param {String} config.sasVersion - Version of SAS, either 'v9' or 'viya' 
+* @param {String} config.sasVersion - Version of SAS, either 'v9' or 'viya'
 * @param {Boolean} config.debug - Whether debug mode is enabled, sets _debug=131
 * @param {String} config.metadataRoot - Base path of all project services to be prepended to _program path
 * @param {String} config.url - URI of the job executor - SPWA or JES
-* @param {String} config.loginUrl - URI of the SASLogon web login path - overridden by form action 
-* @param {String} config.logoutUrl - URI of the logout action 
+* @param {String} config.loginUrl - URI of the SASLogon web login path - overridden by form action
+* @param {String} config.logoutUrl - URI of the logout action
 * @param {String} config.RESTauth - Boolean to toggle use of REST authentication in SAS v9
-* @param {String} config.RESTauthLoginUrl - Address of SASLogon tickets endpoint for REST auth 
+* @param {String} config.RESTauthLoginUrl - Address of SASLogon tickets endpoint for REST auth
 * @param {Boolean} config.retryAfterLogin - Whether to resume requests which were parked with login redirect after a successful re-login
 * @param {Number} config.maxXhrRetries - If a program call fails, attempt to call it again N times until it succeeds
 * @param {Number} config.ajaxTimeout - Number of milliseconds to wait for a response before closing the request
 * @param {Boolean} config.useMultipartFormData - Whether to use multipart for POST - for legacy backend support
-* @param {String} config.csrf - CSRF token for JES 
+* @param {String} config.csrf - CSRF token for JES
 * @
 *
 */
-var h54s = module.exports = function(config) {
+const h54s = module.exports = function(config) {
 
   // TODO: NM there should be a way to make this more elegant, it's the first thing anyone sees
   // Default config values, overridden by anything in the config object
@@ -67,7 +67,7 @@ var h54s = module.exports = function(config) {
 
   // If this instance was deployed with a standalone config external to the build use that
   if(config && config.isRemoteConfig) {
-    var self = this;
+    const self = this;
 
     this._disableCalls = true;
 
@@ -76,7 +76,7 @@ var h54s = module.exports = function(config) {
     //       does gulp displace this config with its _server_data object?
     //replaced with gulp in dev build
     this._ajax.get('h54sConfig.json').success(function(res) {
-      var remoteConfig = JSON.parse(res.responseText);
+      const remoteConfig = JSON.parse(res.responseText);
 
       for(let key in remoteConfig) {
         if(remoteConfig.hasOwnProperty(key) && key !== 'isRemoteConfig') {
@@ -89,8 +89,8 @@ var h54s = module.exports = function(config) {
       _setConfig.call(self, config);
 
       // Execute callbacks when overrides from remote config are applied
-      for(var i = 0, n = self.remoteConfigUpdateCallbacks.length; i < n; i++) {
-        var fn = self.remoteConfigUpdateCallbacks[i];
+      for(let i = 0, n = self.remoteConfigUpdateCallbacks.length; i < n; i++) {
+        const fn = self.remoteConfigUpdateCallbacks[i];
         fn();
       }
 
@@ -148,7 +148,7 @@ var h54s = module.exports = function(config) {
     }
 
     //merge config object from parameter with this
-    for(var key in config) {
+    for(let key in config) {
       if(config.hasOwnProperty(key)) {
         if((key === 'url' || key === 'loginUrl') && config[key].charAt(0) !== '/') {
           config[key] = '/' + config[key];
