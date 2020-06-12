@@ -1,96 +1,117 @@
 /************************************************************************/
-/*            Parser and Generator for v1 of the Adapter                */
+/*                    .__     .________   _____                         */
+/*                    |  |__  |   ____/  /  |  |  ______                */
+/*                    |  |  \ |____  \  /   |  |_/  ___/                */
+/*                    |   Y  \/       \/    ^   /\___ \                 */
+/*                    |___|  /______  /\____   |/____  >                */
+/*                         \/       \/      |__|     \/                 */
 /*                                                                      */
 /************************************************************************/
 
-* check if we are in debug mode and delimit data with -h54s-- tags ;
-%global h54sDebuggingMode;
+%GLOBAL h54ssource h54ssource2 h54slrecl h54snotes h54starget 
+        h54sDeveloperMode h54sDebuggingMode _debug h54sIsViya;
+
+/*  if we are developing, set this to 1; */
+%let h54sDeveloperMode = 0;
+/*  this is always set to = to start with; */
 %let h54sDebuggingMode = 0;
-%global _debug;
 
-%global isSASViya;
-%let isSASViya = 0;
-
+/*  check platform */
 data _null_;
   major = substr(symget("SYSVER"), 1, find(symget("SYSVER"), ".")-1);         
-  if major eq "V" then call symput('isSASViya', 1);
-  else call symput('isSASViya', 0);
+  if major eq "V" then do;
+    call symput('h54sIsViya', '1');
+    /*  optimisations for avoiding reopening connection to
+        viya files service multiple times for appending output */
+    call symput('h54sBufferTarget', 'thiscall');
+    call symput('h54sJsonTarget', 'thisjson');
+    call symput('h54sBufferWriteMode', 'mod');
+  end;
+  else do; 
+    call symput('h54sIsViya', '0');
+    call symput('h54sBufferTarget', '_webout');
+    call symput('h54sJsonTarget', '_webout');
+    call symput('h54sBufferWriteMode', '');
+  end;
 run;
 
 
+%macro bafQuietenDown;
+  %let h54ssource=%sysfunc(getoption(source));
+  %let h54ssource2=%sysfunc(getoption(source2));
+  %let h54slrecl=%sysfunc(getoption(lrecl));
+  %let h54snotes=%sysfunc(getoption(notes));
+  options nosource nosource2 nonotes;
+%mend;
+
+%macro bafQuietenUp;
+  options &h54ssource &h54ssource2 lrecl=&h54slrecl &h54snotes; 
+%mend;
+
+
+/*  go quiet while sourcing */
+%bafQuietenDown;
+
 %macro bafCheckDebug;
-  %if %symExist(_debug) %then %do;
-    %if &_debug = 131 %then %do;
-      %let h54sDebuggingMode = 1;
+  /*  this runs for each request. 
+      debugging mode inserts data delimiters
+      into SPWA output so log can be parsed out
+  */
+  %if &h54sIsViya = 0 %then %do;
+    %if %symExist(_debug) %then %do;
+      %if &_debug = 131 %then %do;
+        %let h54sDebuggingMode = 1;
+      %end;
+      %else %do;
+        %let h54sDebuggingMode = 0;
+      %end;
     %end;
   %end;
 %mend;
 
-%bafCheckDebug;
-
-%GLOBAL h54sQuiet h54sDebug h54ssource h54ssource2 h54slrecl h54snotes h54starget;
-
-* to enable quiet mode (minimal log output) set variable to blank 
-  otherwise set variable to *. See around 10 lines below for what it does 
-;
-%let h54sQuiet = ;
-
-* to enable debug log output set this variable to blank
-  otherwise set variable to * 
-;
-%let h54sDebug = *;
-
-%macro bafQuietenDown;
-  %&h54sQuiet.let h54ssource=%sysfunc(getoption(source));
-  %&h54sQuiet.let h54ssource2=%sysfunc(getoption(source2));
-  %&h54sQuiet.let h54slrecl=%sysfunc(getoption(lrecl));
-  %&h54sQuiet.let h54snotes=%sysfunc(getoption(notes));
-  &h54sQuiet.options nosource nosource2 nonotes;
-%mend;
-
-%macro bafQuietenUp;
-  &h54sQuiet.options &h54ssource &h54ssource2 lrecl=&h54slrecl &h54snotes; 
-%mend;
-
-* Go quiet and avoid all the garbage in the log ;
-%bafQuietenDown;
-* Go loud;
-%bafQuietenUp;
 
 %macro bafGetDatasets();
-  /*
-  _WEBIN_NAME has the name of each parameter for the counterpart spec
-  _WEBIN_FILE_COUNT has the total number of files. If 1 then we need no suffix
-  */
+  %bafCheckDebug;
+  /* quieten down the log unless we are debugging */
+  %if (&h54sDeveloperMode ne 1) %then %bafQuietenDown;
+
+  /* _WEBIN_NAME has the name of each parameter for the counterpart spec
+     _WEBIN_FILE_COUNT has the total number of files. If 1 then we need no suffix */
   %if %symexist(_webin_file_count) = 0 %then %do;
+    %put [h54s] There are no WEBIN files;
+    %if (&h54sDeveloperMode ne 1) %then %bafQuietenUp;
+    /* No tables were sent */
     %return;
   %end;
+  %put [h54s] WEBIN file count is &_WEBIN_FILE_COUNT.;
 
-  %put h54s ==> WEBIN FILE COUNT IS &_WEBIN_FILE_COUNT.;
-
-  /*
-  bafpn is the index of a file described as FILE
-  bafxn is the index of a file described as XML
-  global vars initialised
+  /*  Reserved uploads: Generic file uploads or OMI metadata queries.
+      bafpn is the index of a file described as FILE
+      bafxn is the index of a file described as XML
+      global vars initialised
   */
   %global bafpn;
   %global bafxn;
   %let bafpn=;
   %let bafxn=;
 
-  /* baftn is the index of the file (table) being iterated over */
+  /*  baftn is the current index of the file (table) being iterated over */
   %do files = 1 %to &_WEBIN_FILE_COUNT;
+    /*  if there is only one file the counts do not get number suffix */
     %if &_WEBIN_FILE_COUNT = 1 %then %let baftn=;
     %else %do;
       %let baftn=&files.;
     %end;
 
-    /* references to file and spec */
+    /*  references to file and spec */
     %let thisobj=&&_WEBIN_name&baftn;
     %let testspec=&&&&&&_WEBIN_name&baftn.;
 
-    %put h54s ==> Evaluating filename &&&&_WEBIN_name&baftn;
-    /* if a spec comes back as a FILE then it is not a table */
+    %put [h54s]    Evaluating filename &&&&_WEBIN_name&baftn;
+    /*  if a spec comes back as FILE when it is not a table 
+        if that is called MYFILE it is SAS code
+        if that is called XML it is an OMI metadata query
+    */
     %if (%UPCASE("&&&&&&_WEBIN_name&baftn.") eq "FILE") %then %do;
       %if (%UPCASE("&&&&_WEBIN_name&baftn.") eq "MYFILE") %then %do;
         %let bafpn=&baftn.;
@@ -109,10 +130,8 @@ run;
         length lenspec $50;
         length varname $32;
         spec=symget(symget(cats("_WEBIN_NAME","&baftn.")));
-        /* viya 3.5 */ 
+        /* viya 3.5 - remove nrstr wrap and character escaping */ 
         spec=prxchange("s/\%([\'\""\%\(\)])/$1/", -1 , prxchange('s/^\%nrstr\((.*)\)/$1/s', -1, spec));
-        
-        put spec=;
         colcount=countw(spec, '|');
 
         do c=1 to colcount;
@@ -127,13 +146,7 @@ run;
               end;
           end;
 
-
-          * length statement specification here ;
-          lname=cats('lens', c);
-          * call symputx(lname, lendef, 'L');
-
-          * input statement specification here ;
-
+          /* input statement to macro */
           pname=cats('cols', c);
           call symputx(pname, indef, 'L');
           output;
@@ -143,15 +156,13 @@ run;
 
       /* parse the actual input data */
 
-  * options mprint mlogic symbolgen;
-  %put h54s --- START DESERIALISING TABLE &&_WEBIN_name&baftn. ;
-  %put h54s --- TABLE FILENAME IS &&_WEBIN_FILEREF&baftn. ;
+  %put [h54s]  start deserialising table &&_WEBIN_NAME&baftn. - table filename is &&_WEBIN_FILEREF&baftn. ;
 
-    %if &isSASViya eq 1 %then %do;
+    %if &h54sIsViya eq 1 %then %do;
 
       filename thisfile filesrvc "&&_WEBIN_FILEURI&baftn." ;	
-      data "&&_WEBIN_name&baftn."n;
-        INFILE thisfile LRECL=32767 recfm=v dsd;
+      data "&&_WEBIN_NAME&baftn."n;
+        INFILE thisfile LRECL=32767 recfm=v dsd termstr=crlf;
         input %do j=1 %to &totalcol.;
         &&cols&j.
         %end;
@@ -161,8 +172,8 @@ run;
     %end;
     %else %do;
 
-      data "&&_WEBIN_name&baftn."n;
-        INFILE &&_WEBIN_FILEREF&baftn. LRECL=32767 recfm=v dsd;
+      data "&&_WEBIN_NAME&baftn."n;
+        INFILE &&_WEBIN_FILEREF&baftn. LRECL=32767 recfm=v dsd termstr=crlf;
         input %do j=1 %to &totalcol.;
         &&cols&j.
         %end;
@@ -171,12 +182,12 @@ run;
       
     %end;
 
-  %put h54s --- FINISH DESERIALISING TABLE &&_WEBIN_name&baftn. ;
+  %put [h54s]  finish deserialising table &&_WEBIN_name&baftn. ;
 
     %end;
   %end;
 
-  %put h54s ==> === SUMMARY OF DESERIALISED INPUT TABLES === ;
+  %put [h54s] summary of all deserialised tables;
     proc sql noprint;
     %do files = 1 %to &_WEBIN_FILE_COUNT;
         %if &_WEBIN_FILE_COUNT eq 1 %then %do;
@@ -189,74 +200,81 @@ run;
         describe table "&&_WEBIN_name&baftn."n;
       %end;
     %end;
-    %put h54s ==> === END SUMMARY ===;
+    %put [h54s] summary end;
     quit;
 
+  %if (&h54sDeveloperMode ne 1) %then %bafQuietenUp;
 %mend;
 
 %macro bafOutDataset(outputas, outlib, outdsn);
+  %bafCheckDebug;
+  %if (&h54sDeveloperMode ne 1) %then %bafQuietenDown;
 
   data _null_;
-    file thiscall mod;
+    file &h54sBufferTarget &h54sBufferWriteMode;
     put '"' "&outputas." '" : ';
   run;
 
-  filename thisjson temp;
 
-  proc json out=thisjson; 
-    export &outlib..&outdsn. / nosastags;
+  %if (&h54sIsViya) %then %do;
+    filename &h54sJsonTarget temp;
+  %end;
+
+  %put [h54s] Writing JSON for &outlib..&outdsn.;
+
+  options validvarname=upcase;
+  proc json out=&h54sJsonTarget. ; 
+    export &outlib..&outdsn. / nosastags
+    nofmtnumeric nofmtdatetime;
   run;
 
+  %if (&h54sIsViya) %then %do; 
   data _null_;
      length data $1;
-     INFILE thisjson recfm=n;
-     file thiscall  recfm=n mod;
+     INFILE &h54sJsonTarget recfm=n;
+     file &h54sBufferTarget  recfm=n &h54sBufferWriteMode;
      input data  $char1. @@;
      put data $char1. @@;
   run;
 
-  filename thisjson clear;
+  %if (&h54sIsViya) %then %do;
+    filename &h54sJsonTarget clear;
+  %end;
+
+  %end;
 
   data _null_;
-    file thiscall mod;
+    file &h54sBufferTarget &h54sBufferWriteMode;
     put ',';
   run;
+  %if (&h54sDeveloperMode ne 1) %then %bafQuietenUp;
 %mend;
   
-%macro bafOutSingleMacro(objectName,singleValue);
-* Note: Use this with care, not best practice. Not quoted, so always quote string JS variables. 
-        It is risky outputting macro vars raw. I personally would not do it.
-;
-  data _null_;
-    file thiscall mod;
-    put '"' "&objectName." '" : "' "&singleValue." '",' ;
-  run;
-* Come back ;
-%mend;
-
 
 %macro bafHeader();
-  filename thiscall temp;
-  * keep quiet in the log;
+  %bafCheckDebug;
+  /* quieten down the log unless we are debugging */
+  %if (&h54sDeveloperMode ne 1) %then %bafQuietenDown;
+  /* create temp file */
+  %if (&h54sIsViya) %then %do;
+    filename &h54sBufferTarget temp;
+  %end;
+
   data _null_;
-    file thiscall mod;
-    * uncomment these if working with v8 SAS/IntrNet broker ;
-    *put "Content-type: text/html";
-    *put;
-    %*hfsCheckDebug;
+    file &h54sBufferTarget &h54sBufferWriteMode;
     %if &h54sDebuggingMode = 1 %then %do;
       put "--h54s-data-start--";
     %end;
     put '{';
   run;
-* Come back ;
+  %if (&h54sDeveloperMode ne 1) %then %bafQuietenUp;
 %mend;
 
 
-
 %macro bafFooter();
-  * keep quiet in the log;
-  /* %bafQuietenDown; */
+  %bafCheckDebug;
+  /* quieten down the log unless we are debugging */
+  %if (&h54sDeveloperMode ne 1) %then %bafQuietenDown;
 
   %if (%symexist(usermessage) = 0) %then %do;
     %let usermessage = blank;
@@ -271,10 +289,9 @@ run;
   %end;
 
 
-
-  %if &isSASViya eq 1 %then %do;
+  %if (&h54sIsViya) %then %do;
     data _null_;
-      file thiscall mod;
+      file &h54sBufferTarget &h54sBufferWriteMode;
       sasdatetime=datetime();
       put '"usermessage" : "' "&usermessage." '",';
       put '"logmessage" : "' "&logmessage." '",';
@@ -284,17 +301,17 @@ run;
       put '"sasDatetime" : ' sasdatetime ',';
       put '"status" : "' "&h54src." '"}';
       put;
-
-      %if &h54sDebuggingMode = 1 %then %do;
-        put "--h54s-data-end--";
-      %end;
     run;
 
-    * http://support.sas.com/kb/20/784.html ;
+    /*  JES files service is faster without updates 
+        so bundle data into a temp filename first
+        http://support.sas.com/kb/20/784.html ; */
+    %put [h54s] Writing buffered output to Viya ;
+
     data _null_;
       length data $1;
-      INFILE thiscall recfm=n;
-      file _webout  recfm=n mod;
+      INFILE &h54sBufferTarget recfm=n;
+      file _webout  recfm=n ;
       input data  $char1. @@;
       put data $char1. @@;
     run;  
@@ -302,7 +319,7 @@ run;
   %end;
   %else %do;
     data _null_;
-      file thiscall mod;
+      file &h54sBufferTarget ;
       sasdatetime=datetime();
       put '"usermessage" : "' "&usermessage." '",';
       put '"logmessage" : "' "&logmessage." '",';
@@ -318,17 +335,10 @@ run;
       %end;
     run;
 
-    * http://support.sas.com/kb/20/784.html ;
-    data _null_;
-      length data $1;
-      INFILE thiscall recfm=n;
-      file _webout  recfm=n mod;
-      input data  $char1. @@;
-      put data $char1. @@;
-    run;
   %end;
 
-  * Come back ;
-  %bafQuietenUp;
-
+  %if (&h54sDeveloperMode ne 1) %then %bafQuietenUp;
 %mend;
+
+/* come back after defining */
+%bafQuietenUp;
