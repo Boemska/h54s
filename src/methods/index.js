@@ -840,25 +840,31 @@ module.exports.deleteItem = function (itemUri, options) {
 	return this.managedRequest('delete', itemUri, options)
 }
 
+
 /**
  * Updates contents of a file
  * @param {String} fileName - Name of the file being updated
- * @param {String} fileBlob - New content of the file
+ * @param {Object | Blob} dataObj - New content of the file (Object must contain file key)
+ * Object example {
+ *   file: [<blob>, <fileName>]
+ * }
  * @param {String} lastModified - the last-modified header string that matches that of file being overwritten
  * @param {Object} options - Options object for managedRequest
  */
-module.exports.updateFile = function (itemUri, fileBlob, lastModified, options) {
+module.exports.updateFile = function (itemUri, dataObj, lastModified, options) {
 	const url = itemUri + '/content'
 	console.log('URL', url)
 	let headers = {
 		'Content-Type': 'application/vnd.sas.file',
 		'If-Unmodified-Since': lastModified
 	}
+	const isBlob = dataObj instanceof Blob
+	const useMultipartFormData = !isBlob // set useMultipartFormData to true if dataObj is not Blob
+
 	const optionsObj = Object.assign({}, options, {
-		params: fileBlob,
+		params: dataObj,
 		headers,
-		useMultipartFormData: false
+		useMultipartFormData
 	})
 	return this.managedRequest('put', url, optionsObj);
 }
-
