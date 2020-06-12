@@ -143,8 +143,8 @@ var adapter = new h54s({hostUrl: 'http://myServer:7980'});
 // then create a dataset to send to SAS, which in JS is an
 // object array that looks a bit like this
 var myFirstTable = [
-  { name: 'Allan', sex: 'M', weight: 101.1 },
-  { name: 'Abdul', sex: 'M', weight: 133.7 }
+  { name: 'Abdul', sex: 'M', weight: 101.1 },
+  { name: 'Jane', sex: 'F', weight: 133.7 }
 ];
 
 // add it to a h54s SasData object
