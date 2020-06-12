@@ -4,5 +4,6 @@ var serverData = {
   url: 'SASStoredProcess/do',
   user: 'jimdemo',
   pass: 'Bigballs1',
-	metadataRoot: '/AJAX/'
+	metadataRoot: '/AJAX/',
+  sasVersion: 'v9'
 };
