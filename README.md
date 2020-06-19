@@ -183,7 +183,7 @@ First, we registered a SAS program as either an STP or Job as a back-end service
 
 Then, from the Web side, we started a new project by creating an `index.html` page which sources the client-side `h54s.js` script. We then used the Chrome Dev Console to run some JavaScript code - to create a configured instance of the h54s Adapter, create a sample dataset, attach that dataset to a call to SAS as `datain`, fire it over, and use a simple function to either show us the dataset that was returned by SAS as `processed`, or have a look at any errors that might have occured.
 
-Easy, right? Want to know more, read our [docs](./docs/)
+Easy, right? Want to know more, read our [docs](https://github.com/Boemska/h54s/wiki)
 
 ## Development and Testing of JS adapter code
 
