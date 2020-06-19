@@ -760,6 +760,11 @@ module.exports.getFolderContents = async function (folderName, options) {
 
 	// Second call to get folder's memebers
 	const _callback = (err, data) => {
+		// handle error of the first call
+		if(err) {
+			callback(err, data)
+			return
+		}
 		let id = data.body.id
 		let membersUrl = '/folders/folders/' + id + '/members' + '/?limit=10000000';
 		return self.managedRequest('get', membersUrl, {callback})
