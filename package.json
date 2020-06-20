@@ -25,7 +25,7 @@
     "test-sas": "node test/sas/src/main.js"
   },
   "author": "Boemska",
-  "license": "GPL V3",
+  "license": "GPL-3.0-only",
   "devDependencies": {
     "browserify": "^16.5.1",
     "gulp": "^4.0.2",
