@@ -12,7 +12,7 @@ H54S facilitates and manages bi-directional communication between JavaScript bas
 
 ## Quick Start
 
-This repository contains the **core H54S JavaScript library**. If you understand what this does, and just want to start creating an App, head over to our our **H54S React Seed App repository** for a choice of pre-integrated Create React App-based template applications that will make your development much, much easier.
+This repository contains the **core H54S JavaScript library**. If you understand what this does and just want to start creating an App, we highly recommend that you head over to our our **[Create SAS App repository](https://github.com/boemska/create-sas-app)** for a choice of pre-integrated Create React App-based template applications that will make your development much, much easier.
 
 
 #### Server Requirements
