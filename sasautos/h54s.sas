@@ -144,6 +144,9 @@ run;
               when ('string') do;
                 indef=cats(varname,':$',scan(lenspec, 3, ','),'.');
               end;
+              when ('date') do;
+                indef=varname!!':best.';
+              end;
           end;
 
           /* input statement to macro */
