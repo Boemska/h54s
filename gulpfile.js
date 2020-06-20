@@ -9,12 +9,10 @@ var karma = require('karma');
 var source = require('vinyl-source-stream');
 var flatten = require('gulp-flatten');
 var clean = require('gulp-clean');
-// var jshint = require('gulp-jshint');
-// var stylish = require('jshint-stylish');
+var jshint = require('gulp-jshint');
+var stylish = require('jshint-stylish');
 var replace = require('gulp-replace');
 var rename = require("gulp-rename");
-var gulpsync = require('gulp-sync')(gulp);
-var webserver = require('gulp-webserver');
 
 var pkg = require('./package.json');
 
@@ -76,23 +74,24 @@ function bundle() {
   return rebundle();
 }
 
-gulp.task('set-production', ['unset-watch'], function() {
-  production = true;
-});
-
-gulp.task('set-ugly', ['unset-watch'], function() {
-  ugly = true;
-});
 
 gulp.task('unset-watch', function() {
   watch = false;
 });
 
+gulp.task('set-production', gulp.series('unset-watch', function() {
+  production = true;
+}));
+
+gulp.task('set-ugly',  gulp.series('unset-watch', function() {
+  ugly = true;
+}));
+
 gulp.task('clean', function(cb) {
   if(production) {
-    return gulp.src(filePaths.releaseDir, {read: false}).pipe(clean());
+    return gulp.src(filePaths.releaseDir, {read: false, allowEmpty: true}).pipe(clean());
   } else {
-    return gulp.src(filePaths.devDir, {read: false}).pipe(clean());
+    return gulp.src(filePaths.devDir, {read: false, allowEmpty: true}).pipe(clean());
   }
 });
 
@@ -110,13 +109,14 @@ gulp.task('jshint', function() {
   .pipe(jshint.reporter('fail'));
 });
 
-gulp.task('build-dev', ['clean'], bundle);
+gulp.task('build-dev', gulp.series('clean', bundle));
 
-gulp.task('build-production', [ 'set-production'], bundle);
-gulp.task('build-ugly', [ 'set-production', 'set-ugly'], bundle);
+gulp.task('build-production', gulp.series('set-production', bundle));
+
+gulp.task('build-ugly', gulp.series(gulp.series('set-production', 'set-ugly'), bundle));
 
 //default build and test it
-gulp.task('default', [ 'unset-watch', 'build-dev'], function(done) {
+gulp.task('default', gulp.series(gulp.series('unset-watch', 'build-dev'), function(done) {
   new karma.Server({
     configFile: __dirname + '/karma.conf.js',
     files: [
@@ -135,10 +135,10 @@ gulp.task('default', [ 'unset-watch', 'build-dev'], function(done) {
     done();
     process.exit();
   }).start();
-});
+}));
 
 //used in development
-gulp.task('watch', ['build-dev'], function(done) {
+gulp.task('watch', gulp.series('build-dev', function(done) {
   new karma.Server({
     configFile: __dirname + '/karma.conf.js',
     files: [
@@ -162,10 +162,10 @@ gulp.task('watch', ['build-dev'], function(done) {
     },
     singleRun: false
   }, done).start();
-});
+}));
 
 //used in development
-gulp.task('watch-unit', ['build-dev'], function(done) {
+gulp.task('watch-unit', gulp.series('build-dev', function(done) {
   new karma.Server({
     configFile: __dirname + '/karma.conf.js',
     files: [
@@ -185,9 +185,9 @@ gulp.task('watch-unit', ['build-dev'], function(done) {
     },
     singleRun: false
   }, done).start();
-});
+}));
 
-gulp.task('test-release', [ 'build-production'], function(done) {
+gulp.task('test-release', gulp.series('build-production', function(done) {
   new karma.Server({
     configFile: __dirname + '/karma.conf.js',
     files: [
@@ -203,9 +203,9 @@ gulp.task('test-release', [ 'build-production'], function(done) {
     ],
     singleRun: true
   }, done).start();
-});
+}));
 
-gulp.task('test-ugly', ['build-ugly'], function(done) {
+gulp.task('test-ugly', gulp.series('build-ugly', function(done) {
   new karma.Server({
     configFile: __dirname + '/karma.conf.js',
     files: [
@@ -221,9 +221,9 @@ gulp.task('test-ugly', ['build-ugly'], function(done) {
     ],
     singleRun: true
   }, done).start();
-});
+}));
 
-gulp.task('test-performance', ['build-dev'], function(done) {
+gulp.task('test-performance', gulp.series('build-dev', function(done) {
   var files = [
     {pattern: 'test/*.json', served: true, included: false},
     {pattern: filePaths.devBuild, served: true},
@@ -245,44 +245,9 @@ gulp.task('test-performance', ['build-dev'], function(done) {
     done();
     process.exit();
   }).start();
-});
+}));
 
-gulp.task('release', gulpsync.sync(['set-production', 'clean', 'test-release', 'test-ugly']), function(done) {
+gulp.task('release', gulp.series(gulp.series(gulp.series('set-production', 'clean'), 'test-release'), 'test-ugly'), function(done) {
   done();
   process.exit();
-});
-
-gulp.task('serveAngular', ['build-dev'], function() {
-  return gulp.src(['./examples/angular/', './dev/', './test/js/'])
-    .pipe(webserver({
-      port: 1337
-    }));
-});
-
-gulp.task('serveExtjs', ['build-dev'], function() {
-  return gulp.src(['./examples/extjs/', './dev/', './test/js/'])
-    .pipe(webserver({
-      port: 1337
-    }));
-});
-
-gulp.task('serveExtjs2', ['build-dev'], function() {
-  return gulp.src(['./examples/extjs2/', './dev/', './test/js/'])
-    .pipe(webserver({
-      port: 1337
-    }));
-});
-
-gulp.task('serveW2UI', ['build-dev'], function() {
-  return gulp.src(['./examples/w2ui/', './dev/', './test/js/'])
-    .pipe(webserver({
-      port: 1337
-    }));
-});
-
-gulp.task('serveOpenUI5', ['build-dev'], function() {
-  return gulp.src(['./examples/openui5/', './dev/', './test/js/'])
-    .pipe(webserver({
-      port: 1337
-    }));
 });
