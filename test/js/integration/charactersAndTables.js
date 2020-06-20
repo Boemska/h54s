@@ -29,6 +29,35 @@ describe('h54s integration -', function () {
 		 	});
 		 });
 
+		 it('Test Date conversion', function (done) {
+		 	this.timeout(10000);
+
+		 	var sasAdapter = new h54s({
+		 		hostUrl: serverData.hostUrl,
+		 		debug: true
+			 });
+
+			originalDate = new Date();
+			var dates = {};
+			dates['datecol'] = originalDate;
+
+		 	var table = new h54s.SasData([dates], 'data');
+
+		 	sasAdapter.login(serverData.user, serverData.pass, function () {
+		 		sasAdapter.call('/AJAX/h54s_test/bounceData', table, function (err, res) {
+		 			assert.isUndefined(err, 'We got error on sas program ajax call');
+					assert.isDefined(res, 'Response is undefined');
+					receivedDate = h54s.fromSasDateTime(res.outputdata[0]['DATECOL']);
+
+					assert.equal(
+						// remove millisecond precision
+						Math.round(receivedDate.getTime()/1000), 
+						Math.round(originalDate.getTime()/1000),
+						'The date that came back in the response was not the same.');
+		 			done();
+		 		});
+		 	})
+		 });
 
 		 it('Test ascii characters', function (done) {
 		 	this.timeout(10000);
