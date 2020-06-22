@@ -191,3 +191,11 @@ We love contributions!  If you'd like to get involved, check out the [build inst
 
 
 ## Any questions or comments? Come join the chat. [![Join the chat at https://gitter.im/Boemska/h54s](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Boemska/h54s?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+
+## License
+
+This work is dual-licensed under Apache 2.0 and GPL 3.0 (or any later version).
+You can choose between one of them if you use this work.
+
+`SPDX-License-Identifier: Apache-2.0 OR GPL-3.0-or-later`
