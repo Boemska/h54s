@@ -75,16 +75,19 @@ function bundle() {
 }
 
 
-gulp.task('unset-watch', function() {
+gulp.task('unset-watch', function(done) {
   watch = false;
+  done();
 });
 
-gulp.task('set-production', gulp.series('unset-watch', function() {
+gulp.task('set-production', gulp.series('unset-watch', function(done) {
   production = true;
+  done();
 }));
 
-gulp.task('set-ugly',  gulp.series('unset-watch', function() {
+gulp.task('set-ugly',  gulp.series('unset-watch', function(done) {
   ugly = true;
+  done();
 }));
 
 gulp.task('clean', function(cb) {
