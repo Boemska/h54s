@@ -70,7 +70,7 @@ run;
 %mend;
 
 
-%macro bafGetDatasets();
+%macro bafGetDatasets(h54sdates=);
   %bafCheckDebug;
   /* quieten down the log unless we are debugging */
   %if (&h54sDeveloperMode ne 1) %then %bafQuietenDown;
@@ -145,7 +145,9 @@ run;
                 indef=cats(varname,':$',scan(lenspec, 3, ','),'.');
               end;
               when ('date') do;
-                indef=varname!!':best.';
+                if ( &h54sdates ne ); then;
+                  indef=varname!!':best.';
+                end;
               end;
           end;
 
@@ -209,7 +211,7 @@ run;
   %if (&h54sDeveloperMode ne 1) %then %bafQuietenUp;
 %mend;
 
-%macro bafOutDataset(outputas, outlib, outdsn);
+%macro bafOutDataset(outputas, outlib, outdsn, h54skeys=);
   %bafCheckDebug;
   %if (&h54sDeveloperMode ne 1) %then %bafQuietenDown;
 
@@ -223,13 +225,41 @@ run;
     filename &h54sJsonTarget temp;
   %end;
 
-  %put [h54s] Writing JSON for &outlib..&outdsn.;
+  %put [h54s] Writing JSON for &outlib..&outdsn. &h54skeys;
+
+  proc contents
+      data = &outlib..&outdsn.
+            noprint
+            out = _h54sinfo
+            (keep = name varnum type);
+  run;
+
+  %if (&h54skeys ne ) %then %do;
+  data _h54sinfo;
+    set _h54sinfo;
+    name = upcase(name);
+    varnum = varnum - 1;
+  run;
+  %end;
 
   options validvarname=upcase;
   proc json out=&h54sJsonTarget. ; 
-    export &outlib..&outdsn. / nosastags
-    nofmtnumeric nofmtdatetime;
+    %if (&h54skeys ne ) %then %do;
+    write open array;
+      write open array;
+        export _h54sinfo / nosastags;
+      write close;
+    %end;
+      write open array;
+        export &outlib..&outdsn. / &h54skeys nosastags
+              nofmtnumeric nofmtdatetime;
+      write close;
+    %if (&h54skeys ne ) %then %do;
+    write close;
+    %end;
   run;
+
+  %symdel h54skeys / nowarn;
 
   %if (&h54sIsViya) %then %do; 
   data _null_;
