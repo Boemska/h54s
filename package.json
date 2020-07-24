@@ -1,6 +1,6 @@
 {
   "name": "h54s",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "HTML5 Data Adapter for SAS",
   "main": "./src/h54s.js",
   "homepage": "https://github.com/Boemska/h54s",
