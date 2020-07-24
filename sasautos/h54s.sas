@@ -145,7 +145,7 @@ run;
                 indef=cats(varname,':$',scan(lenspec, 3, ','),'.');
               end;
               when ('date') do;
-                if ( &h54sdates ne ); then;
+                if ( &h54sdates eq ); then;
                   indef=varname!!':best.';
                 end;
               end;
