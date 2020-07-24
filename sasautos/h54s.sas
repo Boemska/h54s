@@ -70,7 +70,7 @@ run;
 %mend;
 
 
-%macro bafGetDatasets(h54sdates=);
+%macro bafGetDatasets();
   %bafCheckDebug;
   /* quieten down the log unless we are debugging */
   %if (&h54sDeveloperMode ne 1) %then %bafQuietenDown;
@@ -145,9 +145,7 @@ run;
                 indef=cats(varname,':$',scan(lenspec, 3, ','),'.');
               end;
               when ('date') do;
-                if ( &h54sdates eq ); then;
-                  indef=varname!!':best.';
-                end;
+                indef=varname!!':best.';
               end;
           end;
 
