@@ -41,7 +41,13 @@ var production = false,
 	es5 = false;
 
 function bundle() {
-	var b;
+	var b = browserify({
+		debug: true,
+		entries: filePaths.srcEntryfile,
+		standalone: 'h54s',
+		cache: {},
+		packageCache: {}
+	})
 
 	if (es5) {
 		b = browserify({
@@ -102,7 +108,7 @@ gulp.task('set-production', gulp.series('unset-watch', function (done) {
 gulp.task('set-babel', gulp.series('unset-watch', function(done) {
 	es5 = true;
 	filePaths.srcEntryfile = ['./src/h54s.js', "node_modules/@babel/polyfill"];
-	filePaths.releaseDir= "./es5/";
+	filePaths.releaseDir= "./dist/es5/";
 	done();
 }));
 
@@ -274,7 +280,7 @@ gulp.task('test-performance', gulp.series('build-dev', function (done) {
 	}).start();
 }));
 
-gulp.task('release', gulp.series(gulp.series(gulp.series('set-production', 'clean'), 'test-release'), 'test-ugly'), function (done) {
+gulp.task('release', gulp.series(gulp.series(gulp.series(gulp.series('set-production', 'clean'), 'test-release'), 'test-ugly'), 'build-es5'), function (done) {
 	done();
 	process.exit();
 });
