@@ -7,7 +7,6 @@ In order to build h54s and run the test suite there are a number of dependencies
 
 1. Clone the project.
 2. Run `yarn install`
-3. Install gulp-cli if it's not installed already - `yarn global add gulp-cli`.
 4. Edit the host URL, user and pass, and sasVersion in /test/js/_server_data.js.
 
 ### SAS
@@ -37,11 +36,9 @@ Regardless of your SAS version, clone the repository to a location on your SAS C
 
 There are two different modes for running the test suite:
 
-1. `gulp` -  This will run jshint and karma tests and creates build in dev/ directory. 
-2. `gulp watch` - this will run the above `gulp` tests but will then wait and will re run the test suite on a file change event. This mode is useful for test drive development.
+1. `./node_modules/gulp/bin/gulp.js` -  This will run jshint and karma tests and creates build in dev/ directory. 
+2. `./node_modules/gulp/bin/gulp.js watch` - this will run the above `gulp` tests but will then wait and will re run the test suite on a file change event. This mode is useful for test drive development.
 
 ## Building a release
 
-  * `gulp release` - Creates dist/h54s.js and dist/h54s.min.js release files and runs karma tests with those files.
-
-
+  * `./node_modules/gulp/bin/gulp.js release` - Creates dist/h54s.js and dist/h54s.min.js release files and runs karma tests with those files.
