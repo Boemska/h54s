@@ -27,8 +27,17 @@
   "author": "Boemska",
   "license": "(Apache-2.0 OR AGPL-3.0-or-later)",
   "devDependencies": {
+    "@babel/core": "^7.11.1",
+    "@babel/plugin-transform-regenerator": "^7.10.4",
+    "@babel/plugin-transform-runtime": "^7.11.0",
+    "@babel/polyfill": "^7.10.4",
+    "@babel/preset-env": "^7.11.0",
+    "babel-polyfill": "^6.26.0",
+    "babelify": "^10.0.0",
     "browserify": "^16.5.1",
+    "core-js": "2",
     "gulp": "^4.0.2",
+    "gulp-babel": "^8.0.0",
     "gulp-clean": "^0.4.0",
     "gulp-flatten": "^0.4.0",
     "gulp-if": "^3.0.0",
@@ -57,7 +66,5 @@
   "resolutions": {
     "graceful-fs": "4.2.3"
   },
-  "dependencies": {
-    "npm-check-updates": "^7.0.1"
-  }
+  "dependencies": {}
 }
