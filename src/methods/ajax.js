@@ -125,7 +125,16 @@ module.exports = function () {
     },
 		delete: function(url, payload, multipartFormData, headers) {
     	return xhr('DELETE', url, payload, null, headers);
-		},
+    },
+    patch: function(url, data, multipartFormData, headers) {
+      let payload = data;
+      if(typeof data === 'object') {
+        if(multipartFormData) {
+          payload = createMultipartFormDataPayload(data);
+        }
+      }
+      return xhr('PATCH', url, payload, multipartFormData, headers);
+    },
     setTimeout: function (t) {
       timeout = t;
     },

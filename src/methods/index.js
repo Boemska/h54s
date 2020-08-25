@@ -873,3 +873,26 @@ module.exports.updateFile = function (itemUri, dataObj, lastModified, options) {
 	})
 	return this.managedRequest('put', url, optionsObj);
 }
+
+/**
+ Updates file Metadata 
+ Fields that can be updated are: name, description, parentUri, documentType, contentDisposition, properties, and expirationTimeStamp
+ params are same as when updating file content
+ except for @param {Object | Blobl} dataObj where insted of the whole content you need only the fields that are being changed
+ */
+module.exports.updateFileMetadata = function (itemUri, dataObj, lastModified, options) {
+  let headers = {
+    'Content-Type':'application/vnd.sas.file+json',
+		'If-Unmodified-Since': lastModified
+  }
+  const isBlob = dataObj instanceof Blob
+  const useMultipartFormData = !isBlob // set useMultipartFormData to true if dataObj is not Blob
+  
+  const optionsObj = Object.assign({}, options, {
+    params: dataObj,
+    headers,
+    useMultipartFormData
+  })
+
+  return this.managedRequest('patch', itemUri, optionsObj);
+}
