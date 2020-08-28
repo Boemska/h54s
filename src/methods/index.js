@@ -876,9 +876,10 @@ module.exports.updateFile = function (itemUri, dataObj, lastModified, options) {
 
 /**
  Updates file Metadata 
- Fields that can be updated are: name, description, parentUri, documentType, contentDisposition, properties, and expirationTimeStamp
- params are same as when updating file content
- except for @param {Object | Blobl} dataObj where insted of the whole content you need only the fields that are being changed
+ * @param {String} fileName - Name of the file being updated
+ * @param {String} lastModified - the last-modified header string that matches that of file being updated
+ * @param {Object | Blob} dataObj - objects containing the fields that are being changed
+ * @param {Object} options - Options object for managedRequest
  */
 module.exports.updateFileMetadata = function (itemUri, dataObj, lastModified, options) {
   let headers = {
@@ -895,4 +896,68 @@ module.exports.updateFileMetadata = function (itemUri, dataObj, lastModified, op
   })
 
   return this.managedRequest('patch', itemUri, optionsObj);
+}
+
+/**
+ * Updates folder info
+ * @param {String} folderUri - uri of the folder that is being changed
+ * @param {String} lastModified - the last-modified header string that matches that of the folder being updated
+ * @param {Object | Blob} dataObj - object thats is either the whole folder or partial data
+ * @param {Object} options - Options object for managedRequest
+ */
+module.exports.updateFolderMetadata = function (folderUri, dataObj, lastModified, options) {
+
+  /**
+    @constant {Boolean} partialData - indicates wether dataObj containts all the data that needs to be send to the server
+    or partial data which contatins only the fields that need to be updated, in which case a call needs to be made to the server for 
+    the rest of the data before the update can be done
+   */
+  const {partialData} = options;
+
+  const headers = {
+    'Content-Type': "application/vnd.sas.content.folder+json",
+    'If-Unmodified-Since': lastModified,
+  }
+
+  if (partialData) {
+
+    const _callback = (err, res) => {
+      if (res) {
+
+        const folder = Object.assign({}, res.body, dataObj);
+
+        let forBlob = JSON.stringify(folder);
+        let data = new Blob([forBlob], {type: "octet/stream"});
+
+        const optionsObj = Object.assign({}, options, {
+          params: data,
+          headers,
+          useMultipartFormData : false,
+        })
+
+        return this.managedRequest('put', folderUri, optionsObj);
+      }
+      
+      return options.callback(err);
+    }
+    const getOptionsObj = Object.assign({}, options, {
+      headers: {'Content-Type': "application/vnd.sas.content.folder+json"},
+      callback: _callback
+    })
+
+    return this.managedRequest('get', folderUri, getOptionsObj);
+  }
+  else {
+    if ( !(dataObj instanceof Blob)) {
+      let forBlob = JSON.stringify(dataObj);
+      dataObj = new Blob([forBlob], {type: "octet/stream"});
+    }
+
+    const optionsObj = Object.assign({}, options, {
+      params: dataObj,
+      headers,
+      useMultipartFormData : false,
+    })
+    return this.managedRequest('put', folderUri, optionsObj);
+  }
 }
