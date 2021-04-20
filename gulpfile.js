@@ -135,7 +135,7 @@ gulp.task('jshint', function () {
 		filePaths.srcFiles,
 		filePaths.helperTestFiles,
 		filePaths.unitTestFiles,
-		filePaths.integrationTestFiles,
+		// filePaths.integrationTestFiles,
 		filePaths.browserifyTestFiles
 	])
 		.pipe(jshint())
@@ -158,7 +158,7 @@ gulp.task('default', gulp.series(gulp.series('unset-watch', 'build-dev'), functi
 			{pattern: filePaths.helperTestFiles},
 			{pattern: filePaths.sasResponses},
 			{pattern: filePaths.unitTestFiles},
-			{pattern: filePaths.integrationTestFiles}
+			// {pattern: filePaths.integrationTestFiles}
 		],
 		proxies: {
 			"/h54sConfig.json": "/base/test/h54sConfig.json"
@@ -180,7 +180,7 @@ gulp.task('watch', gulp.series('build-dev', function (done) {
 			{pattern: filePaths.helperTestFiles},
 			{pattern: filePaths.sasResponses},
 			{pattern: filePaths.unitTestFiles},
-			{pattern: filePaths.integrationTestFiles},
+			// {pattern: filePaths.integrationTestFiles},
 			{pattern: filePaths.browserifyTestFiles}
 		],
 		frameworks: ['browserify', 'mocha', 'proclaim', 'testdouble'],
