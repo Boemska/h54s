@@ -288,7 +288,12 @@ module.exports.getFullProgramPath = function(metadataRoot, sasProgramPath) {
 module.exports.getObjOfTable = function (table, key, value = null) {
 	const obj = {}
 	table.forEach(row => {
-		obj[row[key]] = value ? row[value] : row
+		if (!obj[row[key]]) {
+			obj[row[key]] = []
+			obj[row[key]].push(value ? row[value] : row)
+		} else {
+			obj[row[key]].push(value ? row[value] : row)
+		}
 	})
 	return obj
 }
