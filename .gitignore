@@ -4,3 +4,4 @@ dev/
 .idea/
 .idea/workspace.xml
 .vscode/
+*.tgz
