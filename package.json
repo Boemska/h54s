@@ -1,8 +1,8 @@
 {
   "name": "h54s",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "HTML5 Data Adapter for SAS",
-  "main": "./src/h54s.js",
+  "main": "./dist/h54s.js",
   "homepage": "https://github.com/Boemska/h54s",
   "repository": {
     "type": "git",
@@ -66,5 +66,9 @@
   "resolutions": {
     "graceful-fs": "4.2.3"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "files": [
+    "./dist/h54s.min.js",
+    "./dist/es5/h54s.min.js"
+  ]
 }
