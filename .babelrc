@@ -6,7 +6,8 @@
         "targets": {
           "esmodules": false,
           "ie": "8"
-        }
+        },
+        "corejs": "2"
       }
     ]]
 }
