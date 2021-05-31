@@ -26,31 +26,31 @@ describe('h54s unit -', function() {
       });
     });
 
-    it('Test get', function(done) {
-      var sasAdapter = new h54s();
+    // it('Test get', function(done) {
+    //   var sasAdapter = new h54s();
 
-      sasAdapter._ajax.get(serverData.hostUrl, {
-        testParameter: 'test'
-      }).success(function(res) {
-        done();
-      }).error(function(err) {
-        assert.notOk(err, 'Ajax get error');
-        done();
-      });
-    });
+    //   sasAdapter._ajax.get(serverData.hostUrl, {
+    //     testParameter: 'test'
+    //   }).success(function(res) {
+    //     done();
+    //   }).error(function(err) {
+    //     assert.notOk(err, 'Ajax get error');
+    //     done();
+    //   });
+    // });
 
-    it('Test post', function(done) {
-      var sasAdapter = new h54s();
+    // it('Test post', function(done) {
+    //   var sasAdapter = new h54s();
 
-      sasAdapter._ajax.post(serverData.hostUrl, {
-        testParameter: 'test'
-      }).success(function(res) {
-        done();
-      }).error(function(err) {
-        assert.notOk(err, 'Ajax post error');
-        done();
-      });
-    });
+    //   sasAdapter._ajax.post(serverData.hostUrl, {
+    //     testParameter: 'test'
+    //   }).success(function(res) {
+    //     done();
+    //   }).error(function(err) {
+    //     assert.notOk(err, 'Ajax post error');
+    //     done();
+    //   });
+    // });
 
   });
 });
