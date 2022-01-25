@@ -66,8 +66,12 @@
   "resolutions": {
     "graceful-fs": "4.2.3"
   },
-  "dependencies": {},
+  "dependencies": {
+    "ansi-regex": "^5.0.1"
+  },
   "files": [
-    "src", "sasautos", "dist"
+    "src",
+    "sasautos",
+    "dist"
   ]
 }
