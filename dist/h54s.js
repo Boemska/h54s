@@ -257,7 +257,7 @@ const h54s = module.exports = function(config) {
 };
 
 // replaced by gulp with real version at build time
-h54s.version = '2.2.3';
+h54s.version = '2.2.5';
 
 
 h54s.prototype = require('./methods');
