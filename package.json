@@ -69,6 +69,7 @@
   "dependencies": {
     "ansi-regex": "^5.0.1",
     "glob-parent": "^5.1.2",
+    "shelljs": "^0.8.5",
     "yargs-parser": "^5.0.1"
   },
   "files": [
