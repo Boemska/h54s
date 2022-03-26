@@ -16,7 +16,7 @@
     "cli-color": "^1.1.0",
     "inquirer": "^8.2.0",
     "lodash": ">=4.17.21",
-    "minimist": "^1.2.3",
+    "minimist": "^1.2.6",
     "suspend": "^0.7.0"
   }
 }
